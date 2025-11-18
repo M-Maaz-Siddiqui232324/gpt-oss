@@ -182,6 +182,36 @@ async def list_documents():
     return {"documents": docs, "count": len(docs)}
 
 
+@app.get("/chat")
+async def chat(message: str):
+    """Simple GET endpoint for testing - sends a message and gets response"""
+    if rag_system is None:
+        raise HTTPException(status_code=503, detail="RAG system not initialized")
+    
+    if not message:
+        raise HTTPException(status_code=400, detail="Message parameter is required")
+    
+    logger.info(f"Chat endpoint query: '{message}'")
+    
+    try:
+        response, sources = rag_system.query(
+            message,
+            max_tokens=DEFAULT_MAX_TOKENS,
+            temperature=DEFAULT_TEMPERATURE,
+            top_p=DEFAULT_TOP_P
+        )
+        
+        return {
+            "message": message,
+            "response": response,
+            "sources_count": len(sources)
+        }
+    
+    except Exception as e:
+        logger.error(f"Chat error: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 if __name__ == "__main__":
     logger.info(f"Starting server on {API_HOST}:{API_PORT}")
     uvicorn.run(
