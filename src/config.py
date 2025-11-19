@@ -39,6 +39,16 @@ RECENT_CONTEXT_EXCHANGES = 5
 API_HOST = "0.0.0.0"
 API_PORT = 8000
 
+# Redis settings (Session Management)
+REDIS_HOST = "localhost"
+REDIS_PORT = 6379
+REDIS_DB = 0
+SESSION_EXPIRY_SECONDS = 1800  # 30 minutes (fallback only)
+
+# Session Archive settings
+ARCHIVE_FOLDER = os.path.join(PROJECT_ROOT, "session_archives")
+ARCHIVE_FORMAT = "json"  # json or txt
+
 # Logging settings
 LOG_LEVEL = "INFO"
 LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'

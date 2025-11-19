@@ -93,7 +93,31 @@ class RAGSystem:
         temperature: float = DEFAULT_TEMPERATURE,
         top_p: float = DEFAULT_TOP_P
     ) -> Tuple[str, List[DocumentChunk]]:
-        """Process a user query and generate response"""
+        """Process a user query and generate response (with internal history)"""
+        recent_context = self.get_recent_context(RECENT_CONTEXT_EXCHANGES)
+        response, sources = self.query_with_context(
+            user_input,
+            recent_context,
+            max_tokens,
+            temperature,
+            top_p
+        )
+        
+        # Save to internal history
+        self.add_message("user", user_input, sources)
+        self.add_message("assistant", response)
+        
+        return response, sources
+    
+    def query_with_context(
+        self, 
+        user_input: str,
+        recent_context: str = "",
+        max_tokens: int = DEFAULT_MAX_TOKENS,
+        temperature: float = DEFAULT_TEMPERATURE,
+        top_p: float = DEFAULT_TOP_P
+    ) -> Tuple[str, List[DocumentChunk]]:
+        """Process a user query with external context (for session management)"""
         logger.info("="*60)
         logger.info(f"Processing query: '{user_input}'")
         logger.info(f"Params: max_tokens={max_tokens}, temp={temperature}, top_p={top_p}")
@@ -106,7 +130,7 @@ class RAGSystem:
             if not context_docs:
                 logger.warning("No context documents found")
                 logger.info(">>> DECISION: Using GENERAL RESPONSE (no context docs)")
-                return self._generate_general_response(user_input, max_tokens, temperature, top_p), []
+                return self._generate_general_response(user_input, recent_context, max_tokens, temperature, top_p), []
             
             # Dynamic threshold filtering
             scores = [doc.relevance_score for doc in context_docs]
@@ -128,7 +152,7 @@ class RAGSystem:
             if not relevant_docs:
                 logger.warning("No documents passed threshold")
                 logger.info(">>> DECISION: Using GENERAL RESPONSE (no relevant docs)")
-                return self._generate_general_response(user_input, max_tokens, temperature, top_p), []
+                return self._generate_general_response(user_input, recent_context, max_tokens, temperature, top_p), []
             
             # Log unique sources
             unique_sources = set(doc.source_file for doc in relevant_docs)
@@ -142,14 +166,11 @@ class RAGSystem:
             response = self._generate_document_response(
                 user_input, 
                 relevant_docs,
+                recent_context,
                 max_tokens,
                 temperature,
                 top_p
             )
-            
-            # Save to history
-            self.add_message("user", user_input, relevant_docs)
-            self.add_message("assistant", response)
             
             logger.info(f"Response generated: {len(response)} chars")
             logger.info("="*60)
@@ -162,13 +183,13 @@ class RAGSystem:
     def _generate_general_response(
         self, 
         user_input: str,
+        recent_context: str,
         max_tokens: int,
         temperature: float,
         top_p: float
     ) -> str:
         """Generate response without document context"""
         logger.info("Generating general response (no relevant documents found)")
-        recent_context = self.get_recent_context(RECENT_CONTEXT_EXCHANGES)
         prompt = get_general_prompt(user_input, recent_context)
         
         # Log the prompt
@@ -189,6 +210,7 @@ class RAGSystem:
         self,
         user_input: str,
         context_docs: List[DocumentChunk],
+        recent_context: str,
         max_tokens: int,
         temperature: float,
         top_p: float
@@ -208,7 +230,6 @@ class RAGSystem:
             logger.info(f"Content:\n{doc.content}")
         logger.info("="*60)
         
-        recent_context = self.get_recent_context(RECENT_CONTEXT_EXCHANGES)
         prompt = get_document_aware_prompt(user_input, context_docs, recent_context)
         
         # Log the full prompt

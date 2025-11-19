@@ -1,12 +1,25 @@
-torch>=2.0.0
-transformers>=4.30.0
-accelerate>=0.20.0
-bitsandbytes>=0.41.0
+# Core dependencies
 sentence-transformers>=2.2.0
 faiss-cpu>=1.7.4
 numpy>=1.24.0
+requests>=2.31.0
+
+# API & Web UI
 fastapi>=0.100.0
 uvicorn>=0.23.0
 streamlit>=1.25.0
-python-docx>=0.8.11
 pydantic>=2.0.0
+
+# Session Management
+redis>=5.0.0
+
+# Document processing
+python-docx>=0.8.11
+
+# Note: Ollama must be installed separately
+# Install: curl -fsSL https://ollama.com/install.sh | sh
+# Then: ollama pull gpt-oss:20b
+
+# Note: Redis must be installed separately
+# Windows: Download from https://github.com/microsoftarchive/redis/releases
+# Or use Docker: docker run -d -p 6379:6379 redis:latest
