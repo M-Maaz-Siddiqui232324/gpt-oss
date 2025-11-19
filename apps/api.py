@@ -265,6 +265,25 @@ async def end_session(session_id: str):
         raise HTTPException(status_code=500, detail="Failed to end session")
 
 
+@app.get("/session/{session_id}/end")
+async def end_session_get(session_id: str):
+    """End a session via GET (for browser testing)"""
+    if session_manager is None:
+        raise HTTPException(status_code=503, detail="Session manager not initialized")
+    
+    if not session_manager.session_exists(session_id):
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    if session_manager.end_session(session_id):
+        return {
+            "message": "Session ended and archived",
+            "session_id": session_id,
+            "archived": True
+        }
+    else:
+        raise HTTPException(status_code=500, detail="Failed to end session")
+
+
 @app.delete("/session/{session_id}")
 async def delete_session(session_id: str, archive: bool = True):
     """Delete a session (archives by default)"""
