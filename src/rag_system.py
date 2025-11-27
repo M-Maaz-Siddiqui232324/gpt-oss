@@ -93,7 +93,11 @@ class RAGSystem:
         temperature: float = DEFAULT_TEMPERATURE,
         top_p: float = DEFAULT_TOP_P
     ) -> Tuple[str, List[DocumentChunk]]:
-        """Process a user query and generate response (with internal history)"""
+        """Process a user query and generate response (with internal history)
+        
+        Note: This method is for backward compatibility. 
+        For session-based management, use query_with_context() directly.
+        """
         recent_context = self.get_recent_context(RECENT_CONTEXT_EXCHANGES)
         response, sources = self.query_with_context(
             user_input,

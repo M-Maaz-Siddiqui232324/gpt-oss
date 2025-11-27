@@ -39,11 +39,11 @@ RECENT_CONTEXT_EXCHANGES = 5
 API_HOST = "0.0.0.0"
 API_PORT = 8000
 
-# Redis settings (Session Management)
-REDIS_HOST = "localhost"
-REDIS_PORT = 6379
-REDIS_DB = 0
-SESSION_EXPIRY_SECONDS = 1800  # 30 minutes (fallback only)
+# FastAPI Session Management
+SECRET_KEY = os.getenv("SECRET_KEY", "")  # Must be set in production
+SESSION_MAX_AGE = 1800  # 30 minutes in seconds
+MAX_SESSIONS = 1000  # Maximum number of concurrent sessions
+CLEANUP_INTERVAL = 300  # 5 minutes in seconds
 
 # Session Archive settings
 ARCHIVE_FOLDER = os.path.join(PROJECT_ROOT, "session_archives")

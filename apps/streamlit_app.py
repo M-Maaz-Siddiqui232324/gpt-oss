@@ -10,7 +10,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 from config import *
 from rag_system import RAGSystem
-from session_manager import SessionManager
 import utils
 
 # Setup logging
@@ -32,28 +31,18 @@ logger.info("="*60)
 
 @st.cache_resource
 def load_system():
-    """Load the RAG system and session manager"""
-    logger.info("Loading RAG system and session manager")
+    """Load the RAG system"""
+    logger.info("Loading RAG system")
     
     # Check directories
     if not os.path.exists(DOCS_FOLDER):
         logger.error(f"Docs directory not found: {DOCS_FOLDER}")
         st.error(f"❌ Docs directory '{DOCS_FOLDER}' not found!")
         st.info("Please create a 'docs' folder and add your documentation files.")
-        return None, None
+        return None
     
     try:
-        with st.spinner("Initializing systems..."):
-            # Initialize session manager
-            try:
-                session_manager = SessionManager()
-                logger.info("Session manager initialized")
-            except Exception as e:
-                logger.error(f"Failed to initialize session manager: {e}")
-                st.warning(f"⚠️ Redis not available: {e}")
-                st.info("Session management disabled. Install Redis for multi-user support.")
-                session_manager = None
-            
+        with st.spinner("Initializing system..."):
             # Initialize RAG system
             rag_system = RAGSystem()
             success = rag_system.initialize()
@@ -61,18 +50,16 @@ def load_system():
             if success:
                 logger.info("RAG system loaded successfully")
                 st.success(f"✅ Loaded {len(rag_system.documents)} documents with {len(rag_system.chunks)} chunks")
-                if session_manager:
-                    st.success(f"✅ Redis connected - {session_manager.get_session_count()} active sessions")
-                return rag_system, session_manager
+                return rag_system
             else:
                 logger.error("Failed to initialize RAG system")
                 st.error("❌ Failed to initialize RAG system")
-                return None, None
+                return None
     
     except Exception as e:
         logger.error(f"Error loading system: {e}", exc_info=True)
         st.error(f"❌ Error: {e}")
-        return None, None
+        return None
 
 
 def main():
@@ -82,8 +69,8 @@ def main():
     st.title("🤖 FlowHCM Chatbot")
     st.markdown("**Powered by GPT-OSS-20B (Local)**")
     
-    # Load systems
-    rag_system, session_manager = load_system()
+    # Load system
+    rag_system = load_system()
     if rag_system is None:
         return
     
@@ -129,49 +116,28 @@ def main():
             st.warning("⚠️ **Vector Search:** Not available")
         
         # Session info
-        if session_manager:
-            st.info(f"**Session ID:** {st.session_state.session_id[:8]}...")
-            st.info(f"**Active Sessions:** {session_manager.get_session_count()}")
+        st.info(f"**Session ID:** {st.session_state.session_id[:8]}...")
         
         # Clear chat
         if st.button("🗑️ Clear Chat", use_container_width=True):
             logger.info("Clearing chat history")
             st.session_state.messages = []
-            if session_manager:
-                session_manager.clear_session(st.session_state.session_id)
-            else:
-                rag_system.clear_conversation()
+            rag_system.clear_conversation()
             st.rerun()
         
         # End session button
         if st.button("🔚 End Session", use_container_width=True):
             logger.info("Ending session")
-            if session_manager:
-                session_manager.end_session(st.session_state.session_id)
-                st.success("Session ended and archived!")
-                # Generate new session
-                st.session_state.session_id = str(uuid.uuid4())
-                st.session_state.messages = []
-            else:
-                rag_system.clear_conversation()
-                st.session_state.messages = []
+            rag_system.clear_conversation()
+            st.session_state.messages = []
+            # Generate new session
+            st.session_state.session_id = str(uuid.uuid4())
             st.rerun()
     
-    # Initialize or load messages
+    # Initialize messages
     if "messages" not in st.session_state:
         logger.info("Initializing session state")
-        if session_manager:
-            # Load from Redis
-            redis_messages = session_manager.get_messages(st.session_state.session_id)
-            st.session_state.messages = []
-            for msg in redis_messages:
-                st.session_state.messages.append({
-                    "role": msg["role"],
-                    "content": msg["content"],
-                    "sources": msg.get("context_docs", [])
-                })
-        else:
-            st.session_state.messages = []
+        st.session_state.messages = []
     
     # Display chat history
     for message in st.session_state.messages:
@@ -210,40 +176,13 @@ def main():
             with st.spinner("Analyzing documentation..."):
                 logger.info("Starting response generation")
                 
-                if session_manager:
-                    # Use Redis session management
-                    recent_context = session_manager.get_recent_context(
-                        st.session_state.session_id, 
-                        RECENT_CONTEXT_EXCHANGES
-                    )
-                    response, context_docs = rag_system.query_with_context(
-                        prompt,
-                        recent_context,
-                        max_tokens=max_tokens,
-                        temperature=temperature,
-                        top_p=top_p
-                    )
-                    
-                    # Save to Redis
-                    sources_data = [
-                        {
-                            "content": doc.content,
-                            "source_file": doc.source_file,
-                            "chunk_id": doc.chunk_id,
-                            "relevance_score": doc.relevance_score
-                        }
-                        for doc in context_docs
-                    ]
-                    session_manager.add_message(st.session_state.session_id, "user", prompt, sources_data)
-                    session_manager.add_message(st.session_state.session_id, "assistant", response)
-                else:
-                    # Use internal RAG system history
-                    response, context_docs = rag_system.query(
-                        prompt,
-                        max_tokens=max_tokens,
-                        temperature=temperature,
-                        top_p=top_p
-                    )
+                # Use internal RAG system history
+                response, context_docs = rag_system.query(
+                    prompt,
+                    max_tokens=max_tokens,
+                    temperature=temperature,
+                    top_p=top_p
+                )
                 
                 logger.info(f"Response generated: {len(response)} chars, {len(context_docs)} sources")
                 

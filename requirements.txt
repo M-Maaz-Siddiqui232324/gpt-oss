@@ -9,9 +9,7 @@ fastapi>=0.100.0
 uvicorn>=0.23.0
 streamlit>=1.25.0
 pydantic>=2.0.0
-
-# Session Management
-redis>=5.0.0
+itsdangerous>=2.0.0  # For session cookie signing
 
 # Document processing
 python-docx>=0.8.11
@@ -20,6 +18,5 @@ python-docx>=0.8.11
 # Install: curl -fsSL https://ollama.com/install.sh | sh
 # Then: ollama pull gpt-oss:20b
 
-# Note: Redis must be installed separately
-# Windows: Download from https://github.com/microsoftarchive/redis/releases
-# Or use Docker: docker run -d -p 6379:6379 redis:latest
+# Note: Set SECRET_KEY environment variable for session security
+# Generate with: python -c "import secrets; print(secrets.token_urlsafe(32))"
