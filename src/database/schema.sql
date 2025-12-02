@@ -24,8 +24,8 @@ CREATE TABLE IF NOT EXISTS chatbot.sessions (
 );
 
 -- Conversation table for current month (December 2025)
--- Note: New tables will be created automatically each month
-CREATE TABLE IF NOT EXISTS chatbot.conversation_december (
+-- Note: New tables will be created automatically each month with format: conversation_mmm_yyyy
+CREATE TABLE IF NOT EXISTS chatbot.conversation_dec_2025 (
     conversation_id SERIAL PRIMARY KEY,
     fk_session_id INTEGER NOT NULL,
     user_message TEXT NOT NULL,
@@ -41,8 +41,8 @@ CREATE INDEX IF NOT EXISTS idx_sessions_client_id ON chatbot.sessions(fk_client_
 CREATE INDEX IF NOT EXISTS idx_sessions_session_id ON chatbot.sessions(session_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_username ON chatbot.sessions(username);
 CREATE INDEX IF NOT EXISTS idx_sessions_last_active ON chatbot.sessions(last_active);
-CREATE INDEX IF NOT EXISTS idx_conversation_december_session_id ON chatbot.conversation_december(fk_session_id);
-CREATE INDEX IF NOT EXISTS idx_conversation_december_created_at ON chatbot.conversation_december(created_at);
+CREATE INDEX IF NOT EXISTS idx_conversation_dec_2025_session_id ON chatbot.conversation_dec_2025(fk_session_id);
+CREATE INDEX IF NOT EXISTS idx_conversation_dec_2025_created_at ON chatbot.conversation_dec_2025(created_at);
 
 -- Insert a default client for testing (optional)
 INSERT INTO chatbot.clients (client_id, company_pin, api_key, is_active) 

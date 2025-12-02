@@ -221,11 +221,12 @@ class PostgresManager:
         Get the current month's conversation table name
         
         Returns:
-            Table name like 'conversation_december'
+            Table name like 'conversation_dec_2025'
         """
         from datetime import datetime
-        month_name = datetime.now().strftime("%B").lower()  # e.g., 'december'
-        return f"conversation_{month_name}"
+        month_abbr = datetime.now().strftime("%b").lower()  # e.g., 'dec'
+        year = datetime.now().strftime("%Y")  # e.g., '2025'
+        return f"conversation_{month_abbr}_{year}"
     
     def _ensure_conversation_table_exists(self, table_name: str) -> bool:
         """
@@ -326,23 +327,23 @@ class PostgresManager:
             logger.error(f"Error getting session: {e}", exc_info=True)
             return None
     
-    def get_session_conversations(self, session_db_id: int, month: str = None, limit: int = 50) -> List[Dict[str, Any]]:
+    def get_session_conversations(self, session_db_id: int, month_year: str = None, limit: int = 50) -> List[Dict[str, Any]]:
         """
         Get conversation history for a session from specific month's table
         
         Args:
             session_db_id: Session database ID (integer)
-            month: Month name (e.g., 'december'), defaults to current month
+            month_year: Month and year (e.g., 'dec_2025'), defaults to current month
             limit: Maximum number of conversations to retrieve
             
         Returns:
             List of conversation dictionaries
         """
         try:
-            if month is None:
+            if month_year is None:
                 table_name = self._get_current_conversation_table()
             else:
-                table_name = f"conversation_{month.lower()}"
+                table_name = f"conversation_{month_year.lower()}"
             
             with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
                 cur.execute(

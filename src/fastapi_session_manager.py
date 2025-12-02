@@ -174,44 +174,18 @@ class FastAPISessionManager:
         return self.store.list_all()
     
     def archive_session(self, session: Session) -> str:
-        """Archive a session to PostgreSQL database and optionally to JSON file"""
-        try:
-            # Save to PostgreSQL database
-            try:
-                from database.postgres_manager import PostgresManager
-                from config import POSTGRES_CONNECTION_STRING, DEFAULT_CLIENT_ID
-                
-                db = PostgresManager(POSTGRES_CONNECTION_STRING)
-                if db.connect():
-                    # Convert messages to dict format for JSONB storage
-                    messages_dict = [asdict(msg) for msg in session.messages]
-                    
-                    # End session in database (INSERT or UPDATE)
-                    success = db.end_session(
-                        session_id=session.session_id,
-                        client_id=DEFAULT_CLIENT_ID,  # Use default client (FlowHCM)
-                        messages=messages_dict,
-                        session_start_time=session.created_at,
-                        session_end_time=datetime.now().isoformat()
-                    )
-                    db.disconnect()
-                    
-                    if success:
-                        logger.info(f"Archived session to PostgreSQL: {session.session_id}")
-                        return f"PostgreSQL: {session.session_id}"
-                    else:
-                        logger.error(f"Failed to archive session to PostgreSQL: {session.session_id}")
-                        return ""
-                else:
-                    logger.error("Failed to connect to PostgreSQL")
-                    return ""
-                    
-            except Exception as pg_error:
-                logger.error(f"PostgreSQL archiving failed: {pg_error}", exc_info=True)
-                return ""
+        """
+        Archive a session (no-op since conversations are saved in real-time)
         
+        Note: With the new architecture, conversations are saved to PostgreSQL
+        in real-time as they happen, so there's nothing to archive when the
+        session expires. This method is kept for compatibility.
+        """
+        try:
+            logger.info(f"Session {session.session_id} expired (conversations already saved in real-time)")
+            return f"Session: {session.session_id}"
         except Exception as e:
-            logger.error(f"Failed to archive session {session.session_id}: {e}", exc_info=True)
+            logger.error(f"Error in archive_session: {e}", exc_info=True)
             return ""
     
     def cleanup_expired_sessions(self) -> int:
