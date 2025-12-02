@@ -3,13 +3,14 @@ import logging
 import os
 import sys
 from datetime import datetime
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Header
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 import uvicorn
 import secrets
+import uuid
 
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
@@ -163,31 +164,107 @@ async def health_check():
 
 
 @app.post("/query", response_model=QueryResponse)
-async def query(request_body: QueryRequest, request: Request):
-    """Process a query with session management"""
+async def query(
+    request_body: QueryRequest, 
+    request: Request,
+    x_client_id: Optional[str] = Header(None, alias="X-Client-ID"),
+    x_company_pin: Optional[str] = Header(None, alias="X-Company-Pin"),
+    x_api_key: Optional[str] = Header(None, alias="X-API-Key"),
+    x_user_name: Optional[str] = Header(None, alias="X-User-Name")
+):
+    """Process a query with authentication and session management"""
     if rag_system is None or session_manager is None:
         raise HTTPException(status_code=503, detail="System not initialized")
     
-    logger.info(f"API query received: '{request_body.query}'")
+    logger.info("="*80)
+    logger.info("NEW QUERY REQUEST RECEIVED")
+    logger.info("="*80)
+    logger.info(f"Query: '{request_body.query}'")
+    logger.info(f"Max Tokens: {request_body.max_tokens}, Temperature: {request_body.temperature}, Top-P: {request_body.top_p}")
+    
+    # Log received headers
+    logger.info("-"*80)
+    logger.info("HEADERS RECEIVED:")
+    logger.info(f"  X-Client-ID: {x_client_id if x_client_id else 'MISSING'} (informational only)")
+    logger.info(f"  X-Company-Pin: {x_company_pin if x_company_pin else 'MISSING'} (used for auth)")
+    logger.info(f"  X-API-Key: {x_api_key[:20] + '...' if x_api_key else 'MISSING'} (used for auth)")
+    logger.info(f"  X-User-Name: {x_user_name if x_user_name else 'MISSING'} (informational only)")
+    logger.info("-"*80)
+    
+    # Validate required headers (only company_pin and api_key needed for auth)
+    if not x_company_pin or not x_api_key:
+        logger.warning("❌ AUTHENTICATION FAILED: Missing required authentication headers (X-Company-Pin or X-API-Key)")
+        logger.info("="*80)
+        return QueryResponse(response="Unauthorized", session_id="")
     
     try:
+        # Authenticate client against PostgreSQL
+        logger.info("🔐 AUTHENTICATING CLIENT...")
+        from database.postgres_manager import PostgresManager
+        db = PostgresManager(POSTGRES_CONNECTION_STRING)
+        
+        if not db.connect():
+            logger.error("❌ Failed to connect to PostgreSQL database")
+            logger.info("="*80)
+            return QueryResponse(response="Unauthorized", session_id="")
+        
+        logger.info("✅ Connected to PostgreSQL database")
+        
+        # Validate credentials (only company_pin and api_key)
+        logger.info(f"🔍 Validating credentials (Company PIN + API Key)")
+        client = db.authenticate_client(x_company_pin, x_api_key)
+        
+        if not client:
+            logger.warning(f"❌ AUTHENTICATION FAILED")
+            logger.warning("   Reason: Invalid company_pin or api_key combination")
+            db.disconnect()
+            logger.info("="*80)
+            return QueryResponse(response="Unauthorized", session_id="")
+        
+        # Get client_id from authenticated result
+        authenticated_client_id = client['client_id']
+        
+        logger.info(f"✅ AUTHENTICATION SUCCESSFUL")
+        logger.info(f"   Client ID: {authenticated_client_id} (from database)")
+        logger.info(f"   Company PIN: {client['company_pin']}")
+        logger.info(f"   API Key: {client['api_key'][:20]}...")
+        logger.info(f"   User: {x_user_name}")
+        logger.info(f"   Active: {client['is_active']}")
+        
         # Get or create session
+        logger.info("-"*80)
+        logger.info("📋 SESSION MANAGEMENT")
         session_id = request.session.get("session_id")
-        logger.debug(f"Session ID from cookie: {session_id}")
+        logger.info(f"Session ID from cookie: {session_id if session_id else 'None (new session)'}")
         
         session = None
         if session_id:
             session = session_manager.get_session(session_id)
             if session:
-                logger.debug(f"Using existing session: {session.session_id}")
+                logger.info(f"✅ Using existing session: {session.session_id}")
+                logger.info(f"   Messages in session: {len(session.messages)}")
         
         if not session:
             # Create new session
             session = session_manager.create_session()
             request.session["session_id"] = session.session_id
-            logger.info(f"Created new session: {session.session_id}")
+            logger.info(f"🆕 Created new in-memory session: {session.session_id}")
+            
+            # Create session in PostgreSQL
+            logger.info(f"💾 Saving session to PostgreSQL database...")
+            db_success = db.create_session(session.session_id, x_user_name or "unknown", authenticated_client_id)
+            if db_success:
+                logger.info(f"✅ Session saved to database")
+                logger.info(f"   Table: chatbot.sessions")
+                logger.info(f"   Session ID: {session.session_id}")
+                logger.info(f"   Username: {x_user_name or 'unknown'}")
+                logger.info(f"   Client ID: {authenticated_client_id}")
+            else:
+                logger.warning(f"⚠️  Failed to save session to database")
         
         # Add user message to session
+        logger.info("-"*80)
+        logger.info("💬 PROCESSING QUERY")
         from fastapi_session_manager import Message
         user_message = Message(
             role="user",
@@ -195,17 +272,22 @@ async def query(request_body: QueryRequest, request: Request):
             timestamp=session.last_active
         )
         session.messages.append(user_message)
+        logger.info(f"Added user message to session (total messages: {len(session.messages)})")
         
         # Get recent context from session
         recent_context = ""
         if len(session.messages) > 1:
             # Get last few exchanges (excluding the current user message)
             recent_messages = session.messages[:-1][-(RECENT_CONTEXT_EXCHANGES * 2):]
+            logger.info(f"Using {len(recent_messages)} previous messages as context")
             for msg in recent_messages:
                 role = "Human" if msg.role == "user" else "Assistant"
                 recent_context += f"{role}: {msg.content}\n"
+        else:
+            logger.info("No previous context (first message in session)")
         
         # Process query with context
+        logger.info("🤖 Generating response using RAG system...")
         response, sources = rag_system.query_with_context(
             request_body.query,
             recent_context=recent_context,
@@ -213,6 +295,7 @@ async def query(request_body: QueryRequest, request: Request):
             temperature=request_body.temperature,
             top_p=request_body.top_p
         )
+        logger.info(f"✅ Response generated ({len(response)} characters, {len(sources)} source documents)")
         
         # Add assistant response to session
         assistant_message = Message(
@@ -226,11 +309,44 @@ async def query(request_body: QueryRequest, request: Request):
             } for doc in sources]
         )
         session.messages.append(assistant_message)
+        logger.info(f"Added assistant response to session (total messages: {len(session.messages)})")
         
-        # Update session
+        # Update session in memory
         session_manager.update_session(session)
+        logger.info("✅ Updated in-memory session")
         
-        logger.info(f"Query processed successfully (session: {session.session_id}, sources: {len(sources)})")
+        # Save conversation to PostgreSQL in real-time
+        logger.info("-"*80)
+        logger.info("💾 SAVING TO DATABASE")
+        logger.info(f"Saving conversation to PostgreSQL...")
+        conv_success = db.add_conversation(session.session_id, request_body.query, response)
+        if conv_success:
+            logger.info(f"✅ Conversation saved to database")
+            logger.info(f"   Table: chatbot.conversation")
+            logger.info(f"   Session ID: {session.session_id}")
+            logger.info(f"   User Message: {request_body.query[:50]}...")
+            logger.info(f"   Bot Response: {response[:50]}...")
+        else:
+            logger.warning(f"⚠️  Failed to save conversation to database")
+        
+        # Update session activity timestamp
+        logger.info(f"Updating session activity timestamp...")
+        activity_success = db.update_session_activity(session.session_id)
+        if activity_success:
+            logger.info(f"✅ Session activity updated")
+        else:
+            logger.warning(f"⚠️  Failed to update session activity")
+        
+        # Disconnect from database
+        db.disconnect()
+        logger.info("✅ Disconnected from PostgreSQL database")
+        
+        logger.info("-"*80)
+        logger.info("✅ QUERY PROCESSED SUCCESSFULLY")
+        logger.info(f"   Session ID: {session.session_id}")
+        logger.info(f"   Source Documents: {len(sources)}")
+        logger.info(f"   Response Length: {len(response)} characters")
+        logger.info("="*80)
         
         return QueryResponse(response=response, session_id=session.session_id)
     
@@ -352,6 +468,53 @@ async def chat(message: str, request: Request):
     
     except Exception as e:
         logger.error(f"Chat error: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Admin Endpoints
+
+class SyncClientRequest(BaseModel):
+    client_id: int
+    company_pin: str
+    api_key: str
+    is_active: bool = True
+
+
+@app.post("/admin/sync-client")
+async def sync_client(request_body: SyncClientRequest):
+    """
+    Sync client data from HCMSAPI to PostgreSQL
+    Called when API key is generated in HCMSAPI
+    """
+    logger.info(f"Syncing client {request_body.client_id} to PostgreSQL")
+    
+    try:
+        from database.postgres_manager import PostgresManager
+        db = PostgresManager(POSTGRES_CONNECTION_STRING)
+        
+        if not db.connect():
+            raise HTTPException(status_code=503, detail="Database connection failed")
+        
+        success = db.sync_client(
+            request_body.client_id,
+            request_body.company_pin,
+            request_body.api_key,
+            request_body.is_active
+        )
+        
+        db.disconnect()
+        
+        if success:
+            logger.info(f"Client {request_body.client_id} synced successfully")
+            return {
+                "success": True,
+                "message": f"Client {request_body.client_id} synced successfully"
+            }
+        else:
+            raise HTTPException(status_code=500, detail="Failed to sync client")
+    
+    except Exception as e:
+        logger.error(f"Error syncing client: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 
