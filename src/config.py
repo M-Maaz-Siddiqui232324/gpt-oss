@@ -1,5 +1,9 @@
 """Configuration settings for the RAG chatbot"""
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Get project root directory (parent of src folder)
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -40,14 +44,22 @@ API_HOST = "0.0.0.0"
 API_PORT = 8000
 
 # FastAPI Session Management
-SECRET_KEY = os.getenv("SECRET_KEY", "")  # Must be set in production
-SESSION_MAX_AGE = 1800  # 30 minutes in seconds
-MAX_SESSIONS = 1000  # Maximum number of concurrent sessions
-CLEANUP_INTERVAL = 300  # 5 minutes in seconds
+SECRET_KEY = os.getenv("SECRET_KEY", "")  
+SESSION_MAX_AGE = 300  # 5 minutes (5 * 60 seconds)
+MAX_SESSIONS = 10000 
+CLEANUP_INTERVAL = 60  # Check every 1 minute (60 seconds)  
 
-# Session Archive settings
-ARCHIVE_FOLDER = os.path.join(PROJECT_ROOT, "session_archives")
-ARCHIVE_FORMAT = "json"  # json or txt
+# PostgreSQL Database settings (for chatbot sessions)
+POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
+POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
+POSTGRES_DB = os.getenv("POSTGRES_DB", "chatbot")
+POSTGRES_SCHEMA = os.getenv("POSTGRES_SCHEMA", "chatbot")
+POSTGRES_USER = os.getenv("POSTGRES_USER", "postgres")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "root")
+POSTGRES_CONNECTION_STRING = f"host={POSTGRES_HOST} port={POSTGRES_PORT} dbname={POSTGRES_DB} user={POSTGRES_USER} password={POSTGRES_PASSWORD} options='-c search_path={POSTGRES_SCHEMA},public'"
+
+# Default client ID for FlowHCM (set after creating client in database)
+DEFAULT_CLIENT_ID = int(os.getenv("DEFAULT_CLIENT_ID", "1"))
 
 # Logging settings
 LOG_LEVEL = "INFO"

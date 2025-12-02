@@ -129,16 +129,11 @@ class FastAPISessionManager:
     def __init__(
         self,
         max_sessions: int = 1000,
-        session_max_age: int = 1800,
-        archive_folder: str = "session_archives"
+        session_max_age: int = 1800
     ):
         self.store = InMemorySessionStore(max_sessions)
         self.session_max_age = session_max_age
-        self.archive_folder = archive_folder
-        
-        # Create archive folder if it doesn't exist
-        os.makedirs(self.archive_folder, exist_ok=True)
-        logger.info(f"Session archives will be saved to: {self.archive_folder}")
+        logger.info("Session manager initialized (PostgreSQL storage)")
     
     def create_session(self) -> Session:
         """Create a new session with a unique ID"""
@@ -174,44 +169,46 @@ class FastAPISessionManager:
             return True
         return False
     
-    def end_session(self, session_id: str) -> Optional[str]:
-        """End a session - archive and delete"""
-        session = self.store.get(session_id)
-        if not session:
-            logger.warning(f"Cannot end session - not found: {session_id}")
-            return None
-        
-        # Archive the session
-        archive_path = self.archive_session(session)
-        
-        # Delete from memory
-        self.store.delete(session_id)
-        logger.info(f"Ended session: {session_id}, archived to: {archive_path}")
-        
-        return archive_path
-    
     def list_sessions(self) -> List[Dict[str, Any]]:
         """List all active sessions"""
         return self.store.list_all()
     
     def archive_session(self, session: Session) -> str:
-        """Archive a session to a JSON file"""
+        """Archive a session to PostgreSQL database and optionally to JSON file"""
         try:
-            # Add ended_at timestamp
-            archive_data = session.to_dict()
-            archive_data["ended_at"] = datetime.now().isoformat()
-            
-            # Create filename with timestamp
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"session_{session.session_id[:8]}_{timestamp}.json"
-            filepath = os.path.join(self.archive_folder, filename)
-            
-            # Save to file
-            with open(filepath, 'w', encoding='utf-8') as f:
-                json.dump(archive_data, f, indent=2, ensure_ascii=False)
-            
-            logger.info(f"Archived session to: {filename}")
-            return filepath
+            # Save to PostgreSQL database
+            try:
+                from database.postgres_manager import PostgresManager
+                from config import POSTGRES_CONNECTION_STRING, DEFAULT_CLIENT_ID
+                
+                db = PostgresManager(POSTGRES_CONNECTION_STRING)
+                if db.connect():
+                    # Convert messages to dict format for JSONB storage
+                    messages_dict = [asdict(msg) for msg in session.messages]
+                    
+                    # End session in database (INSERT or UPDATE)
+                    success = db.end_session(
+                        session_id=session.session_id,
+                        client_id=DEFAULT_CLIENT_ID,  # Use default client (FlowHCM)
+                        messages=messages_dict,
+                        session_start_time=session.created_at,
+                        session_end_time=datetime.now().isoformat()
+                    )
+                    db.disconnect()
+                    
+                    if success:
+                        logger.info(f"Archived session to PostgreSQL: {session.session_id}")
+                        return f"PostgreSQL: {session.session_id}"
+                    else:
+                        logger.error(f"Failed to archive session to PostgreSQL: {session.session_id}")
+                        return ""
+                else:
+                    logger.error("Failed to connect to PostgreSQL")
+                    return ""
+                    
+            except Exception as pg_error:
+                logger.error(f"PostgreSQL archiving failed: {pg_error}", exc_info=True)
+                return ""
         
         except Exception as e:
             logger.error(f"Failed to archive session {session.session_id}: {e}", exc_info=True)

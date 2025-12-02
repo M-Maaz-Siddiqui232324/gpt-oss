@@ -47,7 +47,7 @@ app.add_middleware(
     https_only=False  # Set to True in production with HTTPS
 )
 
-# CORS
+# CORS - Must specify exact origins when using credentials
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -100,8 +100,7 @@ async def startup_event():
         # Initialize session manager
         session_manager = FastAPISessionManager(
             max_sessions=MAX_SESSIONS,
-            session_max_age=SESSION_MAX_AGE,
-            archive_folder=ARCHIVE_FOLDER
+            session_max_age=SESSION_MAX_AGE
         )
         logger.info("Session manager initialized successfully")
         
@@ -174,18 +173,19 @@ async def query(request_body: QueryRequest, request: Request):
     try:
         # Get or create session
         session_id = request.session.get("session_id")
-        session = None
+        logger.debug(f"Session ID from cookie: {session_id}")
         
+        session = None
         if session_id:
             session = session_manager.get_session(session_id)
+            if session:
+                logger.debug(f"Using existing session: {session.session_id}")
         
         if not session:
             # Create new session
             session = session_manager.create_session()
             request.session["session_id"] = session.session_id
             logger.info(f"Created new session: {session.session_id}")
-        else:
-            logger.debug(f"Using existing session: {session.session_id}")
         
         # Add user message to session
         from fastapi_session_manager import Message
@@ -279,32 +279,6 @@ async def list_documents():
     ]
     
     return {"documents": docs, "count": len(docs)}
-
-
-@app.post("/session/end")
-async def end_session(request: Request):
-    """End the current session - archives and deletes it"""
-    if session_manager is None:
-        raise HTTPException(status_code=503, detail="Session manager not initialized")
-    
-    # Get session
-    session_id = request.session.get("session_id")
-    if not session_id:
-        raise HTTPException(status_code=400, detail="No active session")
-    
-    # End session (archive and delete)
-    archive_path = session_manager.end_session(session_id)
-    
-    if archive_path:
-        # Clear session cookie
-        request.session.clear()
-        logger.info(f"Ended session: {session_id}")
-        return {
-            "message": "Session ended successfully",
-            "archived_to": archive_path
-        }
-    else:
-        raise HTTPException(status_code=404, detail="Session not found")
 
 
 @app.get("/sessions")

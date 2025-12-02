@@ -1,20 +1,25 @@
 """Streamlit UI for the RAG chatbot"""
 import streamlit as st
+import streamlit.components.v1 as components
 import logging
 import os
 import sys
-import uuid
+import requests
+from typing import List, Dict, Optional
 
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 from config import *
-from rag_system import RAGSystem
 import utils
 
 # Setup logging
 utils.setup_logging(LOG_LEVEL)
 logger = logging.getLogger(__name__)
+
+# FastAPI backend URL
+# Use localhost instead of 0.0.0.0 for client connections
+API_BASE_URL = f"http://localhost:{API_PORT}"
 
 # Page config
 st.set_page_config(
@@ -29,37 +34,95 @@ logger.info("FlowHCM Chatbot Starting Up")
 logger.info("="*60)
 
 
-@st.cache_resource
-def load_system():
-    """Load the RAG system"""
-    logger.info("Loading RAG system")
-    
-    # Check directories
-    if not os.path.exists(DOCS_FOLDER):
-        logger.error(f"Docs directory not found: {DOCS_FOLDER}")
-        st.error(f"❌ Docs directory '{DOCS_FOLDER}' not found!")
-        st.info("Please create a 'docs' folder and add your documentation files.")
-        return None
-    
+def check_api_health():
+    """Check if FastAPI backend is running"""
     try:
-        with st.spinner("Initializing system..."):
-            # Initialize RAG system
-            rag_system = RAGSystem()
-            success = rag_system.initialize()
-            
-            if success:
-                logger.info("RAG system loaded successfully")
-                st.success(f"✅ Loaded {len(rag_system.documents)} documents with {len(rag_system.chunks)} chunks")
-                return rag_system
-            else:
-                logger.error("Failed to initialize RAG system")
-                st.error("❌ Failed to initialize RAG system")
-                return None
-    
-    except Exception as e:
-        logger.error(f"Error loading system: {e}", exc_info=True)
-        st.error(f"❌ Error: {e}")
+        response = requests.get(f"{API_BASE_URL}/health", timeout=5)
+        if response.status_code == 200:
+            data = response.json()
+            logger.info("FastAPI backend is healthy")
+            return data
+        else:
+            logger.error(f"API health check failed: {response.status_code}")
+            return None
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Cannot connect to FastAPI backend: {e}")
         return None
+
+
+def get_documents():
+    """Get list of documents from API"""
+    try:
+        response = requests.get(f"{API_BASE_URL}/documents", timeout=5)
+        if response.status_code == 200:
+            return response.json()
+        return None
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error fetching documents: {e}")
+        return None
+
+
+def send_query(query: str, max_tokens: int, temperature: float, top_p: float, session_cookie: Optional[str] = None):
+    """Send query to FastAPI backend"""
+    try:
+        headers = {}
+        cookies = {}
+        
+        # Add session cookie if available
+        if session_cookie:
+            cookies["session"] = session_cookie
+        
+        payload = {
+            "query": query,
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+            "top_p": top_p
+        }
+        
+        response = requests.post(
+            f"{API_BASE_URL}/query",
+            json=payload,
+            cookies=cookies,
+            timeout=180  # 3 minutes for LLM generation
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            # Extract session cookie from response
+            new_session_cookie = response.cookies.get("session")
+            return data, new_session_cookie
+        else:
+            logger.error(f"Query failed: {response.status_code} - {response.text}")
+            return None, None
+            
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error sending query: {e}")
+        return None, None
+
+
+def clear_session(session_cookie: str):
+    """Clear conversation history"""
+    try:
+        cookies = {"session": session_cookie}
+        response = requests.post(f"{API_BASE_URL}/clear", cookies=cookies, timeout=5)
+        return response.status_code == 200
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error clearing session: {e}")
+        return False
+
+
+def end_session(session_cookie: str):
+    """End the session"""
+    try:
+        cookies = {"session": session_cookie}
+        response = requests.post(f"{API_BASE_URL}/session/end", cookies=cookies, timeout=5)
+        return response.status_code == 200
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error ending session: {e}")
+        return False
+
+
+
 
 
 def main():
@@ -67,30 +130,32 @@ def main():
     
     # Title
     st.title("🤖 FlowHCM Chatbot")
-    st.markdown("**Powered by GPT-OSS-20B (Local)**")
+    st.markdown("**Powered by GPT-OSS-20B (Local) via FastAPI**")
     
-    # Load system
-    rag_system = load_system()
-    if rag_system is None:
+    # Check API health
+    health_data = check_api_health()
+    if health_data is None:
+        st.error("❌ Cannot connect to FastAPI backend!")
+        st.info(f"Please ensure the FastAPI server is running at {API_BASE_URL}")
+        st.code(f"python apps/api.py", language="bash")
         return
     
-    # Initialize session ID in Streamlit session state
-    if "session_id" not in st.session_state:
-        st.session_state.session_id = str(uuid.uuid4())
-        logger.info(f"New Streamlit session: {st.session_state.session_id}")
+    # Initialize session cookie in Streamlit session state
+    if "session_cookie" not in st.session_state:
+        st.session_state.session_cookie = None
+        logger.info("New Streamlit session - no API session yet")
     
     # Sidebar
     with st.sidebar:
         st.header("📋 Document Library")
         
-        # Show documents
-        if rag_system.documents:
-            for doc in rag_system.documents:
+        # Get documents from API
+        docs_data = get_documents()
+        if docs_data and docs_data.get("documents"):
+            for doc in docs_data["documents"]:
                 with st.expander(f"📄 {doc['name']}"):
                     st.write(f"**Type:** {doc['type']}")
-                    st.write(f"**Size:** {len(doc['content'])} chars")
-                    preview = doc['content'][:200] + "..." if len(doc['content']) > 200 else doc['content']
-                    st.code(preview, language=doc['type'])
+                    st.write(f"**Size:** {doc['size']} chars")
         else:
             st.info("No documents loaded")
         
@@ -106,32 +171,34 @@ def main():
         
         # System info
         st.subheader("📊 System Status")
-        st.info(f"**Device:** {rag_system.llm_engine.device}")
-        st.info(f"**Documents:** {len(rag_system.documents)}")
-        st.info(f"**Chunks:** {len(rag_system.chunks)}")
-        
-        if rag_system.vector_store.index:
-            st.success(f"✅ **Vector Search:** {rag_system.vector_store.index.ntotal} embeddings")
-        else:
-            st.warning("⚠️ **Vector Search:** Not available")
+        st.success(f"✅ **API Status:** {health_data['status']}")
+        st.info(f"**Documents:** {health_data['documents_loaded']}")
+        st.info(f"**Chunks:** {health_data['chunks_created']}")
+        st.info(f"**Model Loaded:** {'Yes' if health_data['model_loaded'] else 'No'}")
         
         # Session info
-        st.info(f"**Session ID:** {st.session_state.session_id[:8]}...")
+        if st.session_state.session_cookie:
+            # Show truncated session cookie
+            cookie_preview = st.session_state.session_cookie[:16] + "..." if len(st.session_state.session_cookie) > 16 else st.session_state.session_cookie
+            st.info(f"**Session:** {cookie_preview}")
+        else:
+            st.info("**Session:** Not started")
         
         # Clear chat
         if st.button("🗑️ Clear Chat", use_container_width=True):
             logger.info("Clearing chat history")
+            if st.session_state.session_cookie:
+                clear_session(st.session_state.session_cookie)
             st.session_state.messages = []
-            rag_system.clear_conversation()
             st.rerun()
         
         # End session button
         if st.button("🔚 End Session", use_container_width=True):
             logger.info("Ending session")
-            rag_system.clear_conversation()
+            if st.session_state.session_cookie:
+                end_session(st.session_state.session_cookie)
             st.session_state.messages = []
-            # Generate new session
-            st.session_state.session_id = str(uuid.uuid4())
+            st.session_state.session_cookie = None
             st.rerun()
     
     # Initialize messages
@@ -143,24 +210,6 @@ def main():
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
-            
-            # Show sources if available
-            if message["role"] == "assistant" and "sources" in message and message["sources"]:
-                with st.expander(f"📚 Sources ({len(message['sources'])})"):
-                    for i, source in enumerate(message["sources"], 1):
-                        st.markdown(f"**{i}. {source.source_file}** (score: {source.relevance_score:.3f})")
-                        st.markdown(f"**Chunk ID:** {source.chunk_id}")
-                        st.markdown(f"**Length:** {len(source.content)} characters")
-                        # Unique key using message index and source index
-                        msg_idx = st.session_state.messages.index(message)
-                        st.text_area(
-                            f"Full Content - Source {i}", 
-                            source.content, 
-                            height=300, 
-                            disabled=True,
-                            key=f"history_source_{msg_idx}_{i}"
-                        )
-                        st.markdown("---")
     
     # Chat input
     if prompt := st.chat_input("Ask about your documentation..."):
@@ -174,37 +223,43 @@ def main():
         # Generate response
         with st.chat_message("assistant"):
             with st.spinner("Analyzing documentation..."):
-                logger.info("Starting response generation")
+                logger.info("Starting response generation via API")
                 
-                # Use internal RAG system history
-                response, context_docs = rag_system.query(
+                # Send query to FastAPI backend
+                result, new_session_cookie = send_query(
                     prompt,
                     max_tokens=max_tokens,
                     temperature=temperature,
-                    top_p=top_p
+                    top_p=top_p,
+                    session_cookie=st.session_state.session_cookie
                 )
                 
-                logger.info(f"Response generated: {len(response)} chars, {len(context_docs)} sources")
+                if result:
+                    response = result["response"]
+                    session_id = result.get("session_id", "unknown")
+                    
+                    # Update session cookie
+                    if new_session_cookie:
+                        st.session_state.session_cookie = new_session_cookie
+                        logger.info(f"Session cookie updated: {session_id}")
+                    
+                    logger.info(f"Response generated: {len(response)} chars")
+                    st.markdown(response)
+                    
+                    # Add to session state
+                    st.session_state.messages.append({
+                        "role": "assistant",
+                        "content": response
+                    })
+                else:
+                    error_msg = "❌ Failed to get response from API"
+                    st.error(error_msg)
+                    st.session_state.messages.append({
+                        "role": "assistant",
+                        "content": error_msg
+                    })
                 
-                st.markdown(response)
-                
-                # Show sources
-                if context_docs:
-                    with st.expander(f"📚 Sources ({len(context_docs)})"):
-                        for i, doc in enumerate(context_docs, 1):
-                            st.markdown(f"**{i}. {doc.source_file}** (score: {doc.relevance_score:.3f})")
-                            st.markdown(f"**Chunk ID:** {doc.chunk_id}")
-                            st.markdown(f"**Length:** {len(doc.content)} characters")
-                            st.text_area(f"Full Content - Source {i}", doc.content, height=300, disabled=True)
-                            st.markdown("---")
-        
-        # Add to session state
-        st.session_state.messages.append({
-            "role": "assistant",
-            "content": response,
-            "sources": context_docs
-        })
-        logger.info("Session state updated")
+                logger.info("Session state updated")
 
 
 if __name__ == "__main__":
