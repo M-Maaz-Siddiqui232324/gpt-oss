@@ -5,9 +5,10 @@ SET search_path TO chatbot, public;
 
 -- Clients table (stores client authentication info)
 CREATE TABLE IF NOT EXISTS chatbot.clients (
-    client_id INTEGER PRIMARY KEY,
-    company_pin VARCHAR(50) NOT NULL,
-    api_key VARCHAR(255) UNIQUE NOT NULL,
+    client_id SERIAL PRIMARY KEY,
+    hcms_client_id INTEGER,
+    company_pin VARCHAR(50) NOT NULL UNIQUE,
+    api_key VARCHAR(255) NOT NULL UNIQUE,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -45,6 +46,6 @@ CREATE INDEX IF NOT EXISTS idx_conversation_dec_2025_session_id ON chatbot.conve
 CREATE INDEX IF NOT EXISTS idx_conversation_dec_2025_created_at ON chatbot.conversation_dec_2025(created_at);
 
 -- Insert a default client for testing (optional)
-INSERT INTO chatbot.clients (client_id, company_pin, api_key, is_active) 
-VALUES (1, '1032', 'FLOW-1-flowhcm_default_key_12345', TRUE)
-ON CONFLICT (client_id) DO NOTHING;
+INSERT INTO chatbot.clients (hcms_client_id, company_pin, api_key, is_active) 
+VALUES (1, '1032', 'flowhcm_default_key_12345', TRUE)
+ON CONFLICT (company_pin) DO NOTHING;

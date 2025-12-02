@@ -108,37 +108,45 @@ class PostgresManager:
             logger.error(f"Error getting client by API key: {e}", exc_info=True)
             return None
     
-    def sync_client(self, client_id: int, company_pin: str, api_key: str, is_active: bool = True) -> bool:
+    def sync_client(self, hcms_client_id: int, company_pin: str, api_key: str, is_active: bool = True) -> bool:
         """
         Sync client data from HCMSAPI (INSERT or UPDATE)
+        Auto-assigns client_id (1, 2, 3...) in PostgreSQL
         
         Args:
-            client_id: Client identifier
-            company_pin: Company PIN
-            api_key: API key
+            hcms_client_id: Client ID from HCMSAPI (stored for reference)
+            company_pin: Company PIN (unique identifier)
+            api_key: API key (unique identifier)
             is_active: Client active status
             
         Returns:
             True if successful, False otherwise
         """
         try:
-            logger.info(f"Syncing client to database: client_id={client_id}, company_pin={company_pin}, api_key={api_key[:20]}..., is_active={is_active}")
+            logger.info(f"Syncing client to database: hcms_client_id={hcms_client_id}, company_pin={company_pin}, api_key={api_key[:20]}..., is_active={is_active}")
             with self.conn.cursor() as cur:
-                # UPSERT: Insert or update if exists
+                # UPSERT based on company_pin (unique identifier)
+                # If company_pin exists, update; otherwise insert with auto-incremented client_id
                 cur.execute(
                     """
-                    INSERT INTO chatbot.clients (client_id, company_pin, api_key, is_active, created_at)
+                    INSERT INTO chatbot.clients (hcms_client_id, company_pin, api_key, is_active, created_at)
                     VALUES (%s, %s, %s, %s, NOW())
-                    ON CONFLICT (client_id) 
+                    ON CONFLICT (company_pin) 
                     DO UPDATE SET 
-                        company_pin = EXCLUDED.company_pin,
+                        hcms_client_id = EXCLUDED.hcms_client_id,
                         api_key = EXCLUDED.api_key,
                         is_active = EXCLUDED.is_active
+                    RETURNING client_id
                     """,
-                    (client_id, company_pin, api_key, is_active)
+                    (hcms_client_id, company_pin, api_key, is_active)
                 )
+                result = cur.fetchone()
+                assigned_client_id = result[0] if result else None
                 self.conn.commit()
-                logger.info(f"✅ Client {client_id} synced to PostgreSQL database (table: chatbot.clients)")
+                logger.info(f"✅ Client synced to PostgreSQL database")
+                logger.info(f"   PostgreSQL client_id: {assigned_client_id} (auto-assigned)")
+                logger.info(f"   HCMS client_id: {hcms_client_id} (reference)")
+                logger.info(f"   Company PIN: {company_pin}")
                 return True
         except Exception as e:
             logger.error(f"❌ Error syncing client to database: {e}", exc_info=True)

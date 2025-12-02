@@ -37,6 +37,58 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Dictionary to cache client loggers
+client_loggers = {}
+
+def setup_client_logger(company_pin: str):
+    """
+    Setup a per-client logger that writes to {companypin}_{date}.log
+    
+    Args:
+        company_pin: Company PIN to identify the client
+        
+    Returns:
+        Logger instance for the client
+    """
+    # Create unique logger name
+    logger_name = f"client_{company_pin}"
+    
+    # Check if logger already exists for today
+    today = datetime.now().strftime('%Y-%m-%d')
+    cache_key = f"{company_pin}_{today}"
+    
+    if cache_key in client_loggers:
+        return client_loggers[cache_key]
+    
+    # Create new logger
+    client_logger = logging.getLogger(logger_name)
+    client_logger.setLevel(getattr(logging, LOG_LEVEL))
+    
+    # Remove existing handlers to avoid duplicates
+    client_logger.handlers = []
+    
+    # Create file handler for client-specific log
+    client_log_filename = os.path.join(logs_dir, f"{company_pin}_{today}.log")
+    file_handler = logging.FileHandler(client_log_filename, encoding='utf-8')
+    file_handler.setLevel(getattr(logging, LOG_LEVEL))
+    
+    # Create formatter
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(formatter)
+    
+    # Add handler to logger
+    client_logger.addHandler(file_handler)
+    
+    # Prevent propagation to root logger (avoid duplicate console logs)
+    client_logger.propagate = False
+    
+    # Cache the logger
+    client_loggers[cache_key] = client_logger
+    
+    logger.info(f"Created client logger for company_pin: {company_pin}, file: {company_pin}_{today}.log")
+    
+    return client_logger
+
 # Validate SECRET_KEY
 if not SECRET_KEY or len(SECRET_KEY) < 32:
     logger.warning("SECRET_KEY not set or too short. Generating a random key for development.")
@@ -189,11 +241,25 @@ async def query(
     if rag_system is None or session_manager is None:
         raise HTTPException(status_code=503, detail="System not initialized")
     
+    # Setup per-client logger if company_pin is provided
+    client_logger = None
+    if x_company_pin:
+        client_logger = setup_client_logger(x_company_pin)
+    
     logger.info("="*80)
     logger.info("NEW QUERY REQUEST RECEIVED")
     logger.info("="*80)
     logger.info(f"Query: '{request_body.query}'")
     logger.info(f"Max Tokens: {request_body.max_tokens}, Temperature: {request_body.temperature}, Top-P: {request_body.top_p}")
+    
+    # Also log to client-specific file
+    if client_logger:
+        client_logger.info("="*80)
+        client_logger.info("NEW QUERY REQUEST RECEIVED")
+        client_logger.info("="*80)
+        client_logger.info(f"Query: '{request_body.query}'")
+        client_logger.info(f"User: {x_user_name if x_user_name else 'UNKNOWN'}")
+        client_logger.info(f"Max Tokens: {request_body.max_tokens}, Temperature: {request_body.temperature}, Top-P: {request_body.top_p}")
     
     # Log received headers
     logger.info("-"*80)
@@ -207,6 +273,8 @@ async def query(
     # Validate required headers (only company_pin and api_key needed for auth)
     if not x_company_pin or not x_api_key:
         logger.warning("❌ AUTHENTICATION FAILED: Missing required authentication headers (X-Company-Pin or X-API-Key)")
+        if client_logger:
+            client_logger.warning("❌ AUTHENTICATION FAILED: Missing required authentication headers")
         logger.info("="*80)
         return QueryResponse(response="Unauthorized", session_id="")
     
@@ -243,6 +311,9 @@ async def query(
         logger.info(f"   API Key: {client['api_key'][:20]}...")
         logger.info(f"   User: {x_user_name}")
         logger.info(f"   Active: {client['is_active']}")
+        
+        if client_logger:
+            client_logger.info(f"✅ AUTHENTICATION SUCCESSFUL - Client ID: {authenticated_client_id}, User: {x_user_name}")
         
         # Get or create session
         logger.info("-"*80)
@@ -377,6 +448,17 @@ async def query(
         logger.info(f"   Response Length: {len(response)} characters")
         logger.info("="*80)
         
+        # Log to client file
+        if client_logger:
+            client_logger.info("-"*80)
+            client_logger.info("✅ QUERY PROCESSED SUCCESSFULLY")
+            client_logger.info(f"Session ID: {session.session_id}")
+            client_logger.info(f"User Query: {request_body.query}")
+            client_logger.info(f"Bot Response: {response[:200]}..." if len(response) > 200 else f"Bot Response: {response}")
+            client_logger.info(f"Source Documents: {len(sources)}")
+            client_logger.info(f"Response Length: {len(response)} characters")
+            client_logger.info("="*80)
+        
         return QueryResponse(response=response, session_id=session.session_id)
     
     except Exception as e:
@@ -503,7 +585,7 @@ async def chat(message: str, request: Request):
 # Admin Endpoints
 
 class SyncClientRequest(BaseModel):
-    client_id: int
+    client_id: int  # HCMS client_id (for reference only)
     company_pin: str
     api_key: str
     is_active: bool = True
@@ -514,8 +596,11 @@ async def sync_client(request_body: SyncClientRequest):
     """
     Sync client data from HCMSAPI to PostgreSQL
     Called when API key is generated in HCMSAPI
+    
+    Note: PostgreSQL will auto-assign client_id (1, 2, 3...)
+    HCMS client_id is stored as hcms_client_id for reference
     """
-    logger.info(f"Syncing client {request_body.client_id} to PostgreSQL")
+    logger.info(f"Syncing client from HCMSAPI (HCMS client_id: {request_body.client_id}) to PostgreSQL")
     
     try:
         from database.postgres_manager import PostgresManager
@@ -525,7 +610,7 @@ async def sync_client(request_body: SyncClientRequest):
             raise HTTPException(status_code=503, detail="Database connection failed")
         
         success = db.sync_client(
-            request_body.client_id,
+            request_body.client_id,  # HCMS client_id
             request_body.company_pin,
             request_body.api_key,
             request_body.is_active
@@ -534,10 +619,10 @@ async def sync_client(request_body: SyncClientRequest):
         db.disconnect()
         
         if success:
-            logger.info(f"Client {request_body.client_id} synced successfully")
+            logger.info(f"Client synced successfully (company_pin: {request_body.company_pin})")
             return {
                 "success": True,
-                "message": f"Client {request_body.client_id} synced successfully"
+                "message": f"Client synced successfully (company_pin: {request_body.company_pin})"
             }
         else:
             raise HTTPException(status_code=500, detail="Failed to sync client")

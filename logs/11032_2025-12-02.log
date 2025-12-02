@@ -1,0 +1,195 @@
+2025-12-02 15:57:47,976 - INFO - ================================================================================
+2025-12-02 15:57:47,976 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-02 15:57:47,976 - INFO - ================================================================================
+2025-12-02 15:57:47,976 - INFO - Query: 'lojikjo'
+2025-12-02 15:57:47,976 - INFO - User: admin@PatelHospital.com1
+2025-12-02 15:57:47,976 - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-02 15:57:48,134 - INFO - ✅ AUTHENTICATION SUCCESSFUL - Client ID: 2, User: admin@PatelHospital.com1
+2025-12-02 15:57:56,311 - INFO - --------------------------------------------------------------------------------
+2025-12-02 15:57:56,311 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-02 15:57:56,311 - INFO - Session ID: 0d026e57-4e03-40db-91ce-0f6f83b68874
+2025-12-02 15:57:56,311 - INFO - User Query: lojikjo
+2025-12-02 15:57:56,311 - INFO - Bot Response: Hey there! 👋 Looks like you typed “lojikjo.” Is that a username, a typo, or something you’d like help with? Let me know how I can assist you!
+2025-12-02 15:57:56,311 - INFO - Source Documents: 0
+2025-12-02 15:57:56,311 - INFO - Response Length: 141 characters
+2025-12-02 15:57:56,311 - INFO - ================================================================================
+2025-12-02 16:00:43,530 - INFO - ================================================================================
+2025-12-02 16:00:43,530 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-02 16:00:43,530 - INFO - ================================================================================
+2025-12-02 16:00:43,530 - INFO - Query: 'how to say thank you in japanes'
+2025-12-02 16:00:43,530 - INFO - User: admin@PatelHospital.com1
+2025-12-02 16:00:43,530 - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-02 16:00:43,597 - INFO - ✅ AUTHENTICATION SUCCESSFUL - Client ID: 2, User: admin@PatelHospital.com1
+2025-12-02 16:00:48,747 - INFO - --------------------------------------------------------------------------------
+2025-12-02 16:00:48,747 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-02 16:00:48,747 - INFO - Session ID: 06ac1688-4ec0-4164-8523-ac3495d17435
+2025-12-02 16:00:48,747 - INFO - User Query: how to say thank you in japanes
+2025-12-02 16:00:48,747 - INFO - Bot Response: In Japanese you can say: - **ありがとう (arigatō)** – casual, “thanks” - **ありがとうございます (arigatō gozaimasu)** – polite, “thank you” If you want to be extra friendly, you can add **どうも** before either one, li...
+2025-12-02 16:00:48,747 - INFO - Source Documents: 0
+2025-12-02 16:00:48,747 - INFO - Response Length: 291 characters
+2025-12-02 16:00:48,747 - INFO - ================================================================================
+2025-12-02 16:01:35,238 - INFO - ================================================================================
+2025-12-02 16:01:35,238 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-02 16:01:35,238 - INFO - ================================================================================
+2025-12-02 16:01:35,238 - INFO - Query: 'translate in arabic the following sentence "the leaves got approved now i am going home"'
+2025-12-02 16:01:35,238 - INFO - User: admin@PatelHospital.com1
+2025-12-02 16:01:35,238 - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-02 16:01:35,293 - INFO - ✅ AUTHENTICATION SUCCESSFUL - Client ID: 2, User: admin@PatelHospital.com1
+2025-12-02 16:01:40,727 - INFO - --------------------------------------------------------------------------------
+2025-12-02 16:01:40,727 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-02 16:01:40,727 - INFO - Session ID: 217fa74e-aecf-4ec2-b887-72d868626202
+2025-12-02 16:01:40,727 - INFO - User Query: translate in arabic the following sentence "the leaves got approved now i am going home"
+2025-12-02 16:01:40,727 - INFO - Bot Response: تمت الموافقة على الإجازات، الآن أذهب إلى المنزل.
+2025-12-02 16:01:40,727 - INFO - Source Documents: 2
+2025-12-02 16:01:40,727 - INFO - Response Length: 48 characters
+2025-12-02 16:01:40,727 - INFO - ================================================================================
+2025-12-02 16:01:55,048 - INFO - ================================================================================
+2025-12-02 16:01:55,048 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-02 16:01:55,048 - INFO - ================================================================================
+2025-12-02 16:01:55,048 - INFO - Query: 'anta chatbot?'
+2025-12-02 16:01:55,048 - INFO - User: admin@PatelHospital.com1
+2025-12-02 16:01:55,048 - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-02 16:01:55,108 - INFO - ✅ AUTHENTICATION SUCCESSFUL - Client ID: 2, User: admin@PatelHospital.com1
+2025-12-02 16:02:00,021 - INFO - --------------------------------------------------------------------------------
+2025-12-02 16:02:00,021 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-02 16:02:00,021 - INFO - Session ID: 8cd91f2e-158b-49d5-8476-9513f7d3ad73
+2025-12-02 16:02:00,021 - INFO - User Query: anta chatbot?
+2025-12-02 16:02:00,021 - INFO - Bot Response: I’m not sure what you mean by “anta chatbot.” Could you give me a bit more detail? I’m happy to help!
+2025-12-02 16:02:00,021 - INFO - Source Documents: 0
+2025-12-02 16:02:00,021 - INFO - Response Length: 101 characters
+2025-12-02 16:02:00,021 - INFO - ================================================================================
+2025-12-02 16:02:38,983 - INFO - ================================================================================
+2025-12-02 16:02:38,983 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-02 16:02:38,983 - INFO - ================================================================================
+2025-12-02 16:02:38,983 - INFO - Query: 'هل أنت روبوت محادثة؟'
+2025-12-02 16:02:38,983 - INFO - User: admin@PatelHospital.com1
+2025-12-02 16:02:38,983 - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-02 16:02:39,038 - INFO - ✅ AUTHENTICATION SUCCESSFUL - Client ID: 2, User: admin@PatelHospital.com1
+2025-12-02 16:02:42,808 - INFO - --------------------------------------------------------------------------------
+2025-12-02 16:02:42,808 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-02 16:02:42,808 - INFO - Session ID: 62c1a3a7-5535-4cf5-bfe3-4d6b95298918
+2025-12-02 16:02:42,808 - INFO - User Query: هل أنت روبوت محادثة؟
+2025-12-02 16:02:42,808 - INFO - Bot Response: نعم، أنا روبوت محادثة.
+2025-12-02 16:02:42,808 - INFO - Source Documents: 0
+2025-12-02 16:02:42,808 - INFO - Response Length: 22 characters
+2025-12-02 16:02:42,808 - INFO - ================================================================================
+2025-12-02 16:03:00,298 - INFO - ================================================================================
+2025-12-02 16:03:00,298 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-02 16:03:00,298 - INFO - ================================================================================
+2025-12-02 16:03:00,298 - INFO - Query: 'كيف يمكنني التقدم بطلب للحصول على أوراق؟'
+2025-12-02 16:03:00,298 - INFO - User: admin@PatelHospital.com1
+2025-12-02 16:03:00,298 - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-02 16:03:00,352 - INFO - ✅ AUTHENTICATION SUCCESSFUL - Client ID: 2, User: admin@PatelHospital.com1
+2025-12-02 16:03:06,761 - INFO - --------------------------------------------------------------------------------
+2025-12-02 16:03:06,761 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-02 16:03:06,761 - INFO - Session ID: 97c3e3fd-7fea-4fd6-9fad-228dc1eade17
+2025-12-02 16:03:06,761 - INFO - User Query: كيف يمكنني التقدم بطلب للحصول على أوراق؟
+2025-12-02 16:03:06,762 - INFO - Bot Response: مرحباً! 😊 للتقدم بطلب للحصول على أوراق داخل FlowHCM، اتبع الخطوات التالية: 1. **تسجيل الدخول** إلى حسابك على منصة FlowHCM. 2. انتقل إلى **القسم “المستندات”** أو “Documents” في القائمة الجانبية. 3. اضغ...
+2025-12-02 16:03:06,762 - INFO - Source Documents: 0
+2025-12-02 16:03:06,762 - INFO - Response Length: 430 characters
+2025-12-02 16:03:06,762 - INFO - ================================================================================
+2025-12-02 16:03:50,760 - INFO - ================================================================================
+2025-12-02 16:03:50,760 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-02 16:03:50,760 - INFO - ================================================================================
+2025-12-02 16:03:50,760 - INFO - Query: 'كيفية تعديل وردية الموظف؟'
+2025-12-02 16:03:50,760 - INFO - User: admin@PatelHospital.com1
+2025-12-02 16:03:50,760 - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-02 16:03:50,824 - INFO - ✅ AUTHENTICATION SUCCESSFUL - Client ID: 2, User: admin@PatelHospital.com1
+2025-12-02 16:03:56,656 - INFO - --------------------------------------------------------------------------------
+2025-12-02 16:03:56,656 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-02 16:03:56,656 - INFO - Session ID: 4197536f-f3d6-4a16-a333-a523de210eab
+2025-12-02 16:03:56,656 - INFO - User Query: كيفية تعديل وردية الموظف؟
+2025-12-02 16:03:56,657 - INFO - Bot Response: لتحرير وردية موظف في FlowHCM، اتبع الخطوات التالية: 1. **تسجيل الدخول** إلى حسابك في FlowHCM. 2. انتقل إلى **الموظفون** (Employees) وابحث عن الموظف الذي تريد تعديل ورديته. 3. افتح ملفه الشخصي ثم اختر ...
+2025-12-02 16:03:56,657 - INFO - Source Documents: 0
+2025-12-02 16:03:56,657 - INFO - Response Length: 487 characters
+2025-12-02 16:03:56,657 - INFO - ================================================================================
+2025-12-02 17:11:18,171 - INFO - ================================================================================
+2025-12-02 17:11:18,171 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-02 17:11:18,171 - INFO - ================================================================================
+2025-12-02 17:11:18,171 - INFO - Query: 'hihihi'
+2025-12-02 17:11:18,171 - INFO - User: admin@PatelHospital.com1
+2025-12-02 17:11:18,171 - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-02 17:11:18,252 - INFO - ✅ AUTHENTICATION SUCCESSFUL - Client ID: 2, User: admin@PatelHospital.com1
+2025-12-02 17:11:25,077 - INFO - --------------------------------------------------------------------------------
+2025-12-02 17:11:25,077 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-02 17:11:25,077 - INFO - Session ID: 6309085c-4f8a-4be4-877e-78ce524c3926
+2025-12-02 17:11:25,078 - INFO - User Query: hihihi
+2025-12-02 17:11:25,078 - INFO - Bot Response: Hey there! How can I help you today?
+2025-12-02 17:11:25,078 - INFO - Source Documents: 0
+2025-12-02 17:11:25,078 - INFO - Response Length: 36 characters
+2025-12-02 17:11:25,078 - INFO - ================================================================================
+2025-12-02 17:11:42,321 - INFO - ================================================================================
+2025-12-02 17:11:42,321 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-02 17:11:42,321 - INFO - ================================================================================
+2025-12-02 17:11:42,321 - INFO - Query: 'hellow howr u?'
+2025-12-02 17:11:42,321 - INFO - User: admin@PatelHospital.com1
+2025-12-02 17:11:42,321 - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-02 17:11:42,390 - INFO - ✅ AUTHENTICATION SUCCESSFUL - Client ID: 2, User: admin@PatelHospital.com1
+2025-12-02 17:11:46,295 - INFO - --------------------------------------------------------------------------------
+2025-12-02 17:11:46,295 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-02 17:11:46,295 - INFO - Session ID: 551da002-fb4a-4e5a-b902-3e45bc18c1ec
+2025-12-02 17:11:46,295 - INFO - User Query: hellow howr u?
+2025-12-02 17:11:46,295 - INFO - Bot Response: Hi! I’m doing great, thanks for asking. How can I help you with FlowHCM today?
+2025-12-02 17:11:46,295 - INFO - Source Documents: 0
+2025-12-02 17:11:46,295 - INFO - Response Length: 78 characters
+2025-12-02 17:11:46,295 - INFO - ================================================================================
+2025-12-02 17:11:54,625 - INFO - ================================================================================
+2025-12-02 17:11:54,625 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-02 17:11:54,625 - INFO - ================================================================================
+2025-12-02 17:11:54,625 - INFO - Query: 'how do i apply for leaves?'
+2025-12-02 17:11:54,625 - INFO - User: admin@PatelHospital.com1
+2025-12-02 17:11:54,625 - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-02 17:11:54,684 - INFO - ✅ AUTHENTICATION SUCCESSFUL - Client ID: 2, User: admin@PatelHospital.com1
+2025-12-02 17:12:01,906 - INFO - --------------------------------------------------------------------------------
+2025-12-02 17:12:01,907 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-02 17:12:01,907 - INFO - Session ID: d75ac548-8452-41b5-af64-30184133c770
+2025-12-02 17:12:01,907 - INFO - User Query: how do i apply for leaves?
+2025-12-02 17:12:01,907 - INFO - Bot Response: To apply for leave in FlowHCM: 1. **Navigate to the Leave module** • From the main menu, select **Leave**. 2. **Start a new leave request** • Click the **Apply for Leave** button. 3. **Enter the leave...
+2025-12-02 17:12:01,907 - INFO - Source Documents: 7
+2025-12-02 17:12:01,907 - INFO - Response Length: 850 characters
+2025-12-02 17:12:01,907 - INFO - ================================================================================
+2025-12-02 17:55:08,183 - INFO - ================================================================================
+2025-12-02 17:55:08,183 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-02 17:55:08,183 - INFO - ================================================================================
+2025-12-02 17:55:08,183 - INFO - Query: 'hi'
+2025-12-02 17:55:08,183 - INFO - User: admin@PatelHospital.com1
+2025-12-02 17:55:08,183 - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-02 17:55:08,360 - INFO - ✅ AUTHENTICATION SUCCESSFUL - Client ID: 2, User: admin@PatelHospital.com1
+2025-12-02 17:55:18,122 - INFO - --------------------------------------------------------------------------------
+2025-12-02 17:55:18,122 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-02 17:55:18,122 - INFO - Session ID: 8ece8ded-bd16-40b2-8721-bf43ea26a96b
+2025-12-02 17:55:18,122 - INFO - User Query: hi
+2025-12-02 17:55:18,129 - INFO - Bot Response: Hey there! 👋 How can I help you with FlowHCM today?
+2025-12-02 17:55:18,129 - INFO - Source Documents: 0
+2025-12-02 17:55:18,129 - INFO - Response Length: 51 characters
+2025-12-02 17:55:18,129 - INFO - ================================================================================
+2025-12-02 18:00:08,725 - INFO - ================================================================================
+2025-12-02 18:00:08,725 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-02 18:00:08,725 - INFO - ================================================================================
+2025-12-02 18:00:08,725 - INFO - Query: 'hello world'
+2025-12-02 18:00:08,725 - INFO - User: admin@PatelHospital.com1
+2025-12-02 18:00:08,725 - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-02 18:00:08,800 - INFO - ✅ AUTHENTICATION SUCCESSFUL - Client ID: 2, User: admin@PatelHospital.com1
+2025-12-02 18:00:13,899 - INFO - --------------------------------------------------------------------------------
+2025-12-02 18:00:13,899 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-02 18:00:13,899 - INFO - Session ID: 9bc61823-75d2-4bc2-95b5-dc9660dffd55
+2025-12-02 18:00:13,899 - INFO - User Query: hello world
+2025-12-02 18:00:13,899 - INFO - Bot Response: Hi there! 👋 How can I help you with FlowHCM today?
+2025-12-02 18:00:13,900 - INFO - Source Documents: 0
+2025-12-02 18:00:13,900 - INFO - Response Length: 50 characters
+2025-12-02 18:00:13,901 - INFO - ================================================================================
+2025-12-02 18:02:58,672 - INFO - ================================================================================
+2025-12-02 18:02:58,672 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-02 18:02:58,672 - INFO - ================================================================================
+2025-12-02 18:02:58,672 - INFO - Query: 'كيفية تعديل وردية الموظف'
+2025-12-02 18:02:58,672 - INFO - User: admin@PatelHospital.com1
+2025-12-02 18:02:58,672 - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-02 18:02:58,722 - INFO - ✅ AUTHENTICATION SUCCESSFUL - Client ID: 2, User: admin@PatelHospital.com1
+2025-12-02 18:03:12,760 - INFO - --------------------------------------------------------------------------------
+2025-12-02 18:03:12,760 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-02 18:03:12,767 - INFO - Session ID: d03d8e58-c604-45b0-8af2-49a1524c371c
+2025-12-02 18:03:12,768 - INFO - User Query: كيفية تعديل وردية الموظف
+2025-12-02 18:03:12,768 - INFO - Bot Response: لتحرير وردية موظف في FlowHCM، اتبع الخطوات التالية: 1. **تسجيل الدخول** ادخل إلى حسابك في FlowHCM. 2. **انتقل إلى قسم الموظفين** - من القائمة الرئيسية، اختر **الموظفون** أو **Employees**. - ابحث عن ال...
+2025-12-02 18:03:12,768 - INFO - Source Documents: 0
+2025-12-02 18:03:12,768 - INFO - Response Length: 1009 characters
+2025-12-02 18:03:12,768 - INFO - ================================================================================
