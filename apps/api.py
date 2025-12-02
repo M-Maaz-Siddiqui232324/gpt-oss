@@ -20,8 +20,21 @@ from rag_system import RAGSystem
 from fastapi_session_manager import FastAPISessionManager
 import utils
 
-# Setup logging
-utils.setup_logging(LOG_LEVEL)
+# Setup logging with daily file rotation
+# Create logs directory if it doesn't exist
+logs_dir = os.path.join(os.path.dirname(__file__), '..', 'logs')
+os.makedirs(logs_dir, exist_ok=True)
+
+# Setup logging with daily file
+log_filename = os.path.join(logs_dir, f"chatbot_{datetime.now().strftime('%Y-%m-%d')}.log")
+logging.basicConfig(
+    level=getattr(logging, LOG_LEVEL),
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(log_filename, encoding='utf-8'),
+        logging.StreamHandler()  # Also log to console
+    ]
+)
 logger = logging.getLogger(__name__)
 
 # Validate SECRET_KEY
@@ -252,11 +265,14 @@ async def query(
             
             # Create session in PostgreSQL
             logger.info(f"💾 Saving session to PostgreSQL database...")
-            db_success = db.create_session(session.session_id, x_user_name or "unknown", authenticated_client_id)
-            if db_success:
+            session_db_id = db.create_session(session.session_id, x_user_name or "unknown", authenticated_client_id)
+            if session_db_id:
+                # Store session_db_id in session for later use
+                session.session_db_id = session_db_id
                 logger.info(f"✅ Session saved to database")
                 logger.info(f"   Table: chatbot.sessions")
-                logger.info(f"   Session ID: {session.session_id}")
+                logger.info(f"   Session DB ID: {session_db_id}")
+                logger.info(f"   Session UUID: {session.session_id}")
                 logger.info(f"   Username: {x_user_name or 'unknown'}")
                 logger.info(f"   Client ID: {authenticated_client_id}")
             else:
@@ -319,15 +335,28 @@ async def query(
         logger.info("-"*80)
         logger.info("💾 SAVING TO DATABASE")
         logger.info(f"Saving conversation to PostgreSQL...")
-        conv_success = db.add_conversation(session.session_id, request_body.query, response)
-        if conv_success:
-            logger.info(f"✅ Conversation saved to database")
-            logger.info(f"   Table: chatbot.conversation")
-            logger.info(f"   Session ID: {session.session_id}")
-            logger.info(f"   User Message: {request_body.query[:50]}...")
-            logger.info(f"   Bot Response: {response[:50]}...")
+        
+        # Get session_db_id (either from session or query database)
+        session_db_id = getattr(session, 'session_db_id', None)
+        if not session_db_id:
+            session_db_id = db.get_session_db_id(session.session_id)
+            if session_db_id:
+                session.session_db_id = session_db_id
+        
+        if session_db_id:
+            current_month = datetime.now().strftime("%B").lower()
+            conv_success = db.add_conversation(session_db_id, request_body.query, response)
+            if conv_success:
+                logger.info(f"✅ Conversation saved to database")
+                logger.info(f"   Table: chatbot.conversation_{current_month}")
+                logger.info(f"   Session DB ID: {session_db_id}")
+                logger.info(f"   Session UUID: {session.session_id}")
+                logger.info(f"   User Message: {request_body.query[:50]}...")
+                logger.info(f"   Bot Response: {response[:50]}...")
+            else:
+                logger.warning(f"⚠️  Failed to save conversation to database")
         else:
-            logger.warning(f"⚠️  Failed to save conversation to database")
+            logger.warning(f"⚠️  Could not get session DB ID, conversation not saved")
         
         # Update session activity timestamp
         logger.info(f"Updating session activity timestamp...")

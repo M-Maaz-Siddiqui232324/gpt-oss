@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS chatbot.clients (
 
 -- Sessions table (stores session metadata)
 CREATE TABLE IF NOT EXISTS chatbot.sessions (
-    session_id UUID PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
+    session_id UUID UNIQUE NOT NULL,
     username VARCHAR(255) NOT NULL,
     fk_client_id INTEGER NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -22,24 +23,26 @@ CREATE TABLE IF NOT EXISTS chatbot.sessions (
     FOREIGN KEY (fk_client_id) REFERENCES chatbot.clients(client_id) ON DELETE CASCADE
 );
 
--- Conversation table (stores individual messages and responses)
-CREATE TABLE IF NOT EXISTS chatbot.conversation (
+-- Conversation table for current month (December 2025)
+-- Note: New tables will be created automatically each month
+CREATE TABLE IF NOT EXISTS chatbot.conversation_december (
     conversation_id SERIAL PRIMARY KEY,
-    fk_session_id UUID NOT NULL,
+    fk_session_id INTEGER NOT NULL,
     user_message TEXT NOT NULL,
     chatbot_response TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (fk_session_id) REFERENCES chatbot.sessions(session_id) ON DELETE CASCADE
+    FOREIGN KEY (fk_session_id) REFERENCES chatbot.sessions(id) ON DELETE CASCADE
 );
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_clients_api_key ON chatbot.clients(api_key);
 CREATE INDEX IF NOT EXISTS idx_clients_company_pin ON chatbot.clients(company_pin);
 CREATE INDEX IF NOT EXISTS idx_sessions_client_id ON chatbot.sessions(fk_client_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_session_id ON chatbot.sessions(session_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_username ON chatbot.sessions(username);
 CREATE INDEX IF NOT EXISTS idx_sessions_last_active ON chatbot.sessions(last_active);
-CREATE INDEX IF NOT EXISTS idx_conversation_session_id ON chatbot.conversation(fk_session_id);
-CREATE INDEX IF NOT EXISTS idx_conversation_created_at ON chatbot.conversation(created_at);
+CREATE INDEX IF NOT EXISTS idx_conversation_december_session_id ON chatbot.conversation_december(fk_session_id);
+CREATE INDEX IF NOT EXISTS idx_conversation_december_created_at ON chatbot.conversation_december(created_at);
 
 -- Insert a default client for testing (optional)
 INSERT INTO chatbot.clients (client_id, company_pin, api_key, is_active) 

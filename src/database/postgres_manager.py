@@ -145,7 +145,7 @@ class PostgresManager:
             self.conn.rollback()
             return False
     
-    def create_session(self, session_id: str, username: str, client_id: int) -> bool:
+    def create_session(self, session_id: str, username: str, client_id: int) -> Optional[int]:
         """
         Create a new session record
         
@@ -155,7 +155,7 @@ class PostgresManager:
             client_id: Client identifier
             
         Returns:
-            True if successful, False otherwise
+            Session ID (integer) if successful, None otherwise
         """
         try:
             logger.debug(f"Inserting session into database: session_id={session_id}, username={username}, client_id={client_id}")
@@ -164,16 +164,40 @@ class PostgresManager:
                     """
                     INSERT INTO chatbot.sessions (session_id, username, fk_client_id, created_at, last_active)
                     VALUES (%s, %s, %s, NOW(), NOW())
+                    RETURNING id
                     """,
                     (session_id, username, client_id)
                 )
+                session_db_id = cur.fetchone()[0]
                 self.conn.commit()
-                logger.info(f"✅ Session created in database: {session_id} (user={username}, client={client_id})")
-                return True
+                logger.info(f"✅ Session created in database: {session_id} (db_id={session_db_id}, user={username}, client={client_id})")
+                return session_db_id
         except Exception as e:
             logger.error(f"❌ Error creating session in database: {e}", exc_info=True)
             self.conn.rollback()
-            return False
+            return None
+    
+    def get_session_db_id(self, session_id: str) -> Optional[int]:
+        """
+        Get the database ID for a session UUID
+        
+        Args:
+            session_id: Session UUID
+            
+        Returns:
+            Database ID (integer) if found, None otherwise
+        """
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute(
+                    "SELECT id FROM chatbot.sessions WHERE session_id = %s",
+                    (session_id,)
+                )
+                result = cur.fetchone()
+                return result[0] if result else None
+        except Exception as e:
+            logger.error(f"❌ Error getting session DB ID: {e}", exc_info=True)
+            return None
     
     def update_session_activity(self, session_id: str) -> bool:
         """Update session last_active timestamp"""
@@ -192,12 +216,68 @@ class PostgresManager:
             self.conn.rollback()
             return False
     
-    def add_conversation(self, session_id: str, user_message: str, chatbot_response: str) -> bool:
+    def _get_current_conversation_table(self) -> str:
         """
-        Add a conversation entry (user message + chatbot response)
+        Get the current month's conversation table name
+        
+        Returns:
+            Table name like 'conversation_december'
+        """
+        from datetime import datetime
+        month_name = datetime.now().strftime("%B").lower()  # e.g., 'december'
+        return f"conversation_{month_name}"
+    
+    def _ensure_conversation_table_exists(self, table_name: str) -> bool:
+        """
+        Create conversation table for the month if it doesn't exist
         
         Args:
-            session_id: Session UUID
+            table_name: Table name like 'conversation_december'
+            
+        Returns:
+            True if table exists or was created, False on error
+        """
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute(
+                    f"""
+                    CREATE TABLE IF NOT EXISTS chatbot.{table_name} (
+                        conversation_id SERIAL PRIMARY KEY,
+                        fk_session_id INTEGER NOT NULL,
+                        user_message TEXT NOT NULL,
+                        chatbot_response TEXT NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (fk_session_id) REFERENCES chatbot.sessions(id) ON DELETE CASCADE
+                    )
+                    """
+                )
+                # Create indexes
+                cur.execute(
+                    f"""
+                    CREATE INDEX IF NOT EXISTS idx_{table_name}_session_id 
+                    ON chatbot.{table_name}(fk_session_id)
+                    """
+                )
+                cur.execute(
+                    f"""
+                    CREATE INDEX IF NOT EXISTS idx_{table_name}_created_at 
+                    ON chatbot.{table_name}(created_at)
+                    """
+                )
+                self.conn.commit()
+                logger.info(f"✅ Ensured conversation table exists: {table_name}")
+                return True
+        except Exception as e:
+            logger.error(f"❌ Error creating conversation table {table_name}: {e}", exc_info=True)
+            self.conn.rollback()
+            return False
+    
+    def add_conversation(self, session_db_id: int, user_message: str, chatbot_response: str) -> bool:
+        """
+        Add a conversation entry (user message + chatbot response) to current month's table
+        
+        Args:
+            session_db_id: Session database ID (integer from sessions.id)
             user_message: User's message
             chatbot_response: Chatbot's response
             
@@ -205,19 +285,27 @@ class PostgresManager:
             True if successful, False otherwise
         """
         try:
-            logger.debug(f"Inserting conversation into database for session: {session_id}")
+            # Get current month's table
+            table_name = self._get_current_conversation_table()
+            
+            # Ensure table exists
+            if not self._ensure_conversation_table_exists(table_name):
+                return False
+            
+            logger.debug(f"Inserting conversation into {table_name} for session_id: {session_db_id}")
             logger.debug(f"  User message: {user_message[:100]}...")
             logger.debug(f"  Bot response: {chatbot_response[:100]}...")
+            
             with self.conn.cursor() as cur:
                 cur.execute(
-                    """
-                    INSERT INTO chatbot.conversation (fk_session_id, user_message, chatbot_response, created_at)
+                    f"""
+                    INSERT INTO chatbot.{table_name} (fk_session_id, user_message, chatbot_response, created_at)
                     VALUES (%s, %s, %s, NOW())
                     """,
-                    (session_id, user_message, chatbot_response)
+                    (session_db_id, user_message, chatbot_response)
                 )
                 self.conn.commit()
-                logger.info(f"✅ Conversation added to database (session: {session_id})")
+                logger.info(f"✅ Conversation added to {table_name} (session_id: {session_db_id})")
                 return True
         except Exception as e:
             logger.error(f"❌ Error adding conversation to database: {e}", exc_info=True)
@@ -238,28 +326,34 @@ class PostgresManager:
             logger.error(f"Error getting session: {e}", exc_info=True)
             return None
     
-    def get_session_conversations(self, session_id: str, limit: int = 50) -> List[Dict[str, Any]]:
+    def get_session_conversations(self, session_db_id: int, month: str = None, limit: int = 50) -> List[Dict[str, Any]]:
         """
-        Get conversation history for a session
+        Get conversation history for a session from specific month's table
         
         Args:
-            session_id: Session UUID
+            session_db_id: Session database ID (integer)
+            month: Month name (e.g., 'december'), defaults to current month
             limit: Maximum number of conversations to retrieve
             
         Returns:
             List of conversation dictionaries
         """
         try:
+            if month is None:
+                table_name = self._get_current_conversation_table()
+            else:
+                table_name = f"conversation_{month.lower()}"
+            
             with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
                 cur.execute(
-                    """
+                    f"""
                     SELECT conversation_id, fk_session_id, user_message, chatbot_response, created_at
-                    FROM chatbot.conversation 
+                    FROM chatbot.{table_name}
                     WHERE fk_session_id = %s 
                     ORDER BY created_at ASC
                     LIMIT %s
                     """,
-                    (session_id, limit)
+                    (session_db_id, limit)
                 )
                 results = cur.fetchall()
                 return [dict(row) for row in results]
