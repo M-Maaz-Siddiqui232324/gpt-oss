@@ -762,3 +762,58 @@ Assistant:
 2025-12-03 12:36:38,018 - fastapi_session_manager - INFO - Deleted session from memory: c10a7e6e-613d-45a8-9dd1-3398c5cbc5b0
 2025-12-03 12:36:38,018 - fastapi_session_manager - INFO - Cleaned up 1 expired sessions
 2025-12-03 12:36:38,018 - __main__ - INFO - Cleanup task removed 1 expired sessions
+2025-12-03 15:10:43,975 - __main__ - WARNING - SECRET_KEY not set or too short. Generating a random key for development.
+2025-12-03 15:10:43,975 - __main__ - WARNING - Generated SECRET_KEY: 3fTz_l87VapS18irhKAXlm7Vt1xlrxhl4fBkN_FzGYU
+2025-12-03 15:10:43,975 - __main__ - WARNING - Set this in your environment for production!
+2025-12-03 15:10:43,983 - __main__ - INFO - Starting server on 0.0.0.0:8000
+2025-12-03 15:10:44,034 - __main__ - INFO - ============================================================
+2025-12-03 15:10:44,034 - __main__ - INFO - Starting FastAPI server
+2025-12-03 15:10:44,034 - __main__ - INFO - ============================================================
+2025-12-03 15:10:44,034 - fastapi_session_manager - INFO - Initialized in-memory session store (max: 10000)
+2025-12-03 15:10:44,034 - fastapi_session_manager - INFO - Session manager initialized (PostgreSQL storage)
+2025-12-03 15:10:44,034 - __main__ - INFO - Session manager initialized successfully
+2025-12-03 15:10:44,034 - rag_system - INFO - ============================================================
+2025-12-03 15:10:44,034 - rag_system - INFO - Initializing RAG System
+2025-12-03 15:10:44,034 - rag_system - INFO - ============================================================
+2025-12-03 15:10:44,034 - processing.document_processor - INFO - Initialized DocumentProcessor with folder: C:\work\chatbot latest\docs
+2025-12-03 15:10:44,034 - processing.chunking - INFO - Initialized SemanticChunker (pure semantic mode, threshold=0.7)
+2025-12-03 15:10:44,034 - processing.chunking - INFO - Loading sentence embedding model for semantic analysis...
+2025-12-03 15:10:46,009 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cuda:0
+2025-12-03 15:10:46,009 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-12-03 15:10:51,784 - processing.chunking - INFO - Sentence embedding model loaded
+2025-12-03 15:10:51,784 - retrieval.vector_store - INFO - Loading embedding model: BAAI/bge-base-en-v1.5
+2025-12-03 15:10:51,784 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cuda:0
+2025-12-03 15:10:51,784 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: BAAI/bge-base-en-v1.5
+2025-12-03 15:10:56,653 - retrieval.vector_store - INFO - Embedding model loaded successfully
+2025-12-03 15:10:56,655 - generation.llm_engine - INFO - Initialized LLMEngine (model=gpt-oss:20b, url=http://localhost:11434)
+2025-12-03 15:10:56,655 - rag_system - INFO - RAG System initialized
+2025-12-03 15:10:56,655 - rag_system - INFO - Starting system initialization
+2025-12-03 15:10:56,655 - rag_system - INFO - Loading LLM model
+2025-12-03 15:10:56,657 - generation.llm_engine - INFO - Checking Ollama connection and model: gpt-oss:20b
+2025-12-03 15:10:58,689 - generation.llm_engine - INFO - Available Ollama models: ['gpt-oss:20b']
+2025-12-03 15:10:58,689 - generation.llm_engine - INFO - Ollama model 'gpt-oss:20b' is ready
+2025-12-03 15:10:58,689 - rag_system - INFO - LLM model loaded successfully
+2025-12-03 15:10:58,690 - rag_system - INFO - Loading documents
+2025-12-03 15:10:58,690 - processing.document_processor - INFO - Starting document loading from: C:\work\chatbot latest\docs
+2025-12-03 15:10:58,710 - processing.document_processor - INFO - Loaded: Attendance Module.docx (11343 chars)
+2025-12-03 15:10:58,733 - processing.document_processor - INFO - Loaded: Leave Module.docx (5125 chars)
+2025-12-03 15:10:58,733 - processing.document_processor - INFO - Total documents loaded: 2
+2025-12-03 15:10:58,733 - rag_system - INFO - Creating document chunks
+2025-12-03 15:10:58,733 - processing.chunking - INFO - Creating semantic chunks from 2 documents
+2025-12-03 15:10:58,968 - processing.chunking - INFO - Total chunks created: 107
+2025-12-03 15:10:58,968 - rag_system - INFO - Building vector index
+2025-12-03 15:10:58,968 - retrieval.vector_store - INFO - Creating embeddings for 107 chunks
+2025-12-03 15:10:59,211 - retrieval.vector_store - INFO - Embeddings created with shape: (107, 768)
+2025-12-03 15:10:59,211 - retrieval.vector_store - INFO - Building FAISS index with dimension: 768
+2025-12-03 15:10:59,211 - retrieval.vector_store - INFO - FAISS index built with 107 vectors
+2025-12-03 15:10:59,211 - retrieval.vector_store - INFO - Saved FAISS index to: C:\work\chatbot latest\data\faiss_index.bin
+2025-12-03 15:10:59,211 - retrieval.vector_store - INFO - Saved chunks to: C:\work\chatbot latest\data\document_chunks.pkl
+2025-12-03 15:10:59,211 - retrieval.retriever - INFO - Initialized SemanticRetriever
+2025-12-03 15:10:59,217 - rag_system - INFO - Retriever initialized
+2025-12-03 15:10:59,217 - rag_system - INFO - ============================================================
+2025-12-03 15:10:59,217 - rag_system - INFO - RAG System initialization complete
+2025-12-03 15:10:59,217 - rag_system - INFO - Documents: 2
+2025-12-03 15:10:59,217 - rag_system - INFO - Chunks: 107
+2025-12-03 15:10:59,217 - rag_system - INFO - ============================================================
+2025-12-03 15:10:59,217 - __main__ - INFO - RAG system initialized successfully
+2025-12-03 15:10:59,217 - __main__ - INFO - Started session cleanup task (interval: 60s)
