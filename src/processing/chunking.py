@@ -44,11 +44,9 @@ class SemanticChunker:
     
     def _chunk_document(self, doc: dict) -> List[DocumentChunk]:
         """Chunk document using semantic similarity between sentences"""
-        # Split into sentences
         sentences = self._split_into_sentences(doc['content'])
         
         if len(sentences) <= 1:
-            # Single sentence or empty - return as one chunk
             return [DocumentChunk(
                 content=doc['content'].strip(),
                 source_file=doc['name'],
@@ -58,7 +56,6 @@ class SemanticChunker:
         
         logger.debug(f"Analyzing {len(sentences)} sentences for semantic boundaries...")
         
-        # Encode all sentences
         embeddings = self.encoder.encode(sentences, convert_to_numpy=True)
         
         # Find semantic boundaries by comparing consecutive sentences
@@ -67,12 +64,9 @@ class SemanticChunker:
         chunk_id = 0
         
         for i in range(1, len(sentences)):
-            # Calculate cosine similarity between current and previous sentence
             similarity = self._cosine_similarity(embeddings[i-1], embeddings[i])
             
             if similarity < self.similarity_threshold:
-                # Low similarity = semantic boundary detected
-                # Save current chunk and start new one
                 chunk_content = ' '.join(current_chunk).strip()
                 if chunk_content:
                     chunks.append(DocumentChunk(
@@ -86,10 +80,8 @@ class SemanticChunker:
                 current_chunk = [sentences[i]]
                 logger.debug(f"Semantic boundary detected at sentence {i} (similarity: {similarity:.3f})")
             else:
-                # High similarity = continue current chunk
                 current_chunk.append(sentences[i])
         
-        # Add final chunk
         if current_chunk:
             chunk_content = ' '.join(current_chunk).strip()
             if chunk_content:
@@ -105,8 +97,7 @@ class SemanticChunker:
     
     def _split_into_sentences(self, text: str) -> List[str]:
         """Split text into sentences"""
-        # Simple sentence splitting (can be improved with spaCy/NLTK)
-        # Split on . ! ? followed by space and capital letter
+       
         sentences = re.split(r'(?<=[.!?])\s+(?=[A-Z])', text)
         return [s.strip() for s in sentences if s.strip()]
     

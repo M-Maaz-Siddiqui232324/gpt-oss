@@ -20,13 +20,11 @@ class LLMEngine:
         logger.info(f"Checking Ollama connection and model: {self.model_name}")
         
         try:
-            # Check if Ollama is running
             response = requests.get(f"{self.base_url}/api/tags", timeout=5)
             if response.status_code != 200:
                 logger.error(f"Ollama API returned status {response.status_code}")
                 return False
             
-            # Check if model is available
             models = response.json().get("models", [])
             model_names = [m.get("name", "") for m in models]
             
@@ -63,7 +61,6 @@ class LLMEngine:
         logger.debug(f"Generating response (max_tokens={max_tokens}, temp={temperature})")
         
         try:
-            # Prepare request payload
             payload = {
                 "model": self.model_name,
                 "prompt": prompt,
@@ -77,7 +74,6 @@ class LLMEngine:
                 }
             }
             
-            # Define stop strings to prevent continuation
             stop_strings = [
                 "USER QUESTION",
                 "QUESTION",
@@ -109,13 +105,11 @@ class LLMEngine:
                 logger.error(f"Ollama API error: {response.status_code}")
                 return "I apologize, but I encountered an error generating a response."
             
-            # Parse response
             result = response.json()
             generated_text = result.get("response", "").strip()
             
             logger.debug(f"Generated response length: {len(generated_text)} chars")
             
-            # Additional cleanup for stop strings (in case Ollama didn't stop)
             for stop_str in stop_strings:
                 if stop_str in generated_text:
                     generated_text = generated_text.split(stop_str)[0].strip()

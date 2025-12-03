@@ -466,30 +466,6 @@ async def query(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/clear")
-async def clear_conversation(request: Request):
-    """Clear conversation history for current session"""
-    if session_manager is None:
-        raise HTTPException(status_code=503, detail="Session manager not initialized")
-    
-    # Get session
-    session_id = request.session.get("session_id")
-    if not session_id:
-        raise HTTPException(status_code=400, detail="No active session")
-    
-    # Clear session messages
-    success = session_manager.clear_session(session_id)
-    
-    if success:
-        logger.info(f"Cleared conversation for session: {session_id}")
-        return {
-            "message": "Conversation history cleared",
-            "session_id": session_id
-        }
-    else:
-        raise HTTPException(status_code=404, detail="Session not found")
-
-
 @app.get("/documents")
 async def list_documents():
     """List loaded documents"""

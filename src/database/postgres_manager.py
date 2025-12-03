@@ -51,13 +51,10 @@ class PostgresManager:
             Client info dict if authenticated, None otherwise
         """
         try:
-            # Extract the actual key part (remove FLOW-{client_id}- prefix)
-            # Format: FLOW-1-test123456789... -> test123456789...
             if api_key.startswith("FLOW-"):
-                # Split by '-' and take everything after the second dash
-                parts = api_key.split("-", 2)  # Split into max 3 parts: ['FLOW', '1', 'test123...']
+                parts = api_key.split("-", 2)
                 if len(parts) >= 3:
-                    actual_key = parts[2]  # Get the part after FLOW-{client_id}-
+                    actual_key = parts[2]  
                     logger.info(f"🔍 Extracted API key: '{api_key}' -> '{actual_key[:30]}...'")
                 else:
                     actual_key = api_key
@@ -94,20 +91,7 @@ class PostgresManager:
             logger.error(f"❌ Error authenticating client: {e}", exc_info=True)
             return None
     
-    def get_client_by_api_key(self, api_key: str) -> Optional[Dict[str, Any]]:
-        """Get client by API key (for backward compatibility)"""
-        try:
-            with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute(
-                    "SELECT * FROM chatbot.clients WHERE api_key = %s AND is_active = TRUE",
-                    (api_key,)
-                )
-                result = cur.fetchone()
-                return dict(result) if result else None
-        except Exception as e:
-            logger.error(f"Error getting client by API key: {e}", exc_info=True)
-            return None
-    
+
     def sync_client(self, hcms_client_id: int, company_pin: str, api_key: str, is_active: bool = True) -> bool:
         """
         Sync client data from HCMSAPI (INSERT or UPDATE)
@@ -125,8 +109,7 @@ class PostgresManager:
         try:
             logger.info(f"Syncing client to database: hcms_client_id={hcms_client_id}, company_pin={company_pin}, api_key={api_key[:20]}..., is_active={is_active}")
             with self.conn.cursor() as cur:
-                # UPSERT based on company_pin (unique identifier)
-                # If company_pin exists, update; otherwise insert with auto-incremented client_id
+      
                 cur.execute(
                     """
                     INSERT INTO chatbot.clients (hcms_client_id, company_pin, api_key, is_active, created_at)
@@ -232,8 +215,8 @@ class PostgresManager:
             Table name like 'conversation_dec_2025'
         """
         from datetime import datetime
-        month_abbr = datetime.now().strftime("%b").lower()  # e.g., 'dec'
-        year = datetime.now().strftime("%Y")  # e.g., '2025'
+        month_abbr = datetime.now().strftime("%b").lower()  
+        year = datetime.now().strftime("%Y")  
         return f"conversation_{month_abbr}_{year}"
     
     def _ensure_conversation_table_exists(self, table_name: str) -> bool:
@@ -294,10 +277,8 @@ class PostgresManager:
             True if successful, False otherwise
         """
         try:
-            # Get current month's table
             table_name = self._get_current_conversation_table()
             
-            # Ensure table exists
             if not self._ensure_conversation_table_exists(table_name):
                 return False
             

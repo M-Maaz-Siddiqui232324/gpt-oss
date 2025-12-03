@@ -40,7 +40,7 @@ class VectorStore:
             logger.error("Cannot build index - dependencies missing")
             return False
         
-        # Try loading existing index
+        # load existing index
         if self._load_index():
             logger.info("Loaded existing FAISS index from disk")
             return True
@@ -66,12 +66,10 @@ class VectorStore:
         logger.info(f"Building FAISS index with dimension: {dimension}")
         self.index = faiss.IndexFlatIP(dimension)
         
-        # Normalize for cosine similarity
         faiss.normalize_L2(embeddings)
         self.index.add(embeddings.astype('float32'))
         logger.info(f"FAISS index built with {self.index.ntotal} vectors")
         
-        # Save index
         self._save_index()
         return True
     
@@ -84,11 +82,9 @@ class VectorStore:
         try:
             logger.debug(f"Semantic search for: '{query}' (top_k={top_k})")
             
-            # Encode query
             query_embedding = self.encoder.encode([query], convert_to_numpy=True)
             faiss.normalize_L2(query_embedding)
             
-            # Search
             scores, indices = self.index.search(query_embedding.astype('float32'), top_k * 2)
             
             results = []
@@ -106,7 +102,6 @@ class VectorStore:
     def _save_index(self):
         """Save FAISS index and chunks to disk"""
         try:
-            # Create data directory if it doesn't exist
             index_dir = os.path.dirname(self.index_file)
             if index_dir and not os.path.exists(index_dir):
                 os.makedirs(index_dir)

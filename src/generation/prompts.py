@@ -11,12 +11,10 @@ Assistant:"""
 
 def get_document_aware_prompt(user_input: str, context_docs: list, recent_context: str = "") -> str:
     """Prompt for answering questions based on documentation"""
-    # Build context with clear separation
     context = ""
     for i, doc in enumerate(context_docs, 1):
         context += f"\n[SOURCE {i}: {doc.source_file}]\n{doc.content}\n"
     
-    # Add conversation history if available
     history_section = f"\nCONVERSATION HISTORY:\n{recent_context}\n" if recent_context else ""
     
     return f"""You are FlowHCM Assistant, an expert at answering questions about FlowHCM HR management software. Your role is to help users navigate the system and understand processes using the official documentation which contains all the information about the FlowHCM.

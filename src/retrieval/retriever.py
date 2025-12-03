@@ -17,7 +17,6 @@ class SemanticRetriever:
         """Semantic search using vector similarity"""
         logger.info(f"Semantic search for: '{query}' (top_k={top_k})")
         
-        # Get semantic scores from vector store
         semantic_results = self.vector_store.search(query, top_k)
         
         if not semantic_results:
@@ -26,7 +25,6 @@ class SemanticRetriever:
         
         logger.info(f"Found {len(semantic_results)} semantic matches")
         
-        # Build results with scores
         results = []
         for idx, score in semantic_results:
             if idx < len(self.chunks):

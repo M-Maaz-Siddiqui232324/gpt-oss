@@ -6,7 +6,6 @@ from typing import List, Dict
 
 logger = logging.getLogger(__name__)
 
-# Optional imports
 try:
     from docx import Document
     DOCX_AVAILABLE = True
@@ -57,7 +56,6 @@ class DocumentProcessor:
         file_ext = os.path.splitext(file_path)[1].lower()
         
         try:
-            # Word documents only
             if file_ext == '.docx' and DOCX_AVAILABLE:
                 logger.debug(f"Extracting DOCX: {file_path}")
                 doc = Document(file_path)

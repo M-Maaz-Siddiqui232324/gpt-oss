@@ -27,17 +27,14 @@ class RAGSystem:
         logger.info("Initializing RAG System")
         logger.info("="*60)
         
-        # Components
         self.doc_processor = DocumentProcessor(DOCS_FOLDER)
         self.chunker = SemanticChunker(similarity_threshold=SEMANTIC_SIMILARITY_THRESHOLD)
         self.vector_store = VectorStore(EMBEDDING_MODEL, FAISS_INDEX_FILE, CHUNKS_FILE)
         self.llm_engine = LLMEngine(MODEL_NAME, OLLAMA_BASE_URL)
         self.retriever = None
         
-        # Data
         self.documents = []
         self.chunks = []
-        self.messages = []
         
         logger.info("RAG System initialized")
     
@@ -52,7 +49,6 @@ class RAGSystem:
             return False
         logger.info("LLM model loaded successfully")
         
-        # Load documents
         logger.info("Loading documents")
         self.documents = self.doc_processor.load_documents()
         if not self.documents:
@@ -66,13 +62,11 @@ class RAGSystem:
             logger.error("Failed to create chunks")
             return False
         
-        # Build vector index
         logger.info("Building vector index")
         if not self.vector_store.build_index(self.chunks):
             logger.error("Failed to build vector index")
             return False
         
-        # Initialize retriever
         self.retriever = SemanticRetriever(
             self.vector_store, 
             self.chunks
@@ -86,33 +80,7 @@ class RAGSystem:
         logger.info("="*60)
         return True
     
-    def query(
-        self, 
-        user_input: str,
-        max_tokens: int = DEFAULT_MAX_TOKENS,
-        temperature: float = DEFAULT_TEMPERATURE,
-        top_p: float = DEFAULT_TOP_P
-    ) -> Tuple[str, List[DocumentChunk]]:
-        """Process a user query and generate response (with internal history)
-        
-        Note: This method is for backward compatibility. 
-        For session-based management, use query_with_context() directly.
-        """
-        recent_context = self.get_recent_context(RECENT_CONTEXT_EXCHANGES)
-        response, sources = self.query_with_context(
-            user_input,
-            recent_context,
-            max_tokens,
-            temperature,
-            top_p
-        )
-        
-        # Save to internal history
-        self.add_message("user", user_input, sources)
-        self.add_message("assistant", response)
-        
-        return response, sources
-    
+
     def query_with_context(
         self, 
         user_input: str,
@@ -136,7 +104,6 @@ class RAGSystem:
                 logger.info(">>> DECISION: Using GENERAL RESPONSE (no context docs)")
                 return self._generate_general_response(user_input, recent_context, max_tokens, temperature, top_p), []
             
-            # Dynamic threshold filtering
             scores = [doc.relevance_score for doc in context_docs]
             mean_score = np.mean(scores)
             std_score = np.std(scores)
@@ -145,11 +112,9 @@ class RAGSystem:
             dynamic_threshold = max(MIN_RELEVANCE_THRESHOLD, mean_score - 0.5 * std_score)
             logger.info(f"Dynamic threshold: {dynamic_threshold:.3f}")
             
-            # Filter relevant docs
             relevant_docs = [doc for doc in context_docs if doc.relevance_score >= dynamic_threshold]
             logger.info(f"Filtered to {len(relevant_docs)} relevant documents")
             
-            # Take top documents for context
             relevant_docs = relevant_docs[:TOP_K_CONTEXT]
             logger.info(f"Using top {len(relevant_docs)} documents")
             
@@ -158,7 +123,6 @@ class RAGSystem:
                 logger.info(">>> DECISION: Using GENERAL RESPONSE (no relevant docs)")
                 return self._generate_general_response(user_input, recent_context, max_tokens, temperature, top_p), []
             
-            # Log unique sources
             unique_sources = set(doc.source_file for doc in relevant_docs)
             logger.info(f"Unique source documents: {len(unique_sources)}")
             for source in unique_sources:
@@ -196,7 +160,6 @@ class RAGSystem:
         logger.info("Generating general response (no relevant documents found)")
         prompt = get_general_prompt(user_input, recent_context)
         
-        # Log the prompt
         logger.info("="*60)
         logger.info("GENERAL PROMPT SENT TO LLM:")
         logger.info(f"\n{prompt}")
@@ -222,7 +185,6 @@ class RAGSystem:
         """Generate response with document context"""
         logger.info("Generating document-aware response")
         
-        # Log the chunks being used
         logger.info("="*60)
         logger.info("CONTEXT CHUNKS USED FOR GENERATION:")
         for i, doc in enumerate(context_docs, 1):
@@ -236,7 +198,6 @@ class RAGSystem:
         
         prompt = get_document_aware_prompt(user_input, context_docs, recent_context)
         
-        # Log the full prompt
         logger.info("="*60)
         logger.info("FULL PROMPT SENT TO LLM:")
         logger.info(f"\n{prompt}")
@@ -249,30 +210,4 @@ class RAGSystem:
             top_p=top_p
         )
         return utils.clean_response(response)
-    
-    def add_message(self, role: str, content: str, context_docs: List[DocumentChunk] = None):
-        """Add message to conversation history"""
-        self.messages.append({
-            "role": role,
-            "content": content,
-            "timestamp": datetime.now(),
-            "context_docs": context_docs or []
-        })
-        
-        # Maintain history limit
-        if len(self.messages) > MAX_HISTORY * 2:
-            self.messages = self.messages[-MAX_HISTORY * 2:]
-    
-    def get_recent_context(self, num_exchanges: int = 2) -> str:
-        """Get recent conversation context"""
-        recent_messages = self.messages[-(num_exchanges * 2):]
-        context = ""
-        for msg in recent_messages:
-            role = "Human" if msg["role"] == "user" else "Assistant"
-            context += f"{role}: {msg['content']}\n"
-        return context
-    
-    def clear_conversation(self):
-        """Clear conversation history"""
-        logger.info("Clearing conversation history")
-        self.messages.clear()
+
