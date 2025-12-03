@@ -315,6 +315,31 @@ async def query(
         if client_logger:
             client_logger.info(f"✅ AUTHENTICATION SUCCESSFUL - Client ID: {authenticated_client_id}, User: {x_user_name}")
         
+        # Check token limit
+        logger.info("-"*80)
+        logger.info("🔢 TOKEN LIMIT CHECK")
+        token_status = db.check_token_limit(authenticated_client_id)
+        logger.info(f"   Token Limit: {token_status['limit']:,}")
+        logger.info(f"   Tokens Used: {token_status['usage']:,}")
+        logger.info(f"   Remaining: {token_status['remaining']:,}")
+        logger.info(f"   Allowed: {token_status['allowed']}")
+        
+        if not token_status['allowed']:
+            logger.warning(f"❌ TOKEN LIMIT EXCEEDED")
+            logger.warning(f"   Client has used {token_status['usage']:,} / {token_status['limit']:,} tokens this month")
+            db.disconnect()
+            
+            if client_logger:
+                client_logger.warning(f"❌ TOKEN LIMIT EXCEEDED - Used: {token_status['usage']:,} / {token_status['limit']:,}")
+            
+            logger.info("="*80)
+            return QueryResponse(
+                response="Your monthly token limit has been reached. Please contact your administrator.",
+                session_id=""
+            )
+        
+        logger.info(f"✅ Token limit check passed")
+        
         # Get or create session
         logger.info("-"*80)
         logger.info("📋 SESSION MANAGEMENT")
@@ -384,6 +409,19 @@ async def query(
         )
         logger.info(f"✅ Response generated ({len(response)} characters, {len(sources)} source documents)")
         
+        # Count tokens used (input + output)
+        logger.info("-"*80)
+        logger.info("🔢 TOKEN COUNTING")
+        input_tokens = utils.count_tokens(request_body.query)
+        output_tokens = utils.count_tokens(response)
+        total_tokens = input_tokens + output_tokens
+        logger.info(f"   Input tokens: {input_tokens:,}")
+        logger.info(f"   Output tokens: {output_tokens:,}")
+        logger.info(f"   Total tokens: {total_tokens:,}")
+        
+        if client_logger:
+            client_logger.info(f"🔢 Tokens - Input: {input_tokens:,}, Output: {output_tokens:,}, Total: {total_tokens:,}")
+        
         # Add assistant response to session
         assistant_message = Message(
             role="assistant",
@@ -415,19 +453,37 @@ async def query(
                 session.session_db_id = session_db_id
         
         if session_db_id:
-            current_month = datetime.now().strftime("%B").lower()
-            conv_success = db.add_conversation(session_db_id, request_body.query, response)
+            month_abbr = datetime.now().strftime("%b").lower()
+            year = datetime.now().strftime("%Y")
+            conv_success = db.add_conversation(session_db_id, request_body.query, response, total_tokens)
             if conv_success:
                 logger.info(f"✅ Conversation saved to database")
-                logger.info(f"   Table: chatbot.conversation_{current_month}")
+                logger.info(f"   Table: chatbot.conversation_{month_abbr}_{year}")
                 logger.info(f"   Session DB ID: {session_db_id}")
                 logger.info(f"   Session UUID: {session.session_id}")
+                logger.info(f"   Tokens Used: {total_tokens:,}")
                 logger.info(f"   User Message: {request_body.query[:50]}...")
                 logger.info(f"   Bot Response: {response[:50]}...")
             else:
                 logger.warning(f"⚠️  Failed to save conversation to database")
         else:
             logger.warning(f"⚠️  Could not get session DB ID, conversation not saved")
+        
+        # Update token usage for client
+        logger.info(f"Updating token usage for client {authenticated_client_id}...")
+        token_update_success = db.update_token_usage(authenticated_client_id, total_tokens)
+        if token_update_success:
+            new_usage = db.get_client_token_usage(authenticated_client_id)
+            logger.info(f"✅ Token usage updated")
+            logger.info(f"   Client ID: {authenticated_client_id}")
+            logger.info(f"   Tokens Added: {total_tokens:,}")
+            logger.info(f"   New Total Usage: {new_usage:,} / {token_status['limit']:,}")
+            logger.info(f"   Remaining: {token_status['limit'] - new_usage:,}")
+            
+            if client_logger:
+                client_logger.info(f"✅ Token usage updated - Added: {total_tokens:,}, Total: {new_usage:,} / {token_status['limit']:,}")
+        else:
+            logger.warning(f"⚠️  Failed to update token usage")
         
         # Update session activity timestamp
         logger.info(f"Updating session activity timestamp...")

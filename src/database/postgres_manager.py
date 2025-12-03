@@ -238,6 +238,7 @@ class PostgresManager:
                         fk_session_id INTEGER NOT NULL,
                         user_message TEXT NOT NULL,
                         chatbot_response TEXT NOT NULL,
+                        tokens_used INTEGER DEFAULT 0,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         FOREIGN KEY (fk_session_id) REFERENCES chatbot.sessions(id) ON DELETE CASCADE
                     )
@@ -264,7 +265,7 @@ class PostgresManager:
             self.conn.rollback()
             return False
     
-    def add_conversation(self, session_db_id: int, user_message: str, chatbot_response: str) -> bool:
+    def add_conversation(self, session_db_id: int, user_message: str, chatbot_response: str, tokens_used: int = 0) -> bool:
         """
         Add a conversation entry (user message + chatbot response) to current month's table
         
@@ -289,13 +290,13 @@ class PostgresManager:
             with self.conn.cursor() as cur:
                 cur.execute(
                     f"""
-                    INSERT INTO chatbot.{table_name} (fk_session_id, user_message, chatbot_response, created_at)
-                    VALUES (%s, %s, %s, NOW())
+                    INSERT INTO chatbot.{table_name} (fk_session_id, user_message, chatbot_response, tokens_used, created_at)
+                    VALUES (%s, %s, %s, %s, NOW())
                     """,
-                    (session_db_id, user_message, chatbot_response)
+                    (session_db_id, user_message, chatbot_response, tokens_used)
                 )
                 self.conn.commit()
-                logger.info(f"✅ Conversation added to {table_name} (session_id: {session_db_id})")
+                logger.info(f"✅ Conversation added to {table_name} (session_id: {session_db_id}, tokens: {tokens_used})")
                 return True
         except Exception as e:
             logger.error(f"❌ Error adding conversation to database: {e}", exc_info=True)
@@ -373,3 +374,134 @@ class PostgresManager:
         except Exception as e:
             logger.error(f"Error getting client sessions: {e}", exc_info=True)
             return []
+    
+    # Token Management Methods
+    
+    def get_client_token_limit(self, client_id: int) -> Optional[int]:
+        """
+        Get token limit per month for a client
+        
+        Args:
+            client_id: Client ID
+            
+        Returns:
+            Token limit or None if not found
+        """
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute(
+                    "SELECT token_limit_per_month FROM chatbot.clients WHERE client_id = %s",
+                    (client_id,)
+                )
+                result = cur.fetchone()
+                return result[0] if result else None
+        except Exception as e:
+            logger.error(f"Error getting client token limit: {e}", exc_info=True)
+            return None
+    
+    def get_client_token_usage(self, client_id: int, month_year: str = None) -> int:
+        """
+        Get current token usage for a client in a specific month
+        
+        Args:
+            client_id: Client ID
+            month_year: Month and year (e.g., 'dec_2025'), defaults to current month
+            
+        Returns:
+            Total tokens used in the month
+        """
+        try:
+            if month_year is None:
+                month_abbr = datetime.now().strftime("%b").lower()
+                year = datetime.now().strftime("%Y")
+                month_year = f"{month_abbr}_{year}"
+            
+            with self.conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT tokens_used FROM chatbot.tokens 
+                    WHERE fk_client_id = %s AND month_year = %s
+                    """,
+                    (client_id, month_year)
+                )
+                result = cur.fetchone()
+                return result[0] if result else 0
+        except Exception as e:
+            logger.error(f"Error getting client token usage: {e}", exc_info=True)
+            return 0
+    
+    def update_token_usage(self, client_id: int, tokens_used: int, month_year: str = None) -> bool:
+        """
+        Update token usage for a client (add to existing usage)
+        
+        Args:
+            client_id: Client ID
+            tokens_used: Number of tokens to add
+            month_year: Month and year (e.g., 'dec_2025'), defaults to current month
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            if month_year is None:
+                month_abbr = datetime.now().strftime("%b").lower()
+                year = datetime.now().strftime("%Y")
+                month_year = f"{month_abbr}_{year}"
+            
+            logger.debug(f"Updating token usage for client {client_id}: +{tokens_used} tokens for {month_year}")
+            
+            with self.conn.cursor() as cur:
+                # Insert or update token usage
+                cur.execute(
+                    """
+                    INSERT INTO chatbot.tokens (fk_client_id, month_year, tokens_used, created_at, updated_at)
+                    VALUES (%s, %s, %s, NOW(), NOW())
+                    ON CONFLICT (fk_client_id, month_year)
+                    DO UPDATE SET 
+                        tokens_used = chatbot.tokens.tokens_used + EXCLUDED.tokens_used,
+                        updated_at = NOW()
+                    """,
+                    (client_id, month_year, tokens_used)
+                )
+                self.conn.commit()
+                logger.info(f"✅ Token usage updated for client {client_id}: +{tokens_used} tokens ({month_year})")
+                return True
+        except Exception as e:
+            logger.error(f"❌ Error updating token usage: {e}", exc_info=True)
+            self.conn.rollback()
+            return False
+    
+    def check_token_limit(self, client_id: int) -> Dict[str, Any]:
+        """
+        Check if client has exceeded token limit for current month
+        
+        Args:
+            client_id: Client ID
+            
+        Returns:
+            Dict with 'allowed' (bool), 'usage' (int), 'limit' (int), 'remaining' (int)
+        """
+        try:
+            limit = self.get_client_token_limit(client_id)
+            usage = self.get_client_token_usage(client_id)
+            
+            if limit is None:
+                limit = 100000  # Default limit
+            
+            remaining = max(0, limit - usage)
+            allowed = usage < limit
+            
+            return {
+                'allowed': allowed,
+                'usage': usage,
+                'limit': limit,
+                'remaining': remaining
+            }
+        except Exception as e:
+            logger.error(f"Error checking token limit: {e}", exc_info=True)
+            return {
+                'allowed': True,  # Allow on error to avoid blocking
+                'usage': 0,
+                'limit': 100000,
+                'remaining': 100000
+            }

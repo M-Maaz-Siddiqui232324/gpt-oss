@@ -408,3 +408,321 @@ POSTGRES_PASSWORD=root
 - **Version**: 1.0
 - **Date**: December 2, 2025
 - **Author**: FlowHCM Development Team
+
+
+---
+
+## 11. Token Limiting System (NEW)
+
+### Overview
+Implemented token-based usage control to limit API consumption per client on a monthly basis.
+
+### Database Schema Changes
+
+#### Updated `chatbot.clients` Table
+```sql
+ALTER TABLE chatbot.clients 
+ADD COLUMN token_limit_per_month INTEGER DEFAULT 100000;
+```
+
+**Purpose**: Store monthly token limit for each client (default: 100,000 tokens).
+
+#### New `chatbot.tokens` Table
+```sql
+CREATE TABLE chatbot.tokens (
+    token_id SERIAL PRIMARY KEY,
+    fk_client_id INTEGER NOT NULL,
+    month_year VARCHAR(10) NOT NULL,              -- Format: "dec_2025"
+    tokens_used INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (fk_client_id) REFERENCES chatbot.clients(client_id) ON DELETE CASCADE,
+    UNIQUE(fk_client_id, month_year)
+);
+```
+
+**Purpose**: Track monthly token usage per client with historical data.
+
+#### Updated `chatbot.conversation_*` Tables
+```sql
+ALTER TABLE chatbot.conversation_dec_2025 
+ADD COLUMN tokens_used INTEGER DEFAULT 0;
+```
+
+**Purpose**: Store token count for each individual query-response pair.
+
+### Token Counting
+
+#### Library: tiktoken
+```bash
+pip install tiktoken
+```
+
+**Why tiktoken?**
+- Same tokenizer used by OpenAI GPT models
+- Accurate token counting for cost estimation
+- Fallback to approximate method if not available
+
+#### Token Calculation
+```python
+input_tokens = count_tokens(user_query)
+output_tokens = count_tokens(bot_response)
+total_tokens = input_tokens + output_tokens
+```
+
+### Authentication Flow with Token Limiting
+
+#### Updated `/query` Endpoint Flow
+```python
+1. Authenticate client (client_id + company_pin + api_key) ✅
+2. Check token limit:
+   - Get client's token_limit_per_month
+   - Get current month's usage from tokens table
+   - If usage >= limit → Return "Token limit exceeded"
+3. Process query ✅
+4. Count tokens (input + output)
+5. Save conversation with tokens_used column
+6. Update tokens table (increment usage)
+7. Return response ✅
+```
+
+### PostgreSQL Manager Methods
+
+#### `get_client_token_limit(client_id)`
+Returns the monthly token limit for a client.
+
+```python
+limit = db.get_client_token_limit(1)  # Returns 100000
+```
+
+#### `get_client_token_usage(client_id, month_year=None)`
+Returns total tokens used by client in specified month (defaults to current month).
+
+```python
+usage = db.get_client_token_usage(1)  # Returns current month usage
+usage = db.get_client_token_usage(1, "dec_2025")  # Returns specific month
+```
+
+#### `update_token_usage(client_id, tokens_used, month_year=None)`
+Adds tokens to client's monthly usage (UPSERT operation).
+
+```python
+db.update_token_usage(1, 175)  # Add 175 tokens to current month
+```
+
+#### `check_token_limit(client_id)`
+Returns dict with usage status.
+
+```python
+status = db.check_token_limit(1)
+# Returns:
+# {
+#     'allowed': True,
+#     'usage': 45230,
+#     'limit': 100000,
+#     'remaining': 54770
+# }
+```
+
+### Monthly Reset Behavior
+
+**Automatic Reset**: Token usage is tracked per month using `month_year` format.
+
+When a new month starts:
+- New row is automatically created in `tokens` table
+- Previous month's data is preserved for history
+- No manual reset needed
+
+Example:
+```sql
+-- December 2025
+fk_client_id | month_year | tokens_used
+1            | dec_2025   | 45230
+
+-- January 2026 (auto-created on first query)
+fk_client_id | month_year | tokens_used
+1            | jan_2026   | 0
+```
+
+### API Response When Limit Exceeded
+
+```json
+{
+  "response": "Your monthly token limit has been reached. Please contact your administrator.",
+  "session_id": ""
+}
+```
+
+### Logging
+
+Token usage is logged in both main and client-specific logs:
+
+```
+🔢 TOKEN LIMIT CHECK
+   Token Limit: 100,000
+   Tokens Used: 45,230
+   Remaining: 54,770
+   Allowed: True
+
+🔢 TOKEN COUNTING
+   Input tokens: 25
+   Output tokens: 150
+   Total tokens: 175
+
+✅ Token usage updated
+   Client ID: 1
+   Tokens Added: 175
+   New Total Usage: 45,405 / 100,000
+   Remaining: 54,595
+```
+
+### Migration
+
+#### Run Migration Script
+```bash
+psql -h localhost -U postgres -d chatbot_db -f migration_add_token_limits.sql
+```
+
+This will:
+- Add `token_limit_per_month` column to `clients` table
+- Create `tokens` table for monthly tracking
+- Add `tokens_used` column to all existing conversation tables
+- Create necessary indexes
+
+### Configuration
+
+#### Set Token Limit for a Client
+```sql
+-- Set limit to 50,000 tokens per month
+UPDATE chatbot.clients 
+SET token_limit_per_month = 50000 
+WHERE client_id = 1;
+
+-- Set unlimited (very high limit)
+UPDATE chatbot.clients 
+SET token_limit_per_month = 999999999 
+WHERE client_id = 2;
+```
+
+#### Check Token Usage
+```sql
+-- Current month usage for a client
+SELECT * FROM chatbot.tokens 
+WHERE fk_client_id = 1 
+AND month_year = 'dec_2025';
+
+-- All-time usage for a client
+SELECT 
+    month_year,
+    tokens_used,
+    updated_at
+FROM chatbot.tokens 
+WHERE fk_client_id = 1 
+ORDER BY month_year DESC;
+
+-- Token usage per conversation
+SELECT 
+    conversation_id,
+    user_message,
+    tokens_used,
+    created_at
+FROM chatbot.conversation_dec_2025
+WHERE fk_session_id = 123
+ORDER BY created_at DESC;
+```
+
+### Testing Token Limiting
+
+#### Test Script
+```bash
+python test_token_counting.py
+```
+
+This will:
+- Test token counting with various inputs
+- Show difference between tiktoken and approximate counting
+- Simulate conversation scenarios
+- Project monthly usage and costs
+
+#### Manual Testing
+```bash
+# 1. Set a low limit for testing
+psql -c "UPDATE chatbot.clients SET token_limit_per_month = 100 WHERE client_id = 1;"
+
+# 2. Make requests until limit is reached
+curl -X POST http://localhost:8000/query \
+  -H "Content-Type: application/json" \
+  -H "X-Client-ID: 1" \
+  -H "X-Company-Pin: 1032" \
+  -H "X-API-Key: FLOW-1-abc123..." \
+  -H "X-User-Name: admin" \
+  -d '{"query": "What is FlowHCM?"}'
+
+# 3. Check usage
+psql -c "SELECT * FROM chatbot.tokens WHERE fk_client_id = 1;"
+
+# 4. Reset for normal use
+psql -c "UPDATE chatbot.clients SET token_limit_per_month = 100000 WHERE client_id = 1;"
+```
+
+### Key Benefits
+
+#### Cost Control
+✅ Prevent unlimited API usage
+✅ Set different limits per client
+✅ Track usage per month with history
+
+#### Transparency
+✅ Detailed token counting per query
+✅ Monthly usage tracking
+✅ Historical data preserved
+
+#### Flexibility
+✅ Configurable limits per client
+✅ Automatic monthly reset
+✅ No manual intervention needed
+
+### Future Enhancements (Planned)
+
+These features are planned but not yet implemented:
+
+1. **Admin Panel in HCMSAPI**:
+   - View token usage per client
+   - Set custom limits per client
+   - View usage history
+   - Manual reset option
+
+2. **Usage Analytics**:
+   - Daily usage trends
+   - Peak usage times
+   - Cost estimation dashboard
+
+3. **Alerts**:
+   - Email when 80% limit reached
+   - Notify admin when client hits limit
+
+4. **Rate Limiting**:
+   - Requests per minute/hour
+   - Concurrent request limits
+
+### Files Modified
+
+- `src/database/schema.sql` - Added token_limit_per_month, tokens table, tokens_used column
+- `src/database/postgres_manager.py` - Added token management methods
+- `apps/api.py` - Added token checking and counting in /query endpoint
+- `src/utils.py` - Added count_tokens() and approximate_token_count() functions
+- `requirements.txt` - Added tiktoken>=0.5.0
+
+### New Files Created
+
+- `migration_add_token_limits.sql` - Migration script for existing databases
+- `TOKEN_LIMITING_GUIDE.md` - Comprehensive guide for token limiting system
+- `test_token_counting.py` - Test script for token counting functionality
+
+---
+
+## Document Version
+- **Version**: 2.0
+- **Date**: December 3, 2025
+- **Author**: FlowHCM Development Team
+- **Changes**: Added Token Limiting System documentation

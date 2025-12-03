@@ -1,0 +1,68 @@
+2025-12-03 12:25:58,603 - INFO - ================================================================================
+2025-12-03 12:25:58,603 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-03 12:25:58,603 - INFO - ================================================================================
+2025-12-03 12:25:58,603 - INFO - Query: 'hi'
+2025-12-03 12:25:58,603 - INFO - User: admin@PatelHospital.com1
+2025-12-03 12:25:58,603 - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-03 12:25:59,037 - INFO - ✅ AUTHENTICATION SUCCESSFUL - Client ID: 1, User: admin@PatelHospital.com1
+2025-12-03 12:26:11,151 - INFO - 🔢 Tokens - Input: 1, Output: 14, Total: 15
+2025-12-03 12:26:11,167 - INFO - ✅ Token usage updated - Added: 15, Total: 15 / 100,000
+2025-12-03 12:26:11,170 - INFO - --------------------------------------------------------------------------------
+2025-12-03 12:26:11,170 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-03 12:26:11,170 - INFO - Session ID: 96553b9e-d18f-44b7-a4f3-c17f88aff106
+2025-12-03 12:26:11,170 - INFO - User Query: hi
+2025-12-03 12:26:11,170 - INFO - Bot Response: Hey there! 👋 How can I help you with FlowHCM today?
+2025-12-03 12:26:11,170 - INFO - Source Documents: 0
+2025-12-03 12:26:11,170 - INFO - Response Length: 51 characters
+2025-12-03 12:26:11,170 - INFO - ================================================================================
+2025-12-03 12:27:28,657 - INFO - ================================================================================
+2025-12-03 12:27:28,657 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-03 12:27:28,657 - INFO - ================================================================================
+2025-12-03 12:27:28,657 - INFO - Query: 'how to apply for leaves'
+2025-12-03 12:27:28,657 - INFO - User: admin@PatelHospital.com1
+2025-12-03 12:27:28,657 - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-03 12:27:28,715 - INFO - ✅ AUTHENTICATION SUCCESSFUL - Client ID: 1, User: admin@PatelHospital.com1
+2025-12-03 12:27:37,938 - INFO - 🔢 Tokens - Input: 6, Output: 354, Total: 360
+2025-12-03 12:27:37,956 - INFO - ✅ Token usage updated - Added: 360, Total: 375 / 100,000
+2025-12-03 12:27:37,957 - INFO - --------------------------------------------------------------------------------
+2025-12-03 12:27:37,957 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-03 12:27:37,957 - INFO - Session ID: d3d7f7ac-0187-4b4a-ab7c-786df6be512b
+2025-12-03 12:27:37,957 - INFO - User Query: how to apply for leaves
+2025-12-03 12:27:37,957 - INFO - Bot Response: **Applying for Leave in FlowHCM** 1. **Navigate to the Leave Module** - From the main menu, select **Leave** → **Leave Management** (or the equivalent entry that opens the leave dashboard). 2. **Start...
+2025-12-03 12:27:37,957 - INFO - Source Documents: 7
+2025-12-03 12:27:37,957 - INFO - Response Length: 1603 characters
+2025-12-03 12:27:37,957 - INFO - ================================================================================
+2025-12-03 12:29:25,239 - INFO - ================================================================================
+2025-12-03 12:29:25,239 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-03 12:29:25,239 - INFO - ================================================================================
+2025-12-03 12:29:25,239 - INFO - Query: 'giuwcqgiouq'
+2025-12-03 12:29:25,239 - INFO - User: admin@PatelHospital.com1
+2025-12-03 12:29:25,239 - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-03 12:29:25,307 - INFO - ✅ AUTHENTICATION SUCCESSFUL - Client ID: 1, User: admin@PatelHospital.com1
+2025-12-03 12:29:28,754 - INFO - 🔢 Tokens - Input: 1, Output: 17, Total: 18
+2025-12-03 12:29:28,774 - INFO - ✅ Token usage updated - Added: 18, Total: 393 / 100,000
+2025-12-03 12:29:28,780 - INFO - --------------------------------------------------------------------------------
+2025-12-03 12:29:28,780 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-03 12:29:28,780 - INFO - Session ID: 49cbdd29-2efb-4708-b594-e8bc3b76b41f
+2025-12-03 12:29:28,780 - INFO - User Query: giuwcqgiouq
+2025-12-03 12:29:28,780 - INFO - Bot Response: Hmm, that looks like a random string. How can I help you today?
+2025-12-03 12:29:28,780 - INFO - Source Documents: 0
+2025-12-03 12:29:28,780 - INFO - Response Length: 63 characters
+2025-12-03 12:29:28,780 - INFO - ================================================================================
+2025-12-03 12:31:07,952 - INFO - ================================================================================
+2025-12-03 12:31:07,952 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-03 12:31:07,952 - INFO - ================================================================================
+2025-12-03 12:31:07,952 - INFO - Query: 'kohiut5r'
+2025-12-03 12:31:07,952 - INFO - User: admin@PatelHospital.com1
+2025-12-03 12:31:07,952 - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-03 12:31:08,020 - INFO - ✅ AUTHENTICATION SUCCESSFUL - Client ID: 1, User: admin@PatelHospital.com1
+2025-12-03 12:31:11,476 - INFO - 🔢 Tokens - Input: 1, Output: 17, Total: 18
+2025-12-03 12:31:11,485 - INFO - ✅ Token usage updated - Added: 18, Total: 411 / 100,000
+2025-12-03 12:31:11,485 - INFO - --------------------------------------------------------------------------------
+2025-12-03 12:31:11,485 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-03 12:31:11,485 - INFO - Session ID: c10a7e6e-613d-45a8-9dd1-3398c5cbc5b0
+2025-12-03 12:31:11,485 - INFO - User Query: kohiut5r
+2025-12-03 12:31:11,485 - INFO - Bot Response: Hmm, that looks like a random string. How can I help you today?
+2025-12-03 12:31:11,485 - INFO - Source Documents: 0
+2025-12-03 12:31:11,485 - INFO - Response Length: 63 characters
+2025-12-03 12:31:11,485 - INFO - ================================================================================
