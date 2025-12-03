@@ -617,7 +617,6 @@ async def chat(message: str, request: Request):
 # Admin Endpoints
 
 class SyncClientRequest(BaseModel):
-    client_id: int  # HCMS client_id (for reference only)
     company_pin: str
     api_key: str
     is_active: bool = True
@@ -630,9 +629,8 @@ async def sync_client(request_body: SyncClientRequest):
     Called when API key is generated in HCMSAPI
     
     Note: PostgreSQL will auto-assign client_id (1, 2, 3...)
-    HCMS client_id is stored as hcms_client_id for reference
     """
-    logger.info(f"Syncing client from HCMSAPI (HCMS client_id: {request_body.client_id}) to PostgreSQL")
+    logger.info(f"Syncing client from HCMSAPI to PostgreSQL (company_pin: {request_body.company_pin})")
     
     try:
         from database.postgres_manager import PostgresManager
@@ -642,7 +640,6 @@ async def sync_client(request_body: SyncClientRequest):
             raise HTTPException(status_code=503, detail="Database connection failed")
         
         success = db.sync_client(
-            request_body.client_id,  # HCMS client_id
             request_body.company_pin,
             request_body.api_key,
             request_body.is_active

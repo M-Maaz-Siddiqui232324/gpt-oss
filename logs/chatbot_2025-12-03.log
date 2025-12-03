@@ -817,3 +817,347 @@ Assistant:
 2025-12-03 15:10:59,217 - rag_system - INFO - ============================================================
 2025-12-03 15:10:59,217 - __main__ - INFO - RAG system initialized successfully
 2025-12-03 15:10:59,217 - __main__ - INFO - Started session cleanup task (interval: 60s)
+2025-12-03 15:12:08,681 - __main__ - INFO - Created client logger for company_pin: 11032, file: 11032_2025-12-03.log
+2025-12-03 15:12:08,681 - __main__ - INFO - ================================================================================
+2025-12-03 15:12:08,684 - __main__ - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-03 15:12:08,684 - __main__ - INFO - ================================================================================
+2025-12-03 15:12:08,684 - __main__ - INFO - Query: 'dwadw'
+2025-12-03 15:12:08,684 - __main__ - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-03 15:12:08,685 - __main__ - INFO - --------------------------------------------------------------------------------
+2025-12-03 15:12:08,685 - __main__ - INFO - HEADERS RECEIVED:
+2025-12-03 15:12:08,685 - __main__ - INFO -   X-Client-ID: 1 (informational only)
+2025-12-03 15:12:08,685 - __main__ - INFO -   X-Company-Pin: 11032 (used for auth)
+2025-12-03 15:12:08,685 - __main__ - INFO -   X-API-Key: FLOW-1-test123456789... (used for auth)
+2025-12-03 15:12:08,685 - __main__ - INFO -   X-User-Name: admin@PatelHospital.com1 (informational only)
+2025-12-03 15:12:08,685 - __main__ - INFO - --------------------------------------------------------------------------------
+2025-12-03 15:12:08,685 - __main__ - INFO - 🔐 AUTHENTICATING CLIENT...
+2025-12-03 15:12:08,718 - database.postgres_manager - INFO - PostgreSQL manager initialized
+2025-12-03 15:12:08,793 - database.postgres_manager - INFO - Connected to PostgreSQL database
+2025-12-03 15:12:08,793 - __main__ - INFO - ✅ Connected to PostgreSQL database
+2025-12-03 15:12:08,793 - __main__ - INFO - 🔍 Validating credentials (Company PIN + API Key)
+2025-12-03 15:12:08,793 - database.postgres_manager - INFO - 🔍 Extracted API key: 'FLOW-1-test123456789012345678901234567890' -> 'test12345678901234567890123456...'
+2025-12-03 15:12:08,793 - database.postgres_manager - INFO - 🔍 Authenticating with:
+2025-12-03 15:12:08,793 - database.postgres_manager - INFO -    Company PIN: '11032' (length: 5)
+2025-12-03 15:12:08,793 - database.postgres_manager - INFO -    API Key (extracted): 'test12345678901234567890123456...' (length: 34)
+2025-12-03 15:12:08,793 - database.postgres_manager - INFO - ✅ Client authenticated successfully from database (client_id: 1)
+2025-12-03 15:12:08,793 - __main__ - INFO - ✅ AUTHENTICATION SUCCESSFUL
+2025-12-03 15:12:08,793 - __main__ - INFO -    Client ID: 1 (from database)
+2025-12-03 15:12:08,793 - __main__ - INFO -    Company PIN: 11032
+2025-12-03 15:12:08,793 - __main__ - INFO -    API Key: test1234567890123456...
+2025-12-03 15:12:08,793 - __main__ - INFO -    User: admin@PatelHospital.com1
+2025-12-03 15:12:08,793 - __main__ - INFO -    Active: True
+2025-12-03 15:12:08,793 - __main__ - INFO - --------------------------------------------------------------------------------
+2025-12-03 15:12:08,793 - __main__ - INFO - 🔢 TOKEN LIMIT CHECK
+2025-12-03 15:12:08,812 - __main__ - INFO -    Token Limit: 100,000
+2025-12-03 15:12:08,812 - __main__ - INFO -    Tokens Used: 411
+2025-12-03 15:12:08,812 - __main__ - INFO -    Remaining: 99,589
+2025-12-03 15:12:08,812 - __main__ - INFO -    Allowed: True
+2025-12-03 15:12:08,812 - __main__ - INFO - ✅ Token limit check passed
+2025-12-03 15:12:08,812 - __main__ - INFO - --------------------------------------------------------------------------------
+2025-12-03 15:12:08,812 - __main__ - INFO - 📋 SESSION MANAGEMENT
+2025-12-03 15:12:08,812 - __main__ - INFO - Session ID from cookie: None (new session)
+2025-12-03 15:12:08,812 - fastapi_session_manager - INFO - Created new session: dd657dd8-facb-4c64-b8bf-dd65e766b03c
+2025-12-03 15:12:08,812 - fastapi_session_manager - INFO - Created session dd657dd8-facb-4c64-b8bf-dd65e766b03c at 2025-12-03T15:12:08.812959
+2025-12-03 15:12:08,816 - __main__ - INFO - 🆕 Created new in-memory session: dd657dd8-facb-4c64-b8bf-dd65e766b03c
+2025-12-03 15:12:08,816 - __main__ - INFO - 💾 Saving session to PostgreSQL database...
+2025-12-03 15:12:08,827 - database.postgres_manager - INFO - ✅ Session created in database: dd657dd8-facb-4c64-b8bf-dd65e766b03c (db_id=5, user=admin@PatelHospital.com1, client=1)
+2025-12-03 15:12:08,828 - __main__ - INFO - ✅ Session saved to database
+2025-12-03 15:12:08,829 - __main__ - INFO -    Table: chatbot.sessions
+2025-12-03 15:12:08,829 - __main__ - INFO -    Session DB ID: 5
+2025-12-03 15:12:08,829 - __main__ - INFO -    Session UUID: dd657dd8-facb-4c64-b8bf-dd65e766b03c
+2025-12-03 15:12:08,829 - __main__ - INFO -    Username: admin@PatelHospital.com1
+2025-12-03 15:12:08,829 - __main__ - INFO -    Client ID: 1
+2025-12-03 15:12:08,829 - __main__ - INFO - --------------------------------------------------------------------------------
+2025-12-03 15:12:08,829 - __main__ - INFO - 💬 PROCESSING QUERY
+2025-12-03 15:12:08,830 - __main__ - INFO - Added user message to session (total messages: 1)
+2025-12-03 15:12:08,830 - __main__ - INFO - No previous context (first message in session)
+2025-12-03 15:12:08,830 - __main__ - INFO - 🤖 Generating response using RAG system...
+2025-12-03 15:12:08,830 - rag_system - INFO - ============================================================
+2025-12-03 15:12:08,830 - rag_system - INFO - Processing query: 'dwadw'
+2025-12-03 15:12:08,830 - rag_system - INFO - Params: max_tokens=750, temp=0.2, top_p=0.7
+2025-12-03 15:12:08,830 - rag_system - INFO - Retrieving relevant documents
+2025-12-03 15:12:08,831 - retrieval.retriever - INFO - Semantic search for: 'dwadw' (top_k=10)
+2025-12-03 15:12:08,872 - retrieval.vector_store - INFO - Semantic search found 20 candidates
+2025-12-03 15:12:08,872 - retrieval.retriever - INFO - Found 20 semantic matches
+2025-12-03 15:12:08,872 - retrieval.retriever - INFO - Returning 20 results
+2025-12-03 15:12:08,876 - rag_system - INFO - Score stats: mean=0.458, std=0.014
+2025-12-03 15:12:08,876 - rag_system - INFO - Dynamic threshold: 0.600
+2025-12-03 15:12:08,876 - rag_system - INFO - Filtered to 0 relevant documents
+2025-12-03 15:12:08,876 - rag_system - INFO - Using top 0 documents
+2025-12-03 15:12:08,876 - rag_system - WARNING - No documents passed threshold
+2025-12-03 15:12:08,876 - rag_system - INFO - >>> DECISION: Using GENERAL RESPONSE (no relevant docs)
+2025-12-03 15:12:08,876 - rag_system - INFO - Generating general response (no relevant documents found)
+2025-12-03 15:12:08,877 - rag_system - INFO - ============================================================
+2025-12-03 15:12:08,877 - rag_system - INFO - GENERAL PROMPT SENT TO LLM:
+2025-12-03 15:12:08,877 - rag_system - INFO - 
+You are a friendly AI assistant for FlowHCM, an HR management software company. Have a natural, helpful conversation with users. Keep responses concise and conversational.
+User: dwadw
+Assistant:
+2025-12-03 15:12:08,877 - rag_system - INFO - ============================================================
+2025-12-03 15:12:16,132 - __main__ - INFO - ✅ Response generated (83 characters, 0 source documents)
+2025-12-03 15:12:16,134 - __main__ - INFO - --------------------------------------------------------------------------------
+2025-12-03 15:12:16,134 - __main__ - INFO - 🔢 TOKEN COUNTING
+2025-12-03 15:12:16,134 - __main__ - INFO -    Input tokens: 1
+2025-12-03 15:12:16,134 - __main__ - INFO -    Output tokens: 22
+2025-12-03 15:12:16,134 - __main__ - INFO -    Total tokens: 23
+2025-12-03 15:12:16,134 - __main__ - INFO - Added assistant response to session (total messages: 2)
+2025-12-03 15:12:16,134 - __main__ - INFO - ✅ Updated in-memory session
+2025-12-03 15:12:16,134 - __main__ - INFO - --------------------------------------------------------------------------------
+2025-12-03 15:12:16,134 - __main__ - INFO - 💾 SAVING TO DATABASE
+2025-12-03 15:12:16,134 - __main__ - INFO - Saving conversation to PostgreSQL...
+2025-12-03 15:12:16,134 - database.postgres_manager - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-03 15:12:16,142 - database.postgres_manager - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 5, tokens: 23)
+2025-12-03 15:12:16,142 - __main__ - INFO - ✅ Conversation saved to database
+2025-12-03 15:12:16,142 - __main__ - INFO -    Table: chatbot.conversation_dec_2025
+2025-12-03 15:12:16,142 - __main__ - INFO -    Session DB ID: 5
+2025-12-03 15:12:16,144 - __main__ - INFO -    Session UUID: dd657dd8-facb-4c64-b8bf-dd65e766b03c
+2025-12-03 15:12:16,144 - __main__ - INFO -    Tokens Used: 23
+2025-12-03 15:12:16,144 - __main__ - INFO -    User Message: dwadw...
+2025-12-03 15:12:16,144 - __main__ - INFO -    Bot Response: Hmm, I’m not sure I understand that. Could you let...
+2025-12-03 15:12:16,144 - __main__ - INFO - Updating token usage for client 1...
+2025-12-03 15:12:16,144 - database.postgres_manager - INFO - ✅ Token usage updated for client 1: +23 tokens (dec_2025)
+2025-12-03 15:12:16,144 - __main__ - INFO - ✅ Token usage updated
+2025-12-03 15:12:16,144 - __main__ - INFO -    Client ID: 1
+2025-12-03 15:12:16,144 - __main__ - INFO -    Tokens Added: 23
+2025-12-03 15:12:16,144 - __main__ - INFO -    New Total Usage: 434 / 100,000
+2025-12-03 15:12:16,144 - __main__ - INFO -    Remaining: 99,566
+2025-12-03 15:12:16,144 - __main__ - INFO - Updating session activity timestamp...
+2025-12-03 15:12:16,149 - database.postgres_manager - INFO - ✅ Session activity updated in database (session: dd657dd8-facb-4c64-b8bf-dd65e766b03c)
+2025-12-03 15:12:16,150 - __main__ - INFO - ✅ Session activity updated
+2025-12-03 15:12:16,150 - database.postgres_manager - INFO - Disconnected from PostgreSQL database
+2025-12-03 15:12:16,150 - __main__ - INFO - ✅ Disconnected from PostgreSQL database
+2025-12-03 15:12:16,151 - __main__ - INFO - --------------------------------------------------------------------------------
+2025-12-03 15:12:16,151 - __main__ - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-03 15:12:16,151 - __main__ - INFO -    Session ID: dd657dd8-facb-4c64-b8bf-dd65e766b03c
+2025-12-03 15:12:16,152 - __main__ - INFO -    Source Documents: 0
+2025-12-03 15:12:16,152 - __main__ - INFO -    Response Length: 83 characters
+2025-12-03 15:12:16,152 - __main__ - INFO - ================================================================================
+2025-12-03 15:17:03,403 - __main__ - INFO - ================================================================================
+2025-12-03 15:17:03,403 - __main__ - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-03 15:17:03,403 - __main__ - INFO - ================================================================================
+2025-12-03 15:17:03,403 - __main__ - INFO - Query: 'how to apply for leaves?'
+2025-12-03 15:17:03,409 - __main__ - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-03 15:17:03,409 - __main__ - INFO - --------------------------------------------------------------------------------
+2025-12-03 15:17:03,409 - __main__ - INFO - HEADERS RECEIVED:
+2025-12-03 15:17:03,409 - __main__ - INFO -   X-Client-ID: 1 (informational only)
+2025-12-03 15:17:03,409 - __main__ - INFO -   X-Company-Pin: 11032 (used for auth)
+2025-12-03 15:17:03,409 - __main__ - INFO -   X-API-Key: FLOW-1-test123456789... (used for auth)
+2025-12-03 15:17:03,409 - __main__ - INFO -   X-User-Name: admin@PatelHospital.com1 (informational only)
+2025-12-03 15:17:03,409 - __main__ - INFO - --------------------------------------------------------------------------------
+2025-12-03 15:17:03,409 - __main__ - INFO - 🔐 AUTHENTICATING CLIENT...
+2025-12-03 15:17:03,409 - database.postgres_manager - INFO - PostgreSQL manager initialized
+2025-12-03 15:17:03,445 - database.postgres_manager - INFO - Connected to PostgreSQL database
+2025-12-03 15:17:03,445 - __main__ - INFO - ✅ Connected to PostgreSQL database
+2025-12-03 15:17:03,445 - __main__ - INFO - 🔍 Validating credentials (Company PIN + API Key)
+2025-12-03 15:17:03,445 - database.postgres_manager - INFO - 🔍 Extracted API key: 'FLOW-1-test123456789012345678901234567890' -> 'test12345678901234567890123456...'
+2025-12-03 15:17:03,445 - database.postgres_manager - INFO - 🔍 Authenticating with:
+2025-12-03 15:17:03,445 - database.postgres_manager - INFO -    Company PIN: '11032' (length: 5)
+2025-12-03 15:17:03,445 - database.postgres_manager - INFO -    API Key (extracted): 'test12345678901234567890123456...' (length: 34)
+2025-12-03 15:17:03,445 - database.postgres_manager - INFO - ✅ Client authenticated successfully from database (client_id: 1)
+2025-12-03 15:17:03,445 - __main__ - INFO - ✅ AUTHENTICATION SUCCESSFUL
+2025-12-03 15:17:03,445 - __main__ - INFO -    Client ID: 1 (from database)
+2025-12-03 15:17:03,453 - __main__ - INFO -    Company PIN: 11032
+2025-12-03 15:17:03,453 - __main__ - INFO -    API Key: test1234567890123456...
+2025-12-03 15:17:03,453 - __main__ - INFO -    User: admin@PatelHospital.com1
+2025-12-03 15:17:03,453 - __main__ - INFO -    Active: True
+2025-12-03 15:17:03,454 - __main__ - INFO - --------------------------------------------------------------------------------
+2025-12-03 15:17:03,454 - __main__ - INFO - 🔢 TOKEN LIMIT CHECK
+2025-12-03 15:17:03,455 - __main__ - INFO -    Token Limit: 100,000
+2025-12-03 15:17:03,455 - __main__ - INFO -    Tokens Used: 434
+2025-12-03 15:17:03,455 - __main__ - INFO -    Remaining: 99,566
+2025-12-03 15:17:03,455 - __main__ - INFO -    Allowed: True
+2025-12-03 15:17:03,455 - __main__ - INFO - ✅ Token limit check passed
+2025-12-03 15:17:03,455 - __main__ - INFO - --------------------------------------------------------------------------------
+2025-12-03 15:17:03,455 - __main__ - INFO - 📋 SESSION MANAGEMENT
+2025-12-03 15:17:03,455 - __main__ - INFO - Session ID from cookie: None (new session)
+2025-12-03 15:17:03,455 - fastapi_session_manager - INFO - Created new session: 39861594-f5b7-43e4-af8a-89a89460c87e
+2025-12-03 15:17:03,455 - fastapi_session_manager - INFO - Created session 39861594-f5b7-43e4-af8a-89a89460c87e at 2025-12-03T15:17:03.455488
+2025-12-03 15:17:03,455 - __main__ - INFO - 🆕 Created new in-memory session: 39861594-f5b7-43e4-af8a-89a89460c87e
+2025-12-03 15:17:03,455 - __main__ - INFO - 💾 Saving session to PostgreSQL database...
+2025-12-03 15:17:03,468 - database.postgres_manager - INFO - ✅ Session created in database: 39861594-f5b7-43e4-af8a-89a89460c87e (db_id=6, user=admin@PatelHospital.com1, client=1)
+2025-12-03 15:17:03,468 - __main__ - INFO - ✅ Session saved to database
+2025-12-03 15:17:03,468 - __main__ - INFO -    Table: chatbot.sessions
+2025-12-03 15:17:03,468 - __main__ - INFO -    Session DB ID: 6
+2025-12-03 15:17:03,468 - __main__ - INFO -    Session UUID: 39861594-f5b7-43e4-af8a-89a89460c87e
+2025-12-03 15:17:03,468 - __main__ - INFO -    Username: admin@PatelHospital.com1
+2025-12-03 15:17:03,468 - __main__ - INFO -    Client ID: 1
+2025-12-03 15:17:03,468 - __main__ - INFO - --------------------------------------------------------------------------------
+2025-12-03 15:17:03,468 - __main__ - INFO - 💬 PROCESSING QUERY
+2025-12-03 15:17:03,468 - __main__ - INFO - Added user message to session (total messages: 1)
+2025-12-03 15:17:03,468 - __main__ - INFO - No previous context (first message in session)
+2025-12-03 15:17:03,468 - __main__ - INFO - 🤖 Generating response using RAG system...
+2025-12-03 15:17:03,468 - rag_system - INFO - ============================================================
+2025-12-03 15:17:03,470 - rag_system - INFO - Processing query: 'how to apply for leaves?'
+2025-12-03 15:17:03,470 - rag_system - INFO - Params: max_tokens=750, temp=0.2, top_p=0.7
+2025-12-03 15:17:03,470 - rag_system - INFO - Retrieving relevant documents
+2025-12-03 15:17:03,470 - retrieval.retriever - INFO - Semantic search for: 'how to apply for leaves?' (top_k=10)
+2025-12-03 15:17:03,504 - retrieval.vector_store - INFO - Semantic search found 20 candidates
+2025-12-03 15:17:03,504 - retrieval.retriever - INFO - Found 20 semantic matches
+2025-12-03 15:17:03,504 - retrieval.retriever - INFO - Returning 20 results
+2025-12-03 15:17:03,504 - rag_system - INFO - Score stats: mean=0.581, std=0.032
+2025-12-03 15:17:03,504 - rag_system - INFO - Dynamic threshold: 0.600
+2025-12-03 15:17:03,504 - rag_system - INFO - Filtered to 4 relevant documents
+2025-12-03 15:17:03,504 - rag_system - INFO - Using top 4 documents
+2025-12-03 15:17:03,504 - rag_system - INFO - Unique source documents: 2
+2025-12-03 15:17:03,504 - rag_system - INFO -   - Attendance Module.docx
+2025-12-03 15:17:03,504 - rag_system - INFO -   - Leave Module.docx
+2025-12-03 15:17:03,504 - rag_system - INFO - >>> DECISION: Using DOCUMENT-AWARE RESPONSE
+2025-12-03 15:17:03,504 - rag_system - INFO - Generating document-aware response
+2025-12-03 15:17:03,504 - rag_system - INFO - ============================================================
+2025-12-03 15:17:03,504 - rag_system - INFO - CONTEXT CHUNKS USED FOR GENERATION:
+2025-12-03 15:17:03,504 - rag_system - INFO - 
+--- Chunk 1 ---
+2025-12-03 15:17:03,504 - rag_system - INFO - Source: Attendance Module.docx
+2025-12-03 15:17:03,504 - rag_system - INFO - Chunk ID: 65
+2025-12-03 15:17:03,504 - rag_system - INFO - Relevance Score: 0.665
+2025-12-03 15:17:03,504 - rag_system - INFO - Content Length: 40 chars
+2025-12-03 15:17:03,504 - rag_system - INFO - Content:
+Apply for specific days or entire month.
+2025-12-03 15:17:03,504 - rag_system - INFO - 
+--- Chunk 2 ---
+2025-12-03 15:17:03,504 - rag_system - INFO - Source: Attendance Module.docx
+2025-12-03 15:17:03,504 - rag_system - INFO - Chunk ID: 83
+2025-12-03 15:17:03,504 - rag_system - INFO - Relevance Score: 0.630
+2025-12-03 15:17:03,504 - rag_system - INFO - Content Length: 20 chars
+2025-12-03 15:17:03,510 - rag_system - INFO - Content:
+Submit for approval.
+2025-12-03 15:17:03,510 - rag_system - INFO - 
+--- Chunk 3 ---
+2025-12-03 15:17:03,510 - rag_system - INFO - Source: Attendance Module.docx
+2025-12-03 15:17:03,510 - rag_system - INFO - Chunk ID: 34
+2025-12-03 15:17:03,510 - rag_system - INFO - Relevance Score: 0.628
+2025-12-03 15:17:03,510 - rag_system - INFO - Content Length: 32 chars
+2025-12-03 15:17:03,510 - rag_system - INFO - Content:
+Submit for approval if required.
+2025-12-03 15:17:03,510 - rag_system - INFO - 
+--- Chunk 4 ---
+2025-12-03 15:17:03,510 - rag_system - INFO - Source: Leave Module.docx
+2025-12-03 15:17:03,510 - rag_system - INFO - Chunk ID: 4
+2025-12-03 15:17:03,510 - rag_system - INFO - Relevance Score: 0.625
+2025-12-03 15:17:03,510 - rag_system - INFO - Content Length: 297 chars
+2025-12-03 15:17:03,510 - rag_system - INFO - Content:
+Navigation Path:
+Leave Module → Leave Request
+
+Process / Flow:
+
+Go to leave module click leave request form
+
+Click Apply for Leave
+
+Select Employee
+
+Select Leave Type
+
+Enter From Date and To Date
+
+Specify Duration (Full/Half/Quarter Day)
+
+Provide Reason
+
+Attach document if required
+
+Click Submit.
+2025-12-03 15:17:03,512 - rag_system - INFO - ============================================================
+2025-12-03 15:17:03,512 - rag_system - INFO - ============================================================
+2025-12-03 15:17:03,512 - rag_system - INFO - FULL PROMPT SENT TO LLM:
+2025-12-03 15:17:03,512 - rag_system - INFO - 
+You are FlowHCM Assistant, an expert at answering questions about FlowHCM HR management software. Your role is to help users navigate the system and understand processes using the official documentation which contains all the information about the FlowHCM.
+
+INSTRUCTIONS:
+
+1. Answer using the information provided in the documentation below. 
+
+2. If the question is ambiguous or could apply to multiple modules, or contexts, ask the user to clarify which specific area they are referring to.
+
+3. If the user asks multiple questions or the question has multiple parts (e.g., "What is X and how do I do Y?"), address ALL parts thoroughly and completely.
+
+4. Provide clear, and step-by-step instructions when explaining processes or procedures. Include all necessary details from the documentation. Use the exact terminology and field names from the documentation to avoid confusion.
+
+5. If the documentation does not contain enough information to fully answer the question, use your own knowledge to answer but make it consistent with the document.
+
+6. Keep the answers complete. Do not use the word documentation in the answers.
+
+THIS IS THE INFORMATION YOU HAVE: 
+[SOURCE 1: Attendance Module.docx]
+Apply for specific days or entire month.
+
+[SOURCE 2: Attendance Module.docx]
+Submit for approval.
+
+[SOURCE 3: Attendance Module.docx]
+Submit for approval if required.
+
+[SOURCE 4: Leave Module.docx]
+Navigation Path:
+Leave Module → Leave Request
+
+Process / Flow:
+
+Go to leave module click leave request form
+
+Click Apply for Leave
+
+Select Employee
+
+Select Leave Type
+
+Enter From Date and To Date
+
+Specify Duration (Full/Half/Quarter Day)
+
+Provide Reason
+
+Attach document if required
+
+Click Submit.
+
+
+ANSWER THIS QUESTION: how to apply for leaves?
+
+YOUR ANSWER:
+2025-12-03 15:17:03,512 - rag_system - INFO - ============================================================
+2025-12-03 15:17:11,933 - rag_system - INFO - Response generated: 1056 chars
+2025-12-03 15:17:11,934 - rag_system - INFO - ============================================================
+2025-12-03 15:17:11,934 - __main__ - INFO - ✅ Response generated (1056 characters, 4 source documents)
+2025-12-03 15:17:11,934 - __main__ - INFO - --------------------------------------------------------------------------------
+2025-12-03 15:17:11,935 - __main__ - INFO - 🔢 TOKEN COUNTING
+2025-12-03 15:17:11,935 - __main__ - INFO -    Input tokens: 6
+2025-12-03 15:17:11,935 - __main__ - INFO -    Output tokens: 238
+2025-12-03 15:17:11,935 - __main__ - INFO -    Total tokens: 244
+2025-12-03 15:17:11,936 - __main__ - INFO - Added assistant response to session (total messages: 2)
+2025-12-03 15:17:11,936 - __main__ - INFO - ✅ Updated in-memory session
+2025-12-03 15:17:11,936 - __main__ - INFO - --------------------------------------------------------------------------------
+2025-12-03 15:17:11,937 - __main__ - INFO - 💾 SAVING TO DATABASE
+2025-12-03 15:17:11,937 - __main__ - INFO - Saving conversation to PostgreSQL...
+2025-12-03 15:17:11,938 - database.postgres_manager - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-03 15:17:11,944 - database.postgres_manager - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 6, tokens: 244)
+2025-12-03 15:17:11,944 - __main__ - INFO - ✅ Conversation saved to database
+2025-12-03 15:17:11,951 - __main__ - INFO -    Table: chatbot.conversation_dec_2025
+2025-12-03 15:17:11,951 - __main__ - INFO -    Session DB ID: 6
+2025-12-03 15:17:11,951 - __main__ - INFO -    Session UUID: 39861594-f5b7-43e4-af8a-89a89460c87e
+2025-12-03 15:17:11,951 - __main__ - INFO -    Tokens Used: 244
+2025-12-03 15:17:11,951 - __main__ - INFO -    User Message: how to apply for leaves?...
+2025-12-03 15:17:11,951 - __main__ - INFO -    Bot Response: **How to Apply for Leaves in FlowHCM** 1. **Naviga...
+2025-12-03 15:17:11,951 - __main__ - INFO - Updating token usage for client 1...
+2025-12-03 15:17:11,951 - database.postgres_manager - INFO - ✅ Token usage updated for client 1: +244 tokens (dec_2025)
+2025-12-03 15:17:11,951 - __main__ - INFO - ✅ Token usage updated
+2025-12-03 15:17:11,951 - __main__ - INFO -    Client ID: 1
+2025-12-03 15:17:11,951 - __main__ - INFO -    Tokens Added: 244
+2025-12-03 15:17:11,951 - __main__ - INFO -    New Total Usage: 678 / 100,000
+2025-12-03 15:17:11,951 - __main__ - INFO -    Remaining: 99,322
+2025-12-03 15:17:11,951 - __main__ - INFO - Updating session activity timestamp...
+2025-12-03 15:17:11,951 - database.postgres_manager - INFO - ✅ Session activity updated in database (session: 39861594-f5b7-43e4-af8a-89a89460c87e)
+2025-12-03 15:17:11,951 - __main__ - INFO - ✅ Session activity updated
+2025-12-03 15:17:11,951 - database.postgres_manager - INFO - Disconnected from PostgreSQL database
+2025-12-03 15:17:11,951 - __main__ - INFO - ✅ Disconnected from PostgreSQL database
+2025-12-03 15:17:11,951 - __main__ - INFO - --------------------------------------------------------------------------------
+2025-12-03 15:17:11,951 - __main__ - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-03 15:17:11,951 - __main__ - INFO -    Session ID: 39861594-f5b7-43e4-af8a-89a89460c87e
+2025-12-03 15:17:11,959 - __main__ - INFO -    Source Documents: 4
+2025-12-03 15:17:11,959 - __main__ - INFO -    Response Length: 1056 characters
+2025-12-03 15:17:11,959 - __main__ - INFO - ================================================================================
+2025-12-03 15:17:59,259 - fastapi_session_manager - INFO - Session expired: dd657dd8-facb-4c64-b8bf-dd65e766b03c (inactive for 47s, conversations already in database)
+2025-12-03 15:17:59,259 - fastapi_session_manager - INFO - Deleted session from memory: dd657dd8-facb-4c64-b8bf-dd65e766b03c
+2025-12-03 15:17:59,259 - fastapi_session_manager - INFO - Cleaned up 1 expired sessions
+2025-12-03 15:17:59,259 - __main__ - INFO - Cleanup task removed 1 expired sessions

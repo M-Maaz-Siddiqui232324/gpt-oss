@@ -5,7 +5,6 @@ SET search_path TO chatbot, public;
 
 CREATE TABLE IF NOT EXISTS chatbot.clients (
     client_id SERIAL PRIMARY KEY,
-    hcms_client_id INTEGER,
     company_pin VARCHAR(50) NOT NULL UNIQUE,
     api_key VARCHAR(255) NOT NULL UNIQUE,
     is_active BOOLEAN DEFAULT TRUE,
@@ -57,7 +56,7 @@ CREATE INDEX IF NOT EXISTS idx_conversation_dec_2025_created_at ON chatbot.conve
 CREATE INDEX IF NOT EXISTS idx_tokens_client_month ON chatbot.tokens(fk_client_id, month_year);
 
 
-INSERT INTO chatbot.clients (hcms_client_id, company_pin, api_key, is_active) 
-VALUES (2, '11032', 'test123456789012345678901234567890', TRUE)
+INSERT INTO chatbot.clients (company_pin, api_key, is_active) 
+VALUES ('11032', 'test123456789012345678901234567890', TRUE)
 ON CONFLICT (company_pin) DO NOTHING;
 

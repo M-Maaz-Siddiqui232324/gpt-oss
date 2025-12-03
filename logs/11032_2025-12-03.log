@@ -66,3 +66,37 @@
 2025-12-03 12:31:11,485 - INFO - Source Documents: 0
 2025-12-03 12:31:11,485 - INFO - Response Length: 63 characters
 2025-12-03 12:31:11,485 - INFO - ================================================================================
+2025-12-03 15:12:08,684 - INFO - ================================================================================
+2025-12-03 15:12:08,685 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-03 15:12:08,685 - INFO - ================================================================================
+2025-12-03 15:12:08,685 - INFO - Query: 'dwadw'
+2025-12-03 15:12:08,685 - INFO - User: admin@PatelHospital.com1
+2025-12-03 15:12:08,685 - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-03 15:12:08,793 - INFO - ✅ AUTHENTICATION SUCCESSFUL - Client ID: 1, User: admin@PatelHospital.com1
+2025-12-03 15:12:16,134 - INFO - 🔢 Tokens - Input: 1, Output: 22, Total: 23
+2025-12-03 15:12:16,144 - INFO - ✅ Token usage updated - Added: 23, Total: 434 / 100,000
+2025-12-03 15:12:16,153 - INFO - --------------------------------------------------------------------------------
+2025-12-03 15:12:16,153 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-03 15:12:16,153 - INFO - Session ID: dd657dd8-facb-4c64-b8bf-dd65e766b03c
+2025-12-03 15:12:16,153 - INFO - User Query: dwadw
+2025-12-03 15:12:16,153 - INFO - Bot Response: Hmm, I’m not sure I understand that. Could you let me know what you need help with?
+2025-12-03 15:12:16,153 - INFO - Source Documents: 0
+2025-12-03 15:12:16,153 - INFO - Response Length: 83 characters
+2025-12-03 15:12:16,153 - INFO - ================================================================================
+2025-12-03 15:17:03,409 - INFO - ================================================================================
+2025-12-03 15:17:03,409 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-03 15:17:03,409 - INFO - ================================================================================
+2025-12-03 15:17:03,409 - INFO - Query: 'how to apply for leaves?'
+2025-12-03 15:17:03,409 - INFO - User: admin@PatelHospital.com1
+2025-12-03 15:17:03,409 - INFO - Max Tokens: 750, Temperature: 0.2, Top-P: 0.7
+2025-12-03 15:17:03,454 - INFO - ✅ AUTHENTICATION SUCCESSFUL - Client ID: 1, User: admin@PatelHospital.com1
+2025-12-03 15:17:11,936 - INFO - 🔢 Tokens - Input: 6, Output: 238, Total: 244
+2025-12-03 15:17:11,951 - INFO - ✅ Token usage updated - Added: 244, Total: 678 / 100,000
+2025-12-03 15:17:11,959 - INFO - --------------------------------------------------------------------------------
+2025-12-03 15:17:11,959 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-03 15:17:11,959 - INFO - Session ID: 39861594-f5b7-43e4-af8a-89a89460c87e
+2025-12-03 15:17:11,959 - INFO - User Query: how to apply for leaves?
+2025-12-03 15:17:11,959 - INFO - Bot Response: **How to Apply for Leaves in FlowHCM** 1. **Navigate to the Leave Module** - From the main menu, click **Leave Module**. - In the submenu, select **Leave Request**. 2. **Open the Leave Request Form** ...
+2025-12-03 15:17:11,959 - INFO - Source Documents: 4
+2025-12-03 15:17:11,959 - INFO - Response Length: 1056 characters
+2025-12-03 15:17:11,959 - INFO - ================================================================================

@@ -92,13 +92,12 @@ class PostgresManager:
             return None
     
 
-    def sync_client(self, hcms_client_id: int, company_pin: str, api_key: str, is_active: bool = True) -> bool:
+    def sync_client(self, company_pin: str, api_key: str, is_active: bool = True) -> bool:
         """
         Sync client data from HCMSAPI (INSERT or UPDATE)
         Auto-assigns client_id (1, 2, 3...) in PostgreSQL
         
         Args:
-            hcms_client_id: Client ID from HCMSAPI (stored for reference)
             company_pin: Company PIN (unique identifier)
             api_key: API key (unique identifier)
             is_active: Client active status
@@ -107,28 +106,26 @@ class PostgresManager:
             True if successful, False otherwise
         """
         try:
-            logger.info(f"Syncing client to database: hcms_client_id={hcms_client_id}, company_pin={company_pin}, api_key={api_key[:20]}..., is_active={is_active}")
+            logger.info(f"Syncing client to database: company_pin={company_pin}, api_key={api_key[:20]}..., is_active={is_active}")
             with self.conn.cursor() as cur:
       
                 cur.execute(
                     """
-                    INSERT INTO chatbot.clients (hcms_client_id, company_pin, api_key, is_active, created_at)
-                    VALUES (%s, %s, %s, %s, NOW())
+                    INSERT INTO chatbot.clients (company_pin, api_key, is_active, created_at)
+                    VALUES (%s, %s, %s, NOW())
                     ON CONFLICT (company_pin) 
                     DO UPDATE SET 
-                        hcms_client_id = EXCLUDED.hcms_client_id,
                         api_key = EXCLUDED.api_key,
                         is_active = EXCLUDED.is_active
                     RETURNING client_id
                     """,
-                    (hcms_client_id, company_pin, api_key, is_active)
+                    (company_pin, api_key, is_active)
                 )
                 result = cur.fetchone()
                 assigned_client_id = result[0] if result else None
                 self.conn.commit()
                 logger.info(f"✅ Client synced to PostgreSQL database")
                 logger.info(f"   PostgreSQL client_id: {assigned_client_id} (auto-assigned)")
-                logger.info(f"   HCMS client_id: {hcms_client_id} (reference)")
                 logger.info(f"   Company PIN: {company_pin}")
                 return True
         except Exception as e:
