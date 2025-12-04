@@ -45,30 +45,17 @@ class PostgresManager:
         
         Args:
             company_pin: Company PIN
-            api_key: API key (with FLOW-{client_id}- prefix)
+            api_key: API key (40-character hash)
             
         Returns:
             Client info dict if authenticated, None otherwise
         """
         try:
-            if api_key.startswith("FLOW-"):
-                parts = api_key.split("-", 2)
-                if len(parts) >= 3:
-                    actual_key = parts[2]  
-                    logger.info(f"🔍 Extracted API key: '{api_key}' -> '{actual_key[:30]}...'")
-                else:
-                    actual_key = api_key
-                    logger.warning(f"⚠️  API key format unexpected: '{api_key}'")
-            else:
-                actual_key = api_key
-                logger.warning(f"⚠️  API key doesn't start with FLOW-: '{api_key[:30]}...'")
-            
             logger.info(f"🔍 Authenticating with:")
             logger.info(f"   Company PIN: '{company_pin}' (length: {len(company_pin)})")
-            logger.info(f"   API Key (extracted): '{actual_key[:30]}...' (length: {len(actual_key)})")
+            logger.info(f"   API Key: '{api_key[:20]}...' (length: {len(api_key)})")
             
             with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
-                # Authenticate using extracted key
                 cur.execute(
                     """
                     SELECT client_id, company_pin, api_key, is_active, created_at
@@ -77,7 +64,7 @@ class PostgresManager:
                       AND api_key = %s 
                       AND is_active = TRUE
                     """,
-                    (company_pin, actual_key)
+                    (company_pin, api_key)
                 )
                 result = cur.fetchone()
                 if result:
@@ -85,7 +72,7 @@ class PostgresManager:
                     return dict(result)
                 else:
                     logger.warning(f"❌ Authentication failed - no matching company_pin and api_key combination in database")
-                    logger.warning(f"   Searched for: pin='{company_pin}', key='{actual_key[:30]}...'")
+                    logger.warning(f"   Searched for: pin='{company_pin}', key='{api_key[:20]}...'")
                     return None
         except Exception as e:
             logger.error(f"❌ Error authenticating client: {e}", exc_info=True)
