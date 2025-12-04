@@ -11,6 +11,7 @@ from typing import List, Optional
 import uvicorn
 import secrets
 import uuid
+from contextvars import ContextVar
 
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
@@ -20,74 +21,103 @@ from rag_system import RAGSystem
 from fastapi_session_manager import FastAPISessionManager
 import utils
 
-# Setup logging with daily file rotation
-# Create logs directory if it doesn't exist
+# Context variable to track current client
+current_client_context: ContextVar[Optional[str]] = ContextVar('current_client_context', default=None)
+
+# Setup logging directories
 logs_dir = os.path.join(os.path.dirname(__file__), '..', 'logs')
 os.makedirs(logs_dir, exist_ok=True)
 
-# Setup logging with daily file
-log_filename = os.path.join(logs_dir, f"chatbot_{datetime.now().strftime('%Y-%m-%d')}.log")
-logging.basicConfig(
-    level=getattr(logging, LOG_LEVEL),
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler(log_filename, encoding='utf-8'),
-        logging.StreamHandler()  # Also log to console
-    ]
-)
+
+class ClientContextFilter(logging.Filter):
+    """Filter that routes logs to client-specific files based on context"""
+    
+    def filter(self, record):
+        # Add client context to record
+        record.client_pin = current_client_context.get()
+        return True
+
+
+class ClientAwareHandler(logging.Handler):
+    """Handler that routes logs to client-specific folders"""
+    
+    def __init__(self):
+        super().__init__()
+        self.client_handlers = {}
+        self.formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    
+    def emit(self, record):
+        try:
+            client_pin = getattr(record, 'client_pin', None)
+            
+            if client_pin:
+                # Route to specific client log
+                handler = self._get_client_handler(client_pin)
+                handler.emit(record)
+            else:
+                # System event - write to ALL existing client folders
+                self._emit_to_all_clients(record)
+        except Exception:
+            self.handleError(record)
+    
+    def _get_client_handler(self, client_pin: str):
+        """Get or create handler for client"""
+        today = datetime.now().strftime('%Y-%m-%d')
+        cache_key = f"{client_pin}_{today}"
+        
+        if cache_key not in self.client_handlers:
+            # Create client folder
+            client_dir = os.path.join(logs_dir, client_pin)
+            os.makedirs(client_dir, exist_ok=True)
+            
+            # Create file handler
+            log_file = os.path.join(client_dir, f"{today}.log")
+            handler = logging.FileHandler(log_file, encoding='utf-8')
+            handler.setFormatter(self.formatter)
+            self.client_handlers[cache_key] = handler
+        
+        return self.client_handlers[cache_key]
+    
+    def _emit_to_all_clients(self, record):
+        """Write system events to all existing client folders"""
+        # Get all client folders
+        if not os.path.exists(logs_dir):
+            return
+        
+        for item in os.listdir(logs_dir):
+            item_path = os.path.join(logs_dir, item)
+            if os.path.isdir(item_path):
+                # This is a client folder
+                handler = self._get_client_handler(item)
+                handler.emit(record)
+
+
+# Setup root logger
+root_logger = logging.getLogger()
+root_logger.setLevel(getattr(logging, LOG_LEVEL))
+root_logger.handlers = []
+
+# Add client-aware handler
+client_aware_handler = ClientAwareHandler()
+client_aware_handler.addFilter(ClientContextFilter())
+root_logger.addHandler(client_aware_handler)
+
+# Add console handler
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+root_logger.addHandler(console_handler)
+
 logger = logging.getLogger(__name__)
 
-# Dictionary to cache client loggers
-client_loggers = {}
 
-def setup_client_logger(company_pin: str):
-    """
-    Setup a per-client logger that writes to {companypin}_{date}.log
-    
-    Args:
-        company_pin: Company PIN to identify the client
-        
-    Returns:
-        Logger instance for the client
-    """
-    # Create unique logger name
-    logger_name = f"client_{company_pin}"
-    
-    # Check if logger already exists for today
-    today = datetime.now().strftime('%Y-%m-%d')
-    cache_key = f"{company_pin}_{today}"
-    
-    if cache_key in client_loggers:
-        return client_loggers[cache_key]
-    
-    # Create new logger
-    client_logger = logging.getLogger(logger_name)
-    client_logger.setLevel(getattr(logging, LOG_LEVEL))
-    
-    # Remove existing handlers to avoid duplicates
-    client_logger.handlers = []
-    
-    # Create file handler for client-specific log
-    client_log_filename = os.path.join(logs_dir, f"{company_pin}_{today}.log")
-    file_handler = logging.FileHandler(client_log_filename, encoding='utf-8')
-    file_handler.setLevel(getattr(logging, LOG_LEVEL))
-    
-    # Create formatter
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    file_handler.setFormatter(formatter)
-    
-    # Add handler to logger
-    client_logger.addHandler(file_handler)
-    
-    # Prevent propagation to root logger (avoid duplicate console logs)
-    client_logger.propagate = False
-    
-    # Cache the logger
-    client_loggers[cache_key] = client_logger
-    
-    logger.info(f"Created client logger for company_pin: {company_pin}, file: {company_pin}_{today}.log")
-    
-    return client_logger
+def set_client_context(company_pin: str):
+    """Set the current client context for logging"""
+    current_client_context.set(company_pin)
+
+
+def clear_client_context():
+    """Clear the current client context"""
+    current_client_context.set(None)
 
 # Validate SECRET_KEY
 if not SECRET_KEY or len(SECRET_KEY) < 32:
@@ -241,25 +271,12 @@ async def query(
     if rag_system is None or session_manager is None:
         raise HTTPException(status_code=503, detail="System not initialized")
     
-    # Setup per-client logger if company_pin is provided
-    client_logger = None
-    if x_company_pin:
-        client_logger = setup_client_logger(x_company_pin)
-    
     logger.info("="*80)
     logger.info("NEW QUERY REQUEST RECEIVED")
     logger.info("="*80)
     logger.info(f"Query: '{request_body.query}'")
+    logger.info(f"User: {x_user_name if x_user_name else 'UNKNOWN'}")
     logger.info(f"Max Tokens: {request_body.max_tokens}, Temperature: {request_body.temperature}, Top-P: {request_body.top_p}")
-    
-    # Also log to client-specific file
-    if client_logger:
-        client_logger.info("="*80)
-        client_logger.info("NEW QUERY REQUEST RECEIVED")
-        client_logger.info("="*80)
-        client_logger.info(f"Query: '{request_body.query}'")
-        client_logger.info(f"User: {x_user_name if x_user_name else 'UNKNOWN'}")
-        client_logger.info(f"Max Tokens: {request_body.max_tokens}, Temperature: {request_body.temperature}, Top-P: {request_body.top_p}")
     
     # Log received headers
     logger.info("-"*80)
@@ -273,8 +290,6 @@ async def query(
     # Validate required headers (only company_pin and api_key needed for auth)
     if not x_company_pin or not x_api_key:
         logger.warning("❌ AUTHENTICATION FAILED: Missing required authentication headers (X-Company-Pin or X-API-Key)")
-        if client_logger:
-            client_logger.warning("❌ AUTHENTICATION FAILED: Missing required authentication headers")
         logger.info("="*80)
         return QueryResponse(response="Unauthorized", session_id="")
     
@@ -305,15 +320,15 @@ async def query(
         # Get client_id from authenticated result
         authenticated_client_id = client['client_id']
         
+        # Set client context for logging
+        set_client_context(client['company_pin'])
+        
         logger.info(f"✅ AUTHENTICATION SUCCESSFUL")
         logger.info(f"   Client ID: {authenticated_client_id} (from database)")
         logger.info(f"   Company PIN: {client['company_pin']}")
         logger.info(f"   API Key: {client['api_key'][:20]}...")
         logger.info(f"   User: {x_user_name}")
         logger.info(f"   Active: {client['is_active']}")
-        
-        if client_logger:
-            client_logger.info(f"✅ AUTHENTICATION SUCCESSFUL - Client ID: {authenticated_client_id}, User: {x_user_name}")
         
         # Check token limit
         logger.info("-"*80)
@@ -328,10 +343,7 @@ async def query(
             logger.warning(f"❌ TOKEN LIMIT EXCEEDED")
             logger.warning(f"   Client has used {token_status['usage']:,} / {token_status['limit']:,} tokens this month")
             db.disconnect()
-            
-            if client_logger:
-                client_logger.warning(f"❌ TOKEN LIMIT EXCEEDED - Used: {token_status['usage']:,} / {token_status['limit']:,}")
-            
+            clear_client_context()
             logger.info("="*80)
             return QueryResponse(
                 response="Your monthly token limit has been reached. Please contact your administrator.",
@@ -419,9 +431,6 @@ async def query(
         logger.info(f"   Output tokens: {output_tokens:,}")
         logger.info(f"   Total tokens: {total_tokens:,}")
         
-        if client_logger:
-            client_logger.info(f"🔢 Tokens - Input: {input_tokens:,}, Output: {output_tokens:,}, Total: {total_tokens:,}")
-        
         # Add assistant response to session
         assistant_message = Message(
             role="assistant",
@@ -479,9 +488,6 @@ async def query(
             logger.info(f"   Tokens Added: {total_tokens:,}")
             logger.info(f"   New Total Usage: {new_usage:,} / {token_status['limit']:,}")
             logger.info(f"   Remaining: {token_status['limit'] - new_usage:,}")
-            
-            if client_logger:
-                client_logger.info(f"✅ Token usage updated - Added: {total_tokens:,}, Total: {new_usage:,} / {token_status['limit']:,}")
         else:
             logger.warning(f"⚠️  Failed to update token usage")
         
@@ -504,21 +510,14 @@ async def query(
         logger.info(f"   Response Length: {len(response)} characters")
         logger.info("="*80)
         
-        # Log to client file
-        if client_logger:
-            client_logger.info("-"*80)
-            client_logger.info("✅ QUERY PROCESSED SUCCESSFULLY")
-            client_logger.info(f"Session ID: {session.session_id}")
-            client_logger.info(f"User Query: {request_body.query}")
-            client_logger.info(f"Bot Response: {response[:200]}..." if len(response) > 200 else f"Bot Response: {response}")
-            client_logger.info(f"Source Documents: {len(sources)}")
-            client_logger.info(f"Response Length: {len(response)} characters")
-            client_logger.info("="*80)
+        # Clear client context
+        clear_client_context()
         
         return QueryResponse(response=response, session_id=session.session_id)
     
     except Exception as e:
         logger.error(f"Query processing error: {e}", exc_info=True)
+        clear_client_context()
         raise HTTPException(status_code=500, detail=str(e))
 
 
