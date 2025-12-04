@@ -23,7 +23,7 @@ DEFAULT_TOP_P = 0.7
 DEFAULT_TOP_K = 20
 REPETITION_PENALTY = 1.2
 NO_REPEAT_NGRAM_SIZE = 3
-OLLAMA_TIMEOUT = 120 
+OLLAMA_TIMEOUT = 500
 
 TOP_K_RETRIEVAL = 10
 TOP_K_CONTEXT = 7  
@@ -37,21 +37,24 @@ API_PORT = 8000
 
 # FastAPI Session Management
 SECRET_KEY = os.getenv("SECRET_KEY", "")  
+
 SESSION_MAX_AGE = 1000000 
 MAX_SESSIONS = 10000 
 CLEANUP_INTERVAL = 60  
 
 # PostgreSQL Database settings (for chatbot sessions)
-POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
-POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
-POSTGRES_DB = os.getenv("POSTGRES_DB", "chatbot")
-POSTGRES_SCHEMA = os.getenv("POSTGRES_SCHEMA", "chatbot")
-POSTGRES_USER = os.getenv("POSTGRES_USER", "postgres")
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "root")
+POSTGRES_HOST = os.getenv("POSTGRES_HOST")
+POSTGRES_PORT = os.getenv("POSTGRES_PORT")
+POSTGRES_DB = os.getenv("POSTGRES_DB")
+POSTGRES_SCHEMA = os.getenv("POSTGRES_SCHEMA")
+POSTGRES_USER = os.getenv("POSTGRES_USER")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+
+# Validate required environment variables
+if not all([POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_SCHEMA, POSTGRES_USER, POSTGRES_PASSWORD]):
+    raise ValueError("Missing required PostgreSQL environment variables. Check your .env file.")
+
 POSTGRES_CONNECTION_STRING = f"host={POSTGRES_HOST} port={POSTGRES_PORT} dbname={POSTGRES_DB} user={POSTGRES_USER} password={POSTGRES_PASSWORD} options='-c search_path={POSTGRES_SCHEMA},public'"
-
-
-DEFAULT_CLIENT_ID = int(os.getenv("DEFAULT_CLIENT_ID", "1"))
 
 LOG_LEVEL = "INFO"
 LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
