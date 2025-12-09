@@ -92,162 +92,83 @@ class DocumentProcessor:
         file_ext = file_extension.lower().strip('.')
         
         try:
-            logger.info("="*60)
-            logger.info("📄 DOCUMENT PROCESSING STARTED")
-            logger.info(f"   File name: {file_name}")
-            logger.info(f"   File type: {file_ext.upper()}")
-            logger.info(f"   Base64 content length: {len(base64_content)} characters")
-            
             # Decode base64 to binary
-            logger.info("🔓 Decoding base64 content...")
             file_bytes = base64.b64decode(base64_content)
-            logger.info(f"✅ Decoded successfully")
-            logger.info(f"   File size: {len(file_bytes):,} bytes ({len(file_bytes) / 1024:.2f} KB)")
             
             # Route to appropriate processor
             if file_ext == 'pdf':
-                logger.info("📕 Routing to PDF processor...")
                 result = self._process_pdf_bytes(file_bytes, file_name)
             elif file_ext in ['docx', 'doc']:
-                logger.info("📘 Routing to DOCX processor...")
                 result = self._process_docx_bytes(file_bytes, file_name)
             else:
-                logger.error(f"❌ Unsupported file type: {file_ext}")
-                logger.error(f"   Supported types: pdf, docx, doc")
+                logger.error(f"Unsupported file type: {file_ext}")
                 return None
-            
-            if result:
-                logger.info("="*60)
-                logger.info("✅ DOCUMENT PROCESSING COMPLETED")
-                logger.info(f"   Extracted text length: {len(result):,} characters")
-                logger.info(f"   Text preview: {result[:200]}...")
-                logger.info("="*60)
-            else:
-                logger.error("❌ Document processing returned empty result")
             
             return result
         
         except Exception as e:
-            logger.error(f"❌ Failed to process document {file_name}: {e}", exc_info=True)
-            logger.error(f"   Error type: {type(e).__name__}")
-            logger.error(f"   Error details: {str(e)}")
+            logger.error(f"Failed to process document {file_name}: {e}")
             return None
     
     def _process_pdf_bytes(self, file_bytes: bytes, file_name: str) -> Optional[str]:
         """Extract text from PDF bytes"""
         if not PDF_AVAILABLE:
-            logger.error("❌ PyPDF2 not available - cannot process PDF")
-            logger.error("   Install with: pip install PyPDF2")
+            logger.error("PyPDF2 not available")
             return None
         
         try:
-            logger.info("📕 Processing PDF document...")
-            logger.info(f"   File: {file_name}")
-            logger.info(f"   Size: {len(file_bytes):,} bytes")
-            
-            # Create file-like object
-            logger.info("🔄 Creating PDF reader...")
             pdf_file = io.BytesIO(file_bytes)
             pdf_reader = PyPDF2.PdfReader(pdf_file)
             
             num_pages = len(pdf_reader.pages)
-            logger.info(f"✅ PDF loaded successfully")
-            logger.info(f"   Total pages: {num_pages}")
-            
-            # Extract metadata if available
-            if pdf_reader.metadata:
-                logger.info("📋 PDF Metadata:")
-                if pdf_reader.metadata.title:
-                    logger.info(f"   Title: {pdf_reader.metadata.title}")
-                if pdf_reader.metadata.author:
-                    logger.info(f"   Author: {pdf_reader.metadata.author}")
             
             # Extract text from each page
-            logger.info("📖 Extracting text from pages...")
             text_content = []
             for page_num in range(num_pages):
-                logger.info(f"   Processing page {page_num + 1}/{num_pages}...")
                 page = pdf_reader.pages[page_num]
                 text = page.extract_text()
                 
                 if text.strip():
                     text_content.append(text.strip())
-                    logger.info(f"   ✅ Page {page_num + 1}: Extracted {len(text):,} characters")
-                else:
-                    logger.warning(f"   ⚠️  Page {page_num + 1}: No text extracted (might be image-based)")
             
             full_text = '\n\n'.join(text_content)
-            logger.info("="*60)
-            logger.info("✅ PDF TEXT EXTRACTION COMPLETED")
-            logger.info(f"   Pages processed: {num_pages}")
-            logger.info(f"   Pages with text: {len(text_content)}")
-            logger.info(f"   Total characters: {len(full_text):,}")
-            logger.info(f"   Total words (approx): {len(full_text.split()):,}")
-            logger.info("="*60)
+            logger.info(f"PDF processed: {file_name} ({num_pages} pages, {len(full_text)} chars)")
             
             return full_text
         
         except Exception as e:
-            logger.error(f"❌ Failed to extract text from PDF {file_name}: {e}", exc_info=True)
-            logger.error(f"   Error type: {type(e).__name__}")
-            logger.error(f"   Error details: {str(e)}")
+            logger.error(f"Failed to extract PDF {file_name}: {e}")
             return None
     
     def _process_docx_bytes(self, file_bytes: bytes, file_name: str) -> Optional[str]:
         """Extract text from DOCX bytes"""
         if not DOCX_AVAILABLE:
-            logger.error("❌ python-docx not available - cannot process DOCX")
-            logger.error("   Install with: pip install python-docx")
+            logger.error("python-docx not available")
             return None
         
         try:
-            logger.info("📘 Processing DOCX document...")
-            logger.info(f"   File: {file_name}")
-            logger.info(f"   Size: {len(file_bytes):,} bytes")
-            
-            # Create file-like object
-            logger.info("🔄 Creating DOCX reader...")
             docx_file = io.BytesIO(file_bytes)
             doc = Document(docx_file)
-            logger.info("✅ DOCX loaded successfully")
             
             # Extract text from paragraphs
-            logger.info("📖 Extracting text from paragraphs...")
             paragraphs = []
-            total_paragraphs = len(doc.paragraphs)
-            logger.info(f"   Total paragraphs in document: {total_paragraphs}")
-            
-            for i, p in enumerate(doc.paragraphs, 1):
+            for p in enumerate(doc.paragraphs, 1):
                 if p.text.strip():
                     paragraphs.append(p.text.strip())
-                    if i <= 3:  # Log first 3 paragraphs
-                        logger.info(f"   Paragraph {i}: {len(p.text)} chars - {p.text[:100]}...")
-            
-            logger.info(f"   Non-empty paragraphs: {len(paragraphs)}")
             
             # Extract text from tables if any
             if doc.tables:
-                logger.info(f"📊 Document contains {len(doc.tables)} table(s)")
-                logger.info("   Extracting text from tables...")
-                for table_num, table in enumerate(doc.tables, 1):
+                for table in doc.tables:
                     for row in table.rows:
                         row_text = ' | '.join([cell.text.strip() for cell in row.cells if cell.text.strip()])
                         if row_text:
                             paragraphs.append(row_text)
-                    logger.info(f"   ✅ Table {table_num}: Extracted {len(table.rows)} rows")
             
             full_text = '\n\n'.join(paragraphs)
-            logger.info("="*60)
-            logger.info("✅ DOCX TEXT EXTRACTION COMPLETED")
-            logger.info(f"   Total paragraphs: {len(paragraphs)}")
-            logger.info(f"   Total characters: {len(full_text):,}")
-            logger.info(f"   Total words (approx): {len(full_text.split()):,}")
-            logger.info("="*60)
+            logger.info(f"DOCX processed: {file_name} ({len(paragraphs)} paragraphs, {len(full_text)} chars)")
             
             return full_text
         
         except Exception as e:
-            logger.error(f"❌ Failed to extract text from DOCX {file_name}: {e}", exc_info=True)
-            logger.error(f"   Error type: {type(e).__name__}")
-            logger.error(f"   Error details: {str(e)}")
+            logger.error(f"Failed to extract DOCX {file_name}: {e}")
             return None

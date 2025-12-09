@@ -4,7 +4,11 @@ import numpy as np
 from typing import List, Tuple
 from datetime import datetime
 
-from config import *
+from config import (
+    DOCS_FOLDER, SEMANTIC_SIMILARITY_THRESHOLD, EMBEDDING_MODEL,
+    MODEL_NAME, OLLAMA_BASE_URL, DEFAULT_MAX_TOKENS, DEFAULT_TEMPERATURE,
+    DEFAULT_TOP_P, TOP_K_RETRIEVAL, TOP_K_CONTEXT, MIN_RELEVANCE_THRESHOLD
+)
 from processing.document_processor import DocumentProcessor
 from processing.chunking import SemanticChunker, DocumentChunk
 from retrieval.vector_store import VectorStore
@@ -23,10 +27,6 @@ class RAGSystem:
     """Complete RAG system with per-client embedding support"""
     
     def __init__(self):
-        logger.info("="*60)
-        logger.info("Initializing RAG System (Per-Client Mode)")
-        logger.info("="*60)
-        
         self.doc_processor = DocumentProcessor(DOCS_FOLDER)
         self.chunker = SemanticChunker(similarity_threshold=SEMANTIC_SIMILARITY_THRESHOLD)
         self.vector_store = VectorStore(EMBEDDING_MODEL)  # No default paths
@@ -38,13 +38,10 @@ class RAGSystem:
         self.chunks = []
         
         # Load LLM immediately
-        logger.info("Loading LLM model")
         if not self.llm_engine.load_model():
             logger.error("Failed to load LLM model")
-        else:
-            logger.info("LLM model loaded successfully")
         
-        logger.info("RAG System initialized (client indexes loaded on-demand)")
+        logger.info("RAG System initialized")
     
     def load_client_index(self, company_pin: str) -> bool:
         """
@@ -56,66 +53,22 @@ class RAGSystem:
         Returns:
             True if loaded successfully, False otherwise
         """
-        logger.info(f"Loading index for client: {company_pin}")
-        
         # Set client-specific paths
         self.vector_store.set_client_paths(company_pin)
         self.current_client = company_pin
         
         # Try to load existing index
         if self.vector_store._load_index():
-            logger.info(f"✅ Loaded existing index for client {company_pin}")
-            logger.info(f"   Vectors: {self.vector_store.index.ntotal}")
-            logger.info(f"   Chunks: {len(self.vector_store.chunks)}")
+            logger.info(f"Loaded index for client: {company_pin}")
             
             # Update retriever
             self.retriever = SemanticRetriever(self.vector_store, self.vector_store.chunks)
             return True
         else:
-            logger.warning(f"⚠️  No existing index found for client {company_pin}")
+            logger.warning(f"No index found for client: {company_pin}")
             return False
     
-    def initialize(self) -> bool:
-        """Initialize all components (legacy method, kept for compatibility)"""
-        logger.info("Starting system initialization")
-        
-        # Load LLM
-        logger.info("Loading LLM model")
-        if not self.llm_engine.load_model():
-            logger.error("Failed to load LLM model")
-            return False
-        logger.info("LLM model loaded successfully")
-        
-        logger.info("Loading documents")
-        self.documents = self.doc_processor.load_documents()
-        if not self.documents:
-            logger.warning("No documents loaded")
-            return False
-        
-        # Create chunks
-        logger.info("Creating document chunks")
-        self.chunks = self.chunker.create_chunks(self.documents)
-        if not self.chunks:
-            logger.error("Failed to create chunks")
-            return False
-        
-        logger.info("Building vector index")
-        if not self.vector_store.build_index(self.chunks):
-            logger.error("Failed to build vector index")
-            return False
-        
-        self.retriever = SemanticRetriever(
-            self.vector_store, 
-            self.chunks
-        )
-        logger.info("Retriever initialized")
-        
-        logger.info("="*60)
-        logger.info("RAG System initialization complete")
-        logger.info(f"Documents: {len(self.documents)}")
-        logger.info(f"Chunks: {len(self.chunks)}")
-        logger.info("="*60)
-        return True
+
     
 
     def query_with_context(
@@ -127,45 +80,24 @@ class RAGSystem:
         top_p: float = DEFAULT_TOP_P
     ) -> Tuple[str, List[DocumentChunk]]:
         """Process a user query with external context (for session management)"""
-        logger.info("="*60)
-        logger.info(f"Processing query: '{user_input}'")
-        logger.info(f"Params: max_tokens={max_tokens}, temp={temperature}, top_p={top_p}")
-        
         try:
             # Retrieve relevant documents
-            logger.info("Retrieving relevant documents")
             context_docs = self.retriever.retrieve(user_input, TOP_K_RETRIEVAL)
             
             if not context_docs:
-                logger.warning("No context documents found")
-                logger.info(">>> DECISION: Using GENERAL RESPONSE (no context docs)")
                 return self._generate_general_response(user_input, recent_context, max_tokens, temperature, top_p), []
             
             scores = [doc.relevance_score for doc in context_docs]
             mean_score = np.mean(scores)
             std_score = np.std(scores)
-            logger.info(f"Score stats: mean={mean_score:.3f}, std={std_score:.3f}")
             
             dynamic_threshold = max(MIN_RELEVANCE_THRESHOLD, mean_score - 0.5 * std_score)
-            logger.info(f"Dynamic threshold: {dynamic_threshold:.3f}")
             
             relevant_docs = [doc for doc in context_docs if doc.relevance_score >= dynamic_threshold]
-            logger.info(f"Filtered to {len(relevant_docs)} relevant documents")
-            
             relevant_docs = relevant_docs[:TOP_K_CONTEXT]
-            logger.info(f"Using top {len(relevant_docs)} documents")
             
             if not relevant_docs:
-                logger.warning("No documents passed threshold")
-                logger.info(">>> DECISION: Using GENERAL RESPONSE (no relevant docs)")
                 return self._generate_general_response(user_input, recent_context, max_tokens, temperature, top_p), []
-            
-            unique_sources = set(doc.source_file for doc in relevant_docs)
-            logger.info(f"Unique source documents: {len(unique_sources)}")
-            for source in unique_sources:
-                logger.info(f"  - {source}")
-            
-            logger.info(">>> DECISION: Using DOCUMENT-AWARE RESPONSE")
             
             # Generate response with context
             response = self._generate_document_response(
@@ -177,8 +109,6 @@ class RAGSystem:
                 top_p
             )
             
-            logger.info(f"Response generated: {len(response)} chars")
-            logger.info("="*60)
             return response, relevant_docs
         
         except Exception as e:
@@ -194,13 +124,7 @@ class RAGSystem:
         top_p: float
     ) -> str:
         """Generate response without document context"""
-        logger.info("Generating general response (no relevant documents found)")
         prompt = get_general_prompt(user_input, recent_context)
-        
-        logger.info("="*60)
-        logger.info("GENERAL PROMPT SENT TO LLM:")
-        logger.info(f"\n{prompt}")
-        logger.info("="*60)
         
         response = self.llm_engine.generate(
             prompt,
@@ -220,25 +144,7 @@ class RAGSystem:
         top_p: float
     ) -> str:
         """Generate response with document context"""
-        logger.info("Generating document-aware response")
-        
-        logger.info("="*60)
-        logger.info("CONTEXT CHUNKS USED FOR GENERATION:")
-        for i, doc in enumerate(context_docs, 1):
-            logger.info(f"\n--- Chunk {i} ---")
-            logger.info(f"Source: {doc.source_file}")
-            logger.info(f"Chunk ID: {doc.chunk_id}")
-            logger.info(f"Relevance Score: {doc.relevance_score:.3f}")
-            logger.info(f"Content Length: {len(doc.content)} chars")
-            logger.info(f"Content:\n{doc.content}")
-        logger.info("="*60)
-        
         prompt = get_document_aware_prompt(user_input, context_docs, recent_context)
-        
-        logger.info("="*60)
-        logger.info("FULL PROMPT SENT TO LLM:")
-        logger.info(f"\n{prompt}")
-        logger.info("="*60)
         
         response = self.llm_engine.generate(
             prompt,

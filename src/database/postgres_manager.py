@@ -51,10 +51,6 @@ class PostgresManager:
             Client info dict if authenticated, None otherwise
         """
         try:
-            logger.info(f"🔍 Authenticating with:")
-            logger.info(f"   Company PIN: '{company_pin}' (length: {len(company_pin)})")
-            logger.info(f"   API Key: '{api_key[:20]}...' (length: {len(api_key)})")
-            
             with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
                 cur.execute(
                     """
@@ -68,14 +64,12 @@ class PostgresManager:
                 )
                 result = cur.fetchone()
                 if result:
-                    logger.info(f"✅ Client authenticated successfully from database (client_id: {result['client_id']})")
                     return dict(result)
                 else:
-                    logger.warning(f"❌ Authentication failed - no matching company_pin and api_key combination in database")
-                    logger.warning(f"   Searched for: pin='{company_pin}', key='{api_key[:20]}...'")
+                    logger.warning(f"Authentication failed for: {company_pin}")
                     return None
         except Exception as e:
-            logger.error(f"❌ Error authenticating client: {e}", exc_info=True)
+            logger.error(f"Error authenticating client: {e}", exc_info=True)
             return None
     
 
@@ -93,7 +87,6 @@ class PostgresManager:
             True if successful, False otherwise
         """
         try:
-            logger.info(f"Syncing client to database: company_pin={company_pin}, api_key={api_key[:20]}..., is_active={is_active}")
             with self.conn.cursor() as cur:
       
                 cur.execute(
@@ -109,14 +102,10 @@ class PostgresManager:
                     (company_pin, api_key, is_active)
                 )
                 result = cur.fetchone()
-                assigned_client_id = result[0] if result else None
                 self.conn.commit()
-                logger.info(f"✅ Client synced to PostgreSQL database")
-                logger.info(f"   PostgreSQL client_id: {assigned_client_id} (auto-assigned)")
-                logger.info(f"   Company PIN: {company_pin}")
                 return True
         except Exception as e:
-            logger.error(f"❌ Error syncing client to database: {e}", exc_info=True)
+            logger.error(f"Error syncing client: {e}", exc_info=True)
             self.conn.rollback()
             return False
     
@@ -133,7 +122,6 @@ class PostgresManager:
             Session ID (integer) if successful, None otherwise
         """
         try:
-            logger.debug(f"Inserting session into database: session_id={session_id}, username={username}, client_id={client_id}")
             with self.conn.cursor() as cur:
                 cur.execute(
                     """
@@ -145,7 +133,6 @@ class PostgresManager:
                 )
                 session_db_id = cur.fetchone()[0]
                 self.conn.commit()
-                logger.info(f"✅ Session created in database: {session_id} (db_id={session_db_id}, user={username}, client={client_id})")
                 return session_db_id
         except Exception as e:
             logger.error(f"❌ Error creating session in database: {e}", exc_info=True)
@@ -198,7 +185,6 @@ class PostgresManager:
         Returns:
             Table name like 'conversation_dec_2025'
         """
-        from datetime import datetime
         month_abbr = datetime.now().strftime("%b").lower()  
         year = datetime.now().strftime("%Y")  
         return f"conversation_{month_abbr}_{year}"
@@ -287,77 +273,7 @@ class PostgresManager:
             self.conn.rollback()
             return False
     
-    def get_session(self, session_id: str) -> Optional[Dict[str, Any]]:
-        """Get session by ID"""
-        try:
-            with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute(
-                    "SELECT * FROM chatbot.sessions WHERE session_id = %s",
-                    (session_id,)
-                )
-                result = cur.fetchone()
-                return dict(result) if result else None
-        except Exception as e:
-            logger.error(f"Error getting session: {e}", exc_info=True)
-            return None
-    
-    def get_session_conversations(self, session_db_id: int, month_year: str = None, limit: int = 50) -> List[Dict[str, Any]]:
-        """
-        Get conversation history for a session from specific month's table
-        
-        Args:
-            session_db_id: Session database ID (integer)
-            month_year: Month and year (e.g., 'dec_2025'), defaults to current month
-            limit: Maximum number of conversations to retrieve
-            
-        Returns:
-            List of conversation dictionaries
-        """
-        try:
-            if month_year is None:
-                table_name = self._get_current_conversation_table()
-            else:
-                table_name = f"conversation_{month_year.lower()}"
-            
-            with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute(
-                    f"""
-                    SELECT conversation_id, fk_session_id, user_message, chatbot_response, created_at
-                    FROM chatbot.{table_name}
-                    WHERE fk_session_id = %s 
-                    ORDER BY created_at ASC
-                    LIMIT %s
-                    """,
-                    (session_db_id, limit)
-                )
-                results = cur.fetchall()
-                return [dict(row) for row in results]
-        except Exception as e:
-            logger.error(f"Error getting session conversations: {e}", exc_info=True)
-            return []
-    
-    def get_client_sessions(self, client_id: int, limit: int = 100) -> List[Dict[str, Any]]:
-        """Get recent sessions for a client"""
-        try:
-            with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute(
-                    """
-                    SELECT s.session_id, s.username, s.fk_client_id, s.created_at, s.last_active,
-                           COUNT(c.conversation_id) as message_count
-                    FROM chatbot.sessions s
-                    LEFT JOIN chatbot.conversation c ON c.fk_session_id = s.session_id
-                    WHERE s.fk_client_id = %s 
-                    GROUP BY s.session_id, s.username, s.fk_client_id, s.created_at, s.last_active
-                    ORDER BY s.last_active DESC 
-                    LIMIT %s
-                    """,
-                    (client_id, limit)
-                )
-                results = cur.fetchall()
-                return [dict(row) for row in results]
-        except Exception as e:
-            logger.error(f"Error getting client sessions: {e}", exc_info=True)
-            return []
+
     
     # Token Management Methods
     
@@ -566,41 +482,7 @@ class PostgresManager:
             self.conn.rollback()
             return None
     
-    def get_document_by_announcement(self, announcement_id: int, client_id: int) -> Optional[Dict[str, Any]]:
-        """Get document by announcement ID and client ID"""
-        try:
-            with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute(
-                    """
-                    SELECT * FROM chatbot.documents 
-                    WHERE announcement_id = %s AND fk_client_id = %s
-                    """,
-                    (announcement_id, client_id)
-                )
-                result = cur.fetchone()
-                return dict(result) if result else None
-        except Exception as e:
-            logger.error(f"Error getting document: {e}", exc_info=True)
-            return None
-    
-    def get_client_documents(self, client_id: int, limit: int = 100) -> List[Dict[str, Any]]:
-        """Get all documents for a client"""
-        try:
-            with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute(
-                    """
-                    SELECT * FROM chatbot.documents 
-                    WHERE fk_client_id = %s 
-                    ORDER BY synced_at DESC 
-                    LIMIT %s
-                    """,
-                    (client_id, limit)
-                )
-                results = cur.fetchall()
-                return [dict(row) for row in results]
-        except Exception as e:
-            logger.error(f"Error getting client documents: {e}", exc_info=True)
-            return []
+
     
     def delete_client_documents(self, client_id: int) -> bool:
         """

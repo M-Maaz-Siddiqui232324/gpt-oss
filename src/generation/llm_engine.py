@@ -2,6 +2,8 @@
 import logging
 import requests
 
+from config import OLLAMA_TIMEOUT
+
 logger = logging.getLogger(__name__)
 
 
@@ -94,7 +96,6 @@ class LLMEngine:
             payload["options"]["stop"] = stop_strings
             
             # Make request to Ollama
-            from config import OLLAMA_TIMEOUT
             response = requests.post(
                 f"{self.base_url}/api/generate",
                 json=payload,

@@ -10,7 +10,7 @@ from typing import List, Dict, Optional
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from config import *
+from config import LOG_LEVEL, API_PORT, DEFAULT_MAX_TOKENS, DEFAULT_TEMPERATURE, DEFAULT_TOP_P
 import utils
 
 # Setup logging
@@ -100,26 +100,7 @@ def send_query(query: str, max_tokens: int, temperature: float, top_p: float, se
         return None, None
 
 
-def clear_session(session_cookie: str):
-    """Clear conversation history"""
-    try:
-        cookies = {"session": session_cookie}
-        response = requests.post(f"{API_BASE_URL}/clear", cookies=cookies, timeout=5)
-        return response.status_code == 200
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Error clearing session: {e}")
-        return False
 
-
-def end_session(session_cookie: str):
-    """End the session"""
-    try:
-        cookies = {"session": session_cookie}
-        response = requests.post(f"{API_BASE_URL}/session/end", cookies=cookies, timeout=5)
-        return response.status_code == 200
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Error ending session: {e}")
-        return False
 
 
 
@@ -184,19 +165,15 @@ def main():
         else:
             st.info("**Session:** Not started")
         
-        # Clear chat
+        # Clear chat (local only - no backend endpoint needed)
         if st.button("🗑️ Clear Chat", use_container_width=True):
-            logger.info("Clearing chat history")
-            if st.session_state.session_cookie:
-                clear_session(st.session_state.session_cookie)
+            logger.info("Clearing chat history (local only)")
             st.session_state.messages = []
             st.rerun()
         
-        # End session button
+        # End session button (local only - no backend endpoint needed)
         if st.button("🔚 End Session", use_container_width=True):
-            logger.info("Ending session")
-            if st.session_state.session_cookie:
-                end_session(st.session_state.session_cookie)
+            logger.info("Ending session (local only)")
             st.session_state.messages = []
             st.session_state.session_cookie = None
             st.rerun()

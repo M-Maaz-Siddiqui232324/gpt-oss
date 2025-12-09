@@ -5,6 +5,8 @@ import logging
 import numpy as np
 from typing import List, Optional
 
+from config import get_client_index_path, get_client_chunks_path
+
 logger = logging.getLogger(__name__)
 
 try:
@@ -42,13 +44,9 @@ class VectorStore:
         Args:
             company_pin: Client's company PIN
         """
-        from config import get_client_index_path, get_client_chunks_path
         self.index_file = get_client_index_path(company_pin)
         self.chunks_file = get_client_chunks_path(company_pin)
         self.current_client = company_pin
-        logger.info(f"Set client paths for: {company_pin}")
-        logger.info(f"  Index: {self.index_file}")
-        logger.info(f"  Chunks: {self.chunks_file}")
     
     def build_index(self, chunks: List, force_rebuild: bool = False) -> bool:
         """Build FAISS index from chunks"""
@@ -122,26 +120,20 @@ class VectorStore:
             index_dir = os.path.dirname(self.index_file)
             if index_dir and not os.path.exists(index_dir):
                 os.makedirs(index_dir, exist_ok=True)
-                logger.info(f"Created directory: {index_dir}")
             
             # Create directory for chunks file (might be different)
             chunks_dir = os.path.dirname(self.chunks_file)
             if chunks_dir and not os.path.exists(chunks_dir):
                 os.makedirs(chunks_dir, exist_ok=True)
-                logger.info(f"Created directory: {chunks_dir}")
             
             if self.index is not None:
-                logger.info(f"Saving FAISS index to: {self.index_file}")
                 faiss.write_index(self.index, self.index_file)
-                logger.info(f"✅ Saved FAISS index to: {self.index_file}")
             
-            logger.info(f"Saving chunks to: {self.chunks_file}")
             with open(self.chunks_file, 'wb') as f:
                 pickle.dump(self.chunks, f)
-            logger.info(f"✅ Saved chunks to: {self.chunks_file}")
         
         except Exception as e:
-            logger.error(f"❌ Failed to save index: {str(e)}", exc_info=True)
+            logger.error(f"Failed to save index: {str(e)}", exc_info=True)
     
     def _load_index(self) -> bool:
         """Load FAISS index and chunks from disk"""
@@ -173,133 +165,25 @@ class VectorStore:
             True if successful, False otherwise
         """
         if not VECTOR_SEARCH_AVAILABLE:
-            logger.error("❌ Cannot rebuild index - dependencies missing")
+            logger.error("Cannot rebuild index - dependencies missing")
             return False
         
         if not all_chunks:
-            logger.warning("⚠️  No chunks provided for rebuild")
+            logger.warning("No chunks provided for rebuild")
             return False
         
         try:
-            logger.info("="*60)
-            logger.info("🔄 REBUILDING INDEX FROM SCRATCH")
-            logger.info("="*60)
-            logger.info(f"Total chunks to index: {len(all_chunks)}")
+            logger.info(f"Rebuilding index from scratch: {len(all_chunks)} chunks")
             
             # Clear existing index and chunks
-            logger.info("🗑️  Clearing existing index and chunks...")
             self.index = None
             self.chunks = []
-            logger.info("✅ Cleared existing data")
             
             # Build fresh index (force rebuild, don't load from disk)
-            logger.info("🔨 Building fresh FAISS index...")
             return self.build_index(all_chunks, force_rebuild=True)
         
         except Exception as e:
-            logger.error(f"❌ Failed to rebuild index: {e}", exc_info=True)
+            logger.error(f"Failed to rebuild index: {e}", exc_info=True)
             return False
     
-    def add_documents(self, new_chunks: List) -> bool:
-        """
-        Add new document chunks to existing FAISS index (incremental indexing)
-        
-        Args:
-            new_chunks: List of new chunks to add
-            
-        Returns:
-            True if successful, False otherwise
-        """
-        if not VECTOR_SEARCH_AVAILABLE:
-            logger.error("❌ Cannot add documents - dependencies missing")
-            return False
-        
-        if not new_chunks:
-            logger.warning("⚠️  No new chunks to add")
-            return False
-        
-        try:
-            logger.info(f"📊 Starting incremental indexing for {len(new_chunks)} new chunks")
-            
-            # Load existing index if not already loaded
-            if self.index is None:
-                logger.info("🔍 Index not loaded in memory, attempting to load from disk...")
-                if not self._load_index():
-                    logger.warning("⚠️  No existing index found, creating new one from scratch")
-                    return self.build_index(new_chunks)
-                logger.info(f"✅ Loaded existing index with {self.index.ntotal} vectors")
-            else:
-                logger.info(f"✅ Using already loaded index with {self.index.ntotal} vectors")
-            
-            # Store original counts for comparison
-            original_vector_count = self.index.ntotal
-            original_chunk_count = len(self.chunks)
-            
-            # Generate embeddings for new chunks
-            logger.info("🔢 Generating embeddings for new chunks...")
-            logger.info(f"   Embedding model: {self.embedding_model_name}")
-            texts = [chunk.content for chunk in new_chunks]
-            logger.info(f"   Processing {len(texts)} text chunks")
-            
-            new_embeddings = self.encoder.encode(
-                texts,
-                show_progress_bar=True,
-                convert_to_numpy=True
-            )
-            logger.info(f"✅ Generated embeddings with shape: {new_embeddings.shape}")
-            logger.info(f"   Embedding dimension: {new_embeddings.shape[1]}")
-            logger.info(f"   Data type: {new_embeddings.dtype}")
-            
-            # Normalize and add to index
-            logger.info("🔄 Normalizing embeddings (L2 normalization)...")
-            faiss.normalize_L2(new_embeddings)
-            logger.info("✅ Embeddings normalized")
-            
-            logger.info(f"➕ Adding {len(new_chunks)} vectors to FAISS index...")
-            self.index.add(new_embeddings.astype('float32'))
-            new_vector_count = self.index.ntotal
-            logger.info(f"✅ Vectors added successfully")
-            logger.info(f"   Previous vector count: {original_vector_count}")
-            logger.info(f"   New vector count: {new_vector_count}")
-            logger.info(f"   Vectors added: {new_vector_count - original_vector_count}")
-            
-            # Append chunks to existing chunks list
-            logger.info("📝 Appending chunks to chunk list...")
-            self.chunks.extend(new_chunks)
-            new_chunk_count = len(self.chunks)
-            logger.info(f"✅ Chunks appended")
-            logger.info(f"   Previous chunk count: {original_chunk_count}")
-            logger.info(f"   New chunk count: {new_chunk_count}")
-            logger.info(f"   Chunks added: {new_chunk_count - original_chunk_count}")
-            
-            # Log chunk details
-            logger.info("📋 New chunk details:")
-            for i, chunk in enumerate(new_chunks[:3], 1):  # Log first 3 chunks
-                logger.info(f"   Chunk {i}:")
-                logger.info(f"     Source: {chunk.source_file}")
-                logger.info(f"     Chunk ID: {chunk.chunk_id}")
-                logger.info(f"     Content length: {len(chunk.content)} chars")
-                logger.info(f"     Content preview: {chunk.content[:100]}...")
-            if len(new_chunks) > 3:
-                logger.info(f"   ... and {len(new_chunks) - 3} more chunks")
-            
-            # Save updated index and chunks
-            logger.info("💾 Saving updated index and chunks to disk...")
-            self._save_index()
-            logger.info("✅ Successfully saved updated index")
-            logger.info(f"   Index file: {self.index_file}")
-            logger.info(f"   Chunks file: {self.chunks_file}")
-            
-            logger.info("="*60)
-            logger.info("✅ INCREMENTAL INDEXING COMPLETED SUCCESSFULLY")
-            logger.info(f"   Total vectors in index: {self.index.ntotal}")
-            logger.info(f"   Total chunks: {len(self.chunks)}")
-            logger.info("="*60)
-            
-            return True
-        
-        except Exception as e:
-            logger.error(f"❌ Failed to add documents to index: {e}", exc_info=True)
-            logger.error(f"   Error type: {type(e).__name__}")
-            logger.error(f"   Error details: {str(e)}")
-            return False
+

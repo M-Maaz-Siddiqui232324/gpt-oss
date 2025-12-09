@@ -154,16 +154,7 @@ class FastAPISessionManager:
         """Update an existing session"""
         self.store.update(session)
     
-    def clear_session(self, session_id: str) -> bool:
-        """Clear messages from a session while preserving the session"""
-        session = self.store.get(session_id)
-        if session:
-            session.messages.clear()
-            session.last_active = datetime.now().isoformat()
-            self.store.update(session)
-            logger.info(f"Cleared session: {session_id}")
-            return True
-        return False
+
     
     def list_sessions(self) -> List[Dict[str, Any]]:
         """List all active sessions"""
