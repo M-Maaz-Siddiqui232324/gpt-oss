@@ -14,8 +14,20 @@ EMBEDDING_MODEL = "BAAI/bge-base-en-v1.5"
 DOCS_FOLDER = os.path.join(PROJECT_ROOT, "docs")
 SEMANTIC_SIMILARITY_THRESHOLD = 0.7  # Lower = more chunks, Higher = fewer chunks
 
+# Per-client embedding storage
+DATA_FOLDER = os.path.join(PROJECT_ROOT, "data")
+
+# Legacy paths (kept for backward compatibility)
 FAISS_INDEX_FILE = os.path.join(PROJECT_ROOT, "data", "faiss_index.bin")
 CHUNKS_FILE = os.path.join(PROJECT_ROOT, "data", "document_chunks.pkl")
+
+def get_client_index_path(company_pin: str) -> str:
+    """Get FAISS index path for a specific client"""
+    return os.path.join(DATA_FOLDER, company_pin, "faiss_index.bin")
+
+def get_client_chunks_path(company_pin: str) -> str:
+    """Get chunks file path for a specific client"""
+    return os.path.join(DATA_FOLDER, company_pin, "document_chunks.pkl")
 
 DEFAULT_MAX_TOKENS = 750
 DEFAULT_TEMPERATURE = 0.1

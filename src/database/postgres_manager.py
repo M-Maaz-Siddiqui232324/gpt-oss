@@ -489,3 +489,142 @@ class PostgresManager:
                 'limit': 100000,
                 'remaining': 100000
             }
+    
+    # Document Management Methods
+    
+    def add_document(self, announcement_id: int, client_id: int, file_name: str, 
+                     document_title: str, file_extension: str, chunk_count: int) -> Optional[int]:
+        """
+        Add or update document metadata
+        
+        Args:
+            announcement_id: Announcement ID from HCMS
+            client_id: Client ID
+            file_name: Original filename
+            document_title: Document title
+            file_extension: File extension (pdf, docx, etc)
+            chunk_count: Number of chunks created
+            
+        Returns:
+            Document ID if successful, None otherwise
+        """
+        try:
+            logger.info("="*60)
+            logger.info("💾 SAVING DOCUMENT METADATA TO DATABASE")
+            logger.info(f"   Announcement ID: {announcement_id}")
+            logger.info(f"   Client ID: {client_id}")
+            logger.info(f"   File Name: {file_name}")
+            logger.info(f"   Document Title: {document_title}")
+            logger.info(f"   File Extension: {file_extension}")
+            logger.info(f"   Chunk Count: {chunk_count}")
+            
+            with self.conn.cursor() as cur:
+                logger.info("🔍 Checking if document already exists...")
+                cur.execute(
+                    "SELECT document_id FROM chatbot.documents WHERE announcement_id = %s AND fk_client_id = %s",
+                    (announcement_id, client_id)
+                )
+                existing = cur.fetchone()
+                
+                if existing:
+                    logger.info(f"⚠️  Document already exists (document_id: {existing[0]})")
+                    logger.info("   Will update existing record")
+                else:
+                    logger.info("✅ Document is new, will insert")
+                
+                logger.info("💾 Executing INSERT/UPDATE query...")
+                cur.execute(
+                    """
+                    INSERT INTO chatbot.documents 
+                    (announcement_id, fk_client_id, file_name, document_title, file_extension, chunk_count, synced_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, NOW())
+                    ON CONFLICT (announcement_id, fk_client_id)
+                    DO UPDATE SET
+                        file_name = EXCLUDED.file_name,
+                        document_title = EXCLUDED.document_title,
+                        file_extension = EXCLUDED.file_extension,
+                        chunk_count = EXCLUDED.chunk_count,
+                        synced_at = NOW()
+                    RETURNING document_id
+                    """,
+                    (announcement_id, client_id, file_name, document_title, file_extension, chunk_count)
+                )
+                document_id = cur.fetchone()[0]
+                self.conn.commit()
+                
+                logger.info("✅ Document metadata saved successfully")
+                logger.info(f"   Document ID: {document_id}")
+                logger.info(f"   Table: chatbot.documents")
+                logger.info(f"   Action: {'Updated' if existing else 'Inserted'}")
+                logger.info("="*60)
+                
+                return document_id
+        except Exception as e:
+            logger.error("❌ Error adding document to database")
+            logger.error(f"   Error type: {type(e).__name__}")
+            logger.error(f"   Error details: {str(e)}", exc_info=True)
+            self.conn.rollback()
+            return None
+    
+    def get_document_by_announcement(self, announcement_id: int, client_id: int) -> Optional[Dict[str, Any]]:
+        """Get document by announcement ID and client ID"""
+        try:
+            with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(
+                    """
+                    SELECT * FROM chatbot.documents 
+                    WHERE announcement_id = %s AND fk_client_id = %s
+                    """,
+                    (announcement_id, client_id)
+                )
+                result = cur.fetchone()
+                return dict(result) if result else None
+        except Exception as e:
+            logger.error(f"Error getting document: {e}", exc_info=True)
+            return None
+    
+    def get_client_documents(self, client_id: int, limit: int = 100) -> List[Dict[str, Any]]:
+        """Get all documents for a client"""
+        try:
+            with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(
+                    """
+                    SELECT * FROM chatbot.documents 
+                    WHERE fk_client_id = %s 
+                    ORDER BY synced_at DESC 
+                    LIMIT %s
+                    """,
+                    (client_id, limit)
+                )
+                results = cur.fetchall()
+                return [dict(row) for row in results]
+        except Exception as e:
+            logger.error(f"Error getting client documents: {e}", exc_info=True)
+            return []
+    
+    def delete_client_documents(self, client_id: int) -> bool:
+        """
+        Delete all document records for a specific client
+        Used when rebuilding index from scratch
+        
+        Args:
+            client_id: Client ID
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            logger.info(f"🗑️  Deleting all document records for client_id: {client_id}")
+            with self.conn.cursor() as cur:
+                cur.execute(
+                    "DELETE FROM chatbot.documents WHERE fk_client_id = %s",
+                    (client_id,)
+                )
+                deleted_count = cur.rowcount
+                self.conn.commit()
+                logger.info(f"✅ Deleted {deleted_count} document record(s)")
+                return True
+        except Exception as e:
+            logger.error(f"❌ Error deleting client documents: {e}", exc_info=True)
+            self.conn.rollback()
+            return False

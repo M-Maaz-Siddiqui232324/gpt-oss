@@ -722,3 +722,1875 @@ YOUR ANSWER:
 2025-12-04 13:09:25,809 - INFO -    Source Documents: 4
 2025-12-04 13:09:25,809 - INFO -    Response Length: 456 characters
 2025-12-04 13:09:25,809 - INFO - ================================================================================
+2025-12-04 16:25:44,836 - INFO - Starting server on 0.0.0.0:8000
+2025-12-04 16:25:44,889 - INFO - ============================================================
+2025-12-04 16:25:44,890 - INFO - Starting FastAPI server
+2025-12-04 16:25:44,890 - INFO - ============================================================
+2025-12-04 16:25:44,891 - INFO - Initialized in-memory session store (max: 10000)
+2025-12-04 16:25:44,891 - INFO - Session manager initialized (PostgreSQL storage)
+2025-12-04 16:25:44,891 - INFO - Session manager initialized successfully
+2025-12-04 16:25:44,891 - INFO - ============================================================
+2025-12-04 16:25:44,892 - INFO - Initializing RAG System
+2025-12-04 16:25:44,892 - INFO - ============================================================
+2025-12-04 16:25:44,892 - INFO - Initialized DocumentProcessor with folder: C:\work\chatbot latest\docs
+2025-12-04 16:25:44,892 - INFO - Initialized SemanticChunker (pure semantic mode, threshold=0.7)
+2025-12-04 16:25:44,892 - INFO - Loading sentence embedding model for semantic analysis...
+2025-12-04 16:25:46,876 - INFO - Use pytorch device_name: cuda:0
+2025-12-04 16:25:46,876 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-12-04 16:25:52,326 - INFO - Sentence embedding model loaded
+2025-12-04 16:25:52,326 - INFO - Loading embedding model: BAAI/bge-base-en-v1.5
+2025-12-04 16:25:52,327 - INFO - Use pytorch device_name: cuda:0
+2025-12-04 16:25:52,328 - INFO - Load pretrained SentenceTransformer: BAAI/bge-base-en-v1.5
+2025-12-04 16:25:56,392 - INFO - Embedding model loaded successfully
+2025-12-04 16:25:56,394 - INFO - Initialized LLMEngine (model=gpt-oss:20b, url=http://localhost:11434)
+2025-12-04 16:25:56,394 - INFO - RAG System initialized
+2025-12-04 16:25:56,394 - INFO - Starting system initialization
+2025-12-04 16:25:56,395 - INFO - Loading LLM model
+2025-12-04 16:25:56,395 - INFO - Checking Ollama connection and model: gpt-oss:20b
+2025-12-04 16:25:58,441 - INFO - Available Ollama models: ['gpt-oss:20b']
+2025-12-04 16:25:58,441 - INFO - Ollama model 'gpt-oss:20b' is ready
+2025-12-04 16:25:58,442 - INFO - LLM model loaded successfully
+2025-12-04 16:25:58,442 - INFO - Loading documents
+2025-12-04 16:25:58,443 - INFO - Starting document loading from: C:\work\chatbot latest\docs
+2025-12-04 16:25:58,468 - INFO - Loaded: Attendance Module.docx (11343 chars)
+2025-12-04 16:25:58,485 - INFO - Loaded: Leave Module.docx (5125 chars)
+2025-12-04 16:25:58,486 - INFO - Total documents loaded: 2
+2025-12-04 16:25:58,487 - INFO - Creating document chunks
+2025-12-04 16:25:58,487 - INFO - Creating semantic chunks from 2 documents
+2025-12-04 16:25:58,761 - INFO - Total chunks created: 107
+2025-12-04 16:25:58,761 - INFO - Building vector index
+2025-12-04 16:25:58,762 - INFO - Loading existing FAISS index and chunks
+2025-12-04 16:25:58,765 - INFO - Loaded 107 vectors and 107 chunks
+2025-12-04 16:25:58,766 - INFO - Loaded existing FAISS index from disk
+2025-12-04 16:25:58,766 - INFO - Initialized SemanticRetriever
+2025-12-04 16:25:58,766 - INFO - Retriever initialized
+2025-12-04 16:25:58,766 - INFO - ============================================================
+2025-12-04 16:25:58,767 - INFO - RAG System initialization complete
+2025-12-04 16:25:58,767 - INFO - Documents: 2
+2025-12-04 16:25:58,767 - INFO - Chunks: 107
+2025-12-04 16:25:58,768 - INFO - ============================================================
+2025-12-04 16:25:58,768 - INFO - RAG system initialized successfully
+2025-12-04 16:25:58,768 - INFO - Started session cleanup task (interval: 60s)
+2025-12-04 16:27:14,031 - INFO - Starting server on 0.0.0.0:8000
+2025-12-04 16:27:14,077 - INFO - ============================================================
+2025-12-04 16:27:14,078 - INFO - Starting FastAPI server
+2025-12-04 16:27:14,079 - INFO - ============================================================
+2025-12-04 16:27:14,079 - INFO - Initialized in-memory session store (max: 10000)
+2025-12-04 16:27:14,079 - INFO - Session manager initialized (PostgreSQL storage)
+2025-12-04 16:27:14,080 - INFO - Session manager initialized successfully
+2025-12-04 16:27:14,080 - INFO - ============================================================
+2025-12-04 16:27:14,080 - INFO - Initializing RAG System
+2025-12-04 16:27:14,080 - INFO - ============================================================
+2025-12-04 16:27:14,081 - INFO - Initialized DocumentProcessor with folder: C:\work\chatbot latest\docs
+2025-12-04 16:27:14,081 - INFO - Initialized SemanticChunker (pure semantic mode, threshold=0.7)
+2025-12-04 16:27:14,081 - INFO - Loading sentence embedding model for semantic analysis...
+2025-12-04 16:27:14,098 - INFO - Use pytorch device_name: cuda:0
+2025-12-04 16:27:14,099 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-12-04 16:27:17,794 - INFO - Sentence embedding model loaded
+2025-12-04 16:27:17,795 - INFO - Loading embedding model: BAAI/bge-base-en-v1.5
+2025-12-04 16:27:17,797 - INFO - Use pytorch device_name: cuda:0
+2025-12-04 16:27:17,797 - INFO - Load pretrained SentenceTransformer: BAAI/bge-base-en-v1.5
+2025-12-04 16:27:21,610 - INFO - Embedding model loaded successfully
+2025-12-04 16:27:21,610 - INFO - Initialized LLMEngine (model=gpt-oss:20b, url=http://localhost:11434)
+2025-12-04 16:27:21,610 - INFO - RAG System initialized
+2025-12-04 16:27:21,610 - INFO - Starting system initialization
+2025-12-04 16:27:21,611 - INFO - Loading LLM model
+2025-12-04 16:27:21,611 - INFO - Checking Ollama connection and model: gpt-oss:20b
+2025-12-04 16:27:23,676 - INFO - Available Ollama models: ['gpt-oss:20b']
+2025-12-04 16:27:23,677 - INFO - Ollama model 'gpt-oss:20b' is ready
+2025-12-04 16:27:23,677 - INFO - LLM model loaded successfully
+2025-12-04 16:27:23,678 - INFO - Loading documents
+2025-12-04 16:27:23,678 - INFO - Starting document loading from: C:\work\chatbot latest\docs
+2025-12-04 16:27:23,709 - INFO - Loaded: Attendance Module.docx (11343 chars)
+2025-12-04 16:27:23,740 - INFO - Loaded: Leave Module.docx (5125 chars)
+2025-12-04 16:27:23,741 - INFO - Total documents loaded: 2
+2025-12-04 16:27:23,742 - INFO - Creating document chunks
+2025-12-04 16:27:23,742 - INFO - Creating semantic chunks from 2 documents
+2025-12-04 16:27:23,983 - INFO - Total chunks created: 107
+2025-12-04 16:27:23,983 - INFO - Building vector index
+2025-12-04 16:27:23,984 - INFO - Loading existing FAISS index and chunks
+2025-12-04 16:27:23,988 - INFO - Loaded 107 vectors and 107 chunks
+2025-12-04 16:27:23,989 - INFO - Loaded existing FAISS index from disk
+2025-12-04 16:27:23,989 - INFO - Initialized SemanticRetriever
+2025-12-04 16:27:23,989 - INFO - Retriever initialized
+2025-12-04 16:27:23,989 - INFO - ============================================================
+2025-12-04 16:27:23,989 - INFO - RAG System initialization complete
+2025-12-04 16:27:23,989 - INFO - Documents: 2
+2025-12-04 16:27:23,991 - INFO - Chunks: 107
+2025-12-04 16:27:23,991 - INFO - ============================================================
+2025-12-04 16:27:23,992 - INFO - RAG system initialized successfully
+2025-12-04 16:27:23,992 - INFO - Started session cleanup task (interval: 60s)
+2025-12-04 16:30:10,372 - INFO - ================================================================================
+2025-12-04 16:30:10,372 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-04 16:30:10,372 - INFO - ================================================================================
+2025-12-04 16:30:10,372 - INFO - Query: 'g;hui'
+2025-12-04 16:30:10,372 - INFO - User: admin@PatelHospital.com1
+2025-12-04 16:30:10,372 - INFO - Max Tokens: 750, Temperature: 0.1, Top-P: 0.7
+2025-12-04 16:30:10,372 - INFO - --------------------------------------------------------------------------------
+2025-12-04 16:30:10,372 - INFO - HEADERS RECEIVED:
+2025-12-04 16:30:10,379 - INFO -   X-Client-ID: 1 (informational only)
+2025-12-04 16:30:10,379 - INFO -   X-Company-Pin: 11032 (used for auth)
+2025-12-04 16:30:10,379 - INFO -   X-API-Key: test1234567890123456... (used for auth)
+2025-12-04 16:30:10,379 - INFO -   X-User-Name: admin@PatelHospital.com1 (informational only)
+2025-12-04 16:30:10,379 - INFO - --------------------------------------------------------------------------------
+2025-12-04 16:30:10,379 - INFO - 🔐 AUTHENTICATING CLIENT...
+2025-12-04 16:30:10,413 - INFO - PostgreSQL manager initialized
+2025-12-04 16:30:10,478 - INFO - Connected to PostgreSQL database
+2025-12-04 16:30:10,480 - INFO - ✅ Connected to PostgreSQL database
+2025-12-04 16:30:10,481 - INFO - 🔍 Validating credentials (Company PIN + API Key)
+2025-12-04 16:30:10,481 - INFO - 🔍 Authenticating with:
+2025-12-04 16:30:10,482 - INFO -    Company PIN: '11032' (length: 5)
+2025-12-04 16:30:10,482 - INFO -    API Key: 'test1234567890123456...' (length: 34)
+2025-12-04 16:30:10,482 - INFO - ✅ Client authenticated successfully from database (client_id: 1)
+2025-12-04 16:30:10,482 - INFO - ✅ AUTHENTICATION SUCCESSFUL
+2025-12-04 16:30:10,482 - INFO -    Client ID: 1 (from database)
+2025-12-04 16:30:10,482 - INFO -    Company PIN: 11032
+2025-12-04 16:30:10,482 - INFO -    API Key: test1234567890123456...
+2025-12-04 16:30:10,482 - INFO -    User: admin@PatelHospital.com1
+2025-12-04 16:30:10,482 - INFO -    Active: True
+2025-12-04 16:30:10,482 - INFO - --------------------------------------------------------------------------------
+2025-12-04 16:30:10,482 - INFO - 🔢 TOKEN LIMIT CHECK
+2025-12-04 16:30:10,482 - INFO -    Token Limit: 100,000
+2025-12-04 16:30:10,482 - INFO -    Tokens Used: 1,793
+2025-12-04 16:30:10,482 - INFO -    Remaining: 98,207
+2025-12-04 16:30:10,482 - INFO -    Allowed: True
+2025-12-04 16:30:10,482 - INFO - ✅ Token limit check passed
+2025-12-04 16:30:10,482 - INFO - --------------------------------------------------------------------------------
+2025-12-04 16:30:10,482 - INFO - 📋 SESSION MANAGEMENT
+2025-12-04 16:30:10,482 - INFO - Session ID from cookie: None (new session)
+2025-12-04 16:30:10,498 - INFO - Created new session: 36820328-bc26-40b6-83fa-b9d84ed93c13
+2025-12-04 16:30:10,498 - INFO - Created session 36820328-bc26-40b6-83fa-b9d84ed93c13 at 2025-12-04T16:30:10.498068
+2025-12-04 16:30:10,498 - INFO - 🆕 Created new in-memory session: 36820328-bc26-40b6-83fa-b9d84ed93c13
+2025-12-04 16:30:10,498 - INFO - 💾 Saving session to PostgreSQL database...
+2025-12-04 16:30:10,514 - INFO - ✅ Session created in database: 36820328-bc26-40b6-83fa-b9d84ed93c13 (db_id=25, user=admin@PatelHospital.com1, client=1)
+2025-12-04 16:30:10,514 - INFO - ✅ Session saved to database
+2025-12-04 16:30:10,514 - INFO -    Table: chatbot.sessions
+2025-12-04 16:30:10,514 - INFO -    Session DB ID: 25
+2025-12-04 16:30:10,514 - INFO -    Session UUID: 36820328-bc26-40b6-83fa-b9d84ed93c13
+2025-12-04 16:30:10,514 - INFO -    Username: admin@PatelHospital.com1
+2025-12-04 16:30:10,514 - INFO -    Client ID: 1
+2025-12-04 16:30:10,514 - INFO - --------------------------------------------------------------------------------
+2025-12-04 16:30:10,514 - INFO - 💬 PROCESSING QUERY
+2025-12-04 16:30:10,514 - INFO - Added user message to session (total messages: 1)
+2025-12-04 16:30:10,514 - INFO - No previous context (first message in session)
+2025-12-04 16:30:10,514 - INFO - 🤖 Generating response using RAG system...
+2025-12-04 16:30:10,514 - INFO - ============================================================
+2025-12-04 16:30:10,514 - INFO - Processing query: 'g;hui'
+2025-12-04 16:30:10,514 - INFO - Params: max_tokens=750, temp=0.1, top_p=0.7
+2025-12-04 16:30:10,514 - INFO - Retrieving relevant documents
+2025-12-04 16:30:10,514 - INFO - Semantic search for: 'g;hui' (top_k=10)
+2025-12-04 16:30:10,563 - INFO - Semantic search found 20 candidates
+2025-12-04 16:30:10,563 - INFO - Found 20 semantic matches
+2025-12-04 16:30:10,563 - INFO - Returning 20 results
+2025-12-04 16:30:10,563 - INFO - Score stats: mean=0.476, std=0.019
+2025-12-04 16:30:10,563 - INFO - Dynamic threshold: 0.600
+2025-12-04 16:30:10,563 - INFO - Filtered to 0 relevant documents
+2025-12-04 16:30:10,563 - INFO - Using top 0 documents
+2025-12-04 16:30:10,563 - WARNING - No documents passed threshold
+2025-12-04 16:30:10,563 - INFO - >>> DECISION: Using GENERAL RESPONSE (no relevant docs)
+2025-12-04 16:30:10,563 - INFO - Generating general response (no relevant documents found)
+2025-12-04 16:30:10,563 - INFO - ============================================================
+2025-12-04 16:30:10,563 - INFO - GENERAL PROMPT SENT TO LLM:
+2025-12-04 16:30:10,563 - INFO - 
+You are a friendly AI assistant for FlowHCM, an HR management software company. Have a natural, helpful conversation with users. 
+    RULES: Keep responses concise and conversational. 
+           Do not create any tables when asked. 
+           Do not write any HTML code no matter what. 
+           Do not use bold text.
+User: g;hui
+Assistant:
+2025-12-04 16:30:10,563 - INFO - ============================================================
+2025-12-04 16:30:18,002 - INFO - ✅ Response generated (74 characters, 0 source documents)
+2025-12-04 16:30:18,002 - INFO - --------------------------------------------------------------------------------
+2025-12-04 16:30:18,002 - INFO - 🔢 TOKEN COUNTING
+2025-12-04 16:30:18,002 - INFO -    Input tokens: 1
+2025-12-04 16:30:18,003 - INFO -    Output tokens: 21
+2025-12-04 16:30:18,003 - INFO -    Total tokens: 22
+2025-12-04 16:30:18,003 - INFO - Added assistant response to session (total messages: 2)
+2025-12-04 16:30:18,003 - INFO - ✅ Updated in-memory session
+2025-12-04 16:30:18,003 - INFO - --------------------------------------------------------------------------------
+2025-12-04 16:30:18,003 - INFO - 💾 SAVING TO DATABASE
+2025-12-04 16:30:18,003 - INFO - Saving conversation to PostgreSQL...
+2025-12-04 16:30:18,004 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-04 16:30:18,008 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 25, tokens: 22)
+2025-12-04 16:30:18,009 - INFO - ✅ Conversation saved to database
+2025-12-04 16:30:18,009 - INFO -    Table: chatbot.conversation_dec_2025
+2025-12-04 16:30:18,009 - INFO -    Session DB ID: 25
+2025-12-04 16:30:18,009 - INFO -    Session UUID: 36820328-bc26-40b6-83fa-b9d84ed93c13
+2025-12-04 16:30:18,009 - INFO -    Tokens Used: 22
+2025-12-04 16:30:18,009 - INFO -    User Message: g;hui...
+2025-12-04 16:30:18,010 - INFO -    Bot Response: I’m not sure I follow that. Could you let me know ...
+2025-12-04 16:30:18,010 - INFO - Updating token usage for client 1...
+2025-12-04 16:30:18,011 - INFO - ✅ Token usage updated for client 1: +22 tokens (dec_2025)
+2025-12-04 16:30:18,012 - INFO - ✅ Token usage updated
+2025-12-04 16:30:18,012 - INFO -    Client ID: 1
+2025-12-04 16:30:18,012 - INFO -    Tokens Added: 22
+2025-12-04 16:30:18,012 - INFO -    New Total Usage: 1,815 / 100,000
+2025-12-04 16:30:18,012 - INFO -    Remaining: 98,185
+2025-12-04 16:30:18,012 - INFO - Updating session activity timestamp...
+2025-12-04 16:30:18,013 - INFO - ✅ Session activity updated in database (session: 36820328-bc26-40b6-83fa-b9d84ed93c13)
+2025-12-04 16:30:18,013 - INFO - ✅ Session activity updated
+2025-12-04 16:30:18,013 - INFO - Disconnected from PostgreSQL database
+2025-12-04 16:30:18,013 - INFO - ✅ Disconnected from PostgreSQL database
+2025-12-04 16:30:18,014 - INFO - --------------------------------------------------------------------------------
+2025-12-04 16:30:18,014 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-04 16:30:18,014 - INFO -    Session ID: 36820328-bc26-40b6-83fa-b9d84ed93c13
+2025-12-04 16:30:18,014 - INFO -    Source Documents: 0
+2025-12-04 16:30:18,014 - INFO -    Response Length: 74 characters
+2025-12-04 16:30:18,014 - INFO - ================================================================================
+2025-12-04 16:30:41,271 - INFO - ================================================================================
+2025-12-04 16:30:41,271 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-04 16:30:41,271 - INFO - ================================================================================
+2025-12-04 16:30:41,271 - INFO - Query: 'how to apply for leaves?'
+2025-12-04 16:30:41,271 - INFO - User: admin@PatelHospital.com1
+2025-12-04 16:30:41,271 - INFO - Max Tokens: 750, Temperature: 0.1, Top-P: 0.7
+2025-12-04 16:30:41,271 - INFO - --------------------------------------------------------------------------------
+2025-12-04 16:30:41,271 - INFO - HEADERS RECEIVED:
+2025-12-04 16:30:41,278 - INFO -   X-Client-ID: 1 (informational only)
+2025-12-04 16:30:41,278 - INFO -   X-Company-Pin: 11032 (used for auth)
+2025-12-04 16:30:41,279 - INFO -   X-API-Key: test1234567890123456... (used for auth)
+2025-12-04 16:30:41,279 - INFO -   X-User-Name: admin@PatelHospital.com1 (informational only)
+2025-12-04 16:30:41,279 - INFO - --------------------------------------------------------------------------------
+2025-12-04 16:30:41,279 - INFO - 🔐 AUTHENTICATING CLIENT...
+2025-12-04 16:30:41,279 - INFO - PostgreSQL manager initialized
+2025-12-04 16:30:41,428 - INFO - Connected to PostgreSQL database
+2025-12-04 16:30:41,428 - INFO - ✅ Connected to PostgreSQL database
+2025-12-04 16:30:41,428 - INFO - 🔍 Validating credentials (Company PIN + API Key)
+2025-12-04 16:30:41,428 - INFO - 🔍 Authenticating with:
+2025-12-04 16:30:41,437 - INFO -    Company PIN: '11032' (length: 5)
+2025-12-04 16:30:41,437 - INFO -    API Key: 'test1234567890123456...' (length: 34)
+2025-12-04 16:30:41,445 - INFO - ✅ Client authenticated successfully from database (client_id: 1)
+2025-12-04 16:30:41,445 - INFO - ✅ AUTHENTICATION SUCCESSFUL
+2025-12-04 16:30:41,445 - INFO -    Client ID: 1 (from database)
+2025-12-04 16:30:41,445 - INFO -    Company PIN: 11032
+2025-12-04 16:30:41,445 - INFO -    API Key: test1234567890123456...
+2025-12-04 16:30:41,445 - INFO -    User: admin@PatelHospital.com1
+2025-12-04 16:30:41,445 - INFO -    Active: True
+2025-12-04 16:30:41,445 - INFO - --------------------------------------------------------------------------------
+2025-12-04 16:30:41,445 - INFO - 🔢 TOKEN LIMIT CHECK
+2025-12-04 16:30:41,445 - INFO -    Token Limit: 100,000
+2025-12-04 16:30:41,445 - INFO -    Tokens Used: 1,815
+2025-12-04 16:30:41,445 - INFO -    Remaining: 98,185
+2025-12-04 16:30:41,445 - INFO -    Allowed: True
+2025-12-04 16:30:41,445 - INFO - ✅ Token limit check passed
+2025-12-04 16:30:41,445 - INFO - --------------------------------------------------------------------------------
+2025-12-04 16:30:41,445 - INFO - 📋 SESSION MANAGEMENT
+2025-12-04 16:30:41,453 - INFO - Session ID from cookie: None (new session)
+2025-12-04 16:30:41,454 - INFO - Created new session: c25b7478-33db-4be8-968e-fc30e778894e
+2025-12-04 16:30:41,454 - INFO - Created session c25b7478-33db-4be8-968e-fc30e778894e at 2025-12-04T16:30:41.454789
+2025-12-04 16:30:41,454 - INFO - 🆕 Created new in-memory session: c25b7478-33db-4be8-968e-fc30e778894e
+2025-12-04 16:30:41,455 - INFO - 💾 Saving session to PostgreSQL database...
+2025-12-04 16:30:41,459 - INFO - ✅ Session created in database: c25b7478-33db-4be8-968e-fc30e778894e (db_id=26, user=admin@PatelHospital.com1, client=1)
+2025-12-04 16:30:41,459 - INFO - ✅ Session saved to database
+2025-12-04 16:30:41,459 - INFO -    Table: chatbot.sessions
+2025-12-04 16:30:41,460 - INFO -    Session DB ID: 26
+2025-12-04 16:30:41,460 - INFO -    Session UUID: c25b7478-33db-4be8-968e-fc30e778894e
+2025-12-04 16:30:41,460 - INFO -    Username: admin@PatelHospital.com1
+2025-12-04 16:30:41,460 - INFO -    Client ID: 1
+2025-12-04 16:30:41,460 - INFO - --------------------------------------------------------------------------------
+2025-12-04 16:30:41,461 - INFO - 💬 PROCESSING QUERY
+2025-12-04 16:30:41,461 - INFO - Added user message to session (total messages: 1)
+2025-12-04 16:30:41,462 - INFO - No previous context (first message in session)
+2025-12-04 16:30:41,462 - INFO - 🤖 Generating response using RAG system...
+2025-12-04 16:30:41,462 - INFO - ============================================================
+2025-12-04 16:30:41,462 - INFO - Processing query: 'how to apply for leaves?'
+2025-12-04 16:30:41,462 - INFO - Params: max_tokens=750, temp=0.1, top_p=0.7
+2025-12-04 16:30:41,462 - INFO - Retrieving relevant documents
+2025-12-04 16:30:41,463 - INFO - Semantic search for: 'how to apply for leaves?' (top_k=10)
+2025-12-04 16:30:41,501 - INFO - Semantic search found 20 candidates
+2025-12-04 16:30:41,502 - INFO - Found 20 semantic matches
+2025-12-04 16:30:41,502 - INFO - Returning 20 results
+2025-12-04 16:30:41,502 - INFO - Score stats: mean=0.581, std=0.032
+2025-12-04 16:30:41,503 - INFO - Dynamic threshold: 0.600
+2025-12-04 16:30:41,503 - INFO - Filtered to 4 relevant documents
+2025-12-04 16:30:41,503 - INFO - Using top 4 documents
+2025-12-04 16:30:41,503 - INFO - Unique source documents: 2
+2025-12-04 16:30:41,503 - INFO -   - Attendance Module.docx
+2025-12-04 16:30:41,503 - INFO -   - Leave Module.docx
+2025-12-04 16:30:41,503 - INFO - >>> DECISION: Using DOCUMENT-AWARE RESPONSE
+2025-12-04 16:30:41,503 - INFO - Generating document-aware response
+2025-12-04 16:30:41,503 - INFO - ============================================================
+2025-12-04 16:30:41,503 - INFO - CONTEXT CHUNKS USED FOR GENERATION:
+2025-12-04 16:30:41,503 - INFO - 
+--- Chunk 1 ---
+2025-12-04 16:30:41,503 - INFO - Source: Attendance Module.docx
+2025-12-04 16:30:41,503 - INFO - Chunk ID: 65
+2025-12-04 16:30:41,503 - INFO - Relevance Score: 0.665
+2025-12-04 16:30:41,503 - INFO - Content Length: 40 chars
+2025-12-04 16:30:41,503 - INFO - Content:
+Apply for specific days or entire month.
+2025-12-04 16:30:41,503 - INFO - 
+--- Chunk 2 ---
+2025-12-04 16:30:41,503 - INFO - Source: Attendance Module.docx
+2025-12-04 16:30:41,503 - INFO - Chunk ID: 83
+2025-12-04 16:30:41,503 - INFO - Relevance Score: 0.630
+2025-12-04 16:30:41,503 - INFO - Content Length: 20 chars
+2025-12-04 16:30:41,503 - INFO - Content:
+Submit for approval.
+2025-12-04 16:30:41,503 - INFO - 
+--- Chunk 3 ---
+2025-12-04 16:30:41,503 - INFO - Source: Attendance Module.docx
+2025-12-04 16:30:41,503 - INFO - Chunk ID: 34
+2025-12-04 16:30:41,503 - INFO - Relevance Score: 0.628
+2025-12-04 16:30:41,508 - INFO - Content Length: 32 chars
+2025-12-04 16:30:41,508 - INFO - Content:
+Submit for approval if required.
+2025-12-04 16:30:41,508 - INFO - 
+--- Chunk 4 ---
+2025-12-04 16:30:41,508 - INFO - Source: Leave Module.docx
+2025-12-04 16:30:41,508 - INFO - Chunk ID: 4
+2025-12-04 16:30:41,508 - INFO - Relevance Score: 0.625
+2025-12-04 16:30:41,508 - INFO - Content Length: 297 chars
+2025-12-04 16:30:41,508 - INFO - Content:
+Navigation Path:
+Leave Module → Leave Request
+
+Process / Flow:
+
+Go to leave module click leave request form
+
+Click Apply for Leave
+
+Select Employee
+
+Select Leave Type
+
+Enter From Date and To Date
+
+Specify Duration (Full/Half/Quarter Day)
+
+Provide Reason
+
+Attach document if required
+
+Click Submit.
+2025-12-04 16:30:41,508 - INFO - ============================================================
+2025-12-04 16:30:41,508 - INFO - ============================================================
+2025-12-04 16:30:41,508 - INFO - FULL PROMPT SENT TO LLM:
+2025-12-04 16:30:41,508 - INFO - 
+You are FlowHCM Assistant, an expert at answering questions about FlowHCM HR management software. Your role is to help users navigate the system and understand processes using the official documentation which contains all the information about the FlowHCM.
+
+INSTRUCTIONS:
+1. Answer using the information provided in the documentation below. Strictly Use the exact terminology and field names from the documentation as is, to avoid confusion.
+2. Provide clear, and step-by-step instructions when explaining processes or procedures. Include all necessary details only from the documentation. Phrase the navigations and process exactly as in the documents do not change words.
+3. If the question is ambiguous or could apply to multiple modules, or contexts, ask the user to clarify which specific area they are referring to.
+4. If the user asks multiple questions or the question has multiple parts (e.g., "What is X and how do I do Y?"), address ALL parts thoroughly and completely.
+5. If the documentation does not contain enough information to fully answer the question, do not make up stuff and tell what you know and what you do not know. 
+6. Keep the answers complete.
+
+DONTS:
+Do not use the word documentation in the answers.
+Do not create any tables even if asked to. 
+Do not write any HTML code no matter what even if asked to. 
+Do not use bold fonts.
+
+THIS IS THE INFORMATION YOU HAVE: 
+[SOURCE 1: Attendance Module.docx]
+Apply for specific days or entire month.
+
+[SOURCE 2: Attendance Module.docx]
+Submit for approval.
+
+[SOURCE 3: Attendance Module.docx]
+Submit for approval if required.
+
+[SOURCE 4: Leave Module.docx]
+Navigation Path:
+Leave Module → Leave Request
+
+Process / Flow:
+
+Go to leave module click leave request form
+
+Click Apply for Leave
+
+Select Employee
+
+Select Leave Type
+
+Enter From Date and To Date
+
+Specify Duration (Full/Half/Quarter Day)
+
+Provide Reason
+
+Attach document if required
+
+Click Submit.
+
+
+ANSWER THIS QUESTION: how to apply for leaves?
+
+YOUR ANSWER:
+2025-12-04 16:30:41,508 - INFO - ============================================================
+2025-12-04 16:30:48,585 - INFO - Response generated: 795 chars
+2025-12-04 16:30:48,586 - INFO - ============================================================
+2025-12-04 16:30:48,587 - INFO - ✅ Response generated (795 characters, 4 source documents)
+2025-12-04 16:30:48,587 - INFO - --------------------------------------------------------------------------------
+2025-12-04 16:30:48,587 - INFO - 🔢 TOKEN COUNTING
+2025-12-04 16:30:48,587 - INFO -    Input tokens: 6
+2025-12-04 16:30:48,587 - INFO -    Output tokens: 180
+2025-12-04 16:30:48,587 - INFO -    Total tokens: 186
+2025-12-04 16:30:48,588 - INFO - Added assistant response to session (total messages: 2)
+2025-12-04 16:30:48,588 - INFO - ✅ Updated in-memory session
+2025-12-04 16:30:48,588 - INFO - --------------------------------------------------------------------------------
+2025-12-04 16:30:48,588 - INFO - 💾 SAVING TO DATABASE
+2025-12-04 16:30:48,588 - INFO - Saving conversation to PostgreSQL...
+2025-12-04 16:30:48,590 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-04 16:30:48,602 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 26, tokens: 186)
+2025-12-04 16:30:48,602 - INFO - ✅ Conversation saved to database
+2025-12-04 16:30:48,602 - INFO -    Table: chatbot.conversation_dec_2025
+2025-12-04 16:30:48,602 - INFO -    Session DB ID: 26
+2025-12-04 16:30:48,602 - INFO -    Session UUID: c25b7478-33db-4be8-968e-fc30e778894e
+2025-12-04 16:30:48,602 - INFO -    Tokens Used: 186
+2025-12-04 16:30:48,602 - INFO -    User Message: how to apply for leaves?...
+2025-12-04 16:30:48,602 - INFO -    Bot Response: To apply for leaves in FlowHCM, follow these steps...
+2025-12-04 16:30:48,602 - INFO - Updating token usage for client 1...
+2025-12-04 16:30:48,602 - INFO - ✅ Token usage updated for client 1: +186 tokens (dec_2025)
+2025-12-04 16:30:48,609 - INFO - ✅ Token usage updated
+2025-12-04 16:30:48,609 - INFO -    Client ID: 1
+2025-12-04 16:30:48,610 - INFO -    Tokens Added: 186
+2025-12-04 16:30:48,610 - INFO -    New Total Usage: 2,001 / 100,000
+2025-12-04 16:30:48,610 - INFO -    Remaining: 97,999
+2025-12-04 16:30:48,610 - INFO - Updating session activity timestamp...
+2025-12-04 16:30:48,610 - INFO - ✅ Session activity updated in database (session: c25b7478-33db-4be8-968e-fc30e778894e)
+2025-12-04 16:30:48,610 - INFO - ✅ Session activity updated
+2025-12-04 16:30:48,610 - INFO - Disconnected from PostgreSQL database
+2025-12-04 16:30:48,610 - INFO - ✅ Disconnected from PostgreSQL database
+2025-12-04 16:30:48,610 - INFO - --------------------------------------------------------------------------------
+2025-12-04 16:30:48,610 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-04 16:30:48,610 - INFO -    Session ID: c25b7478-33db-4be8-968e-fc30e778894e
+2025-12-04 16:30:48,610 - INFO -    Source Documents: 4
+2025-12-04 16:30:48,610 - INFO -    Response Length: 795 characters
+2025-12-04 16:30:48,610 - INFO - ================================================================================
+2025-12-04 17:09:34,928 - INFO - ================================================================================
+2025-12-04 17:09:34,928 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-04 17:09:34,928 - INFO - ================================================================================
+2025-12-04 17:09:34,928 - INFO - Query: 'hi'
+2025-12-04 17:09:34,934 - INFO - User: admin@PatelHospital.com1
+2025-12-04 17:09:34,934 - INFO - Max Tokens: 750, Temperature: 0.1, Top-P: 0.7
+2025-12-04 17:09:34,934 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:09:34,936 - INFO - HEADERS RECEIVED:
+2025-12-04 17:09:34,936 - INFO -   X-Client-ID: 1 (informational only)
+2025-12-04 17:09:34,937 - INFO -   X-Company-Pin: 11032 (used for auth)
+2025-12-04 17:09:34,938 - INFO -   X-API-Key: test1234567890123456... (used for auth)
+2025-12-04 17:09:34,939 - INFO -   X-User-Name: admin@PatelHospital.com1 (informational only)
+2025-12-04 17:09:34,940 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:09:34,940 - INFO - 🔐 AUTHENTICATING CLIENT...
+2025-12-04 17:09:34,940 - INFO - PostgreSQL manager initialized
+2025-12-04 17:09:35,011 - INFO - Connected to PostgreSQL database
+2025-12-04 17:09:35,019 - INFO - ✅ Connected to PostgreSQL database
+2025-12-04 17:09:35,020 - INFO - 🔍 Validating credentials (Company PIN + API Key)
+2025-12-04 17:09:35,020 - INFO - 🔍 Authenticating with:
+2025-12-04 17:09:35,021 - INFO -    Company PIN: '11032' (length: 5)
+2025-12-04 17:09:35,022 - INFO -    API Key: 'test1234567890123456...' (length: 34)
+2025-12-04 17:09:35,027 - INFO - ✅ Client authenticated successfully from database (client_id: 1)
+2025-12-04 17:09:35,027 - INFO - ✅ AUTHENTICATION SUCCESSFUL
+2025-12-04 17:09:35,027 - INFO -    Client ID: 1 (from database)
+2025-12-04 17:09:35,027 - INFO -    Company PIN: 11032
+2025-12-04 17:09:35,027 - INFO -    API Key: test1234567890123456...
+2025-12-04 17:09:35,027 - INFO -    User: admin@PatelHospital.com1
+2025-12-04 17:09:35,027 - INFO -    Active: True
+2025-12-04 17:09:35,027 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:09:35,027 - INFO - 🔢 TOKEN LIMIT CHECK
+2025-12-04 17:09:35,038 - INFO -    Token Limit: 100,000
+2025-12-04 17:09:35,038 - INFO -    Tokens Used: 2,001
+2025-12-04 17:09:35,038 - INFO -    Remaining: 97,999
+2025-12-04 17:09:35,038 - INFO -    Allowed: True
+2025-12-04 17:09:35,038 - INFO - ✅ Token limit check passed
+2025-12-04 17:09:35,038 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:09:35,038 - INFO - 📋 SESSION MANAGEMENT
+2025-12-04 17:09:35,038 - INFO - Session ID from cookie: None (new session)
+2025-12-04 17:09:35,038 - INFO - Created new session: 44661877-9265-4d37-ae8a-f023c0113bbd
+2025-12-04 17:09:35,038 - INFO - Created session 44661877-9265-4d37-ae8a-f023c0113bbd at 2025-12-04T17:09:35.038095
+2025-12-04 17:09:35,038 - INFO - 🆕 Created new in-memory session: 44661877-9265-4d37-ae8a-f023c0113bbd
+2025-12-04 17:09:35,044 - INFO - 💾 Saving session to PostgreSQL database...
+2025-12-04 17:09:35,052 - INFO - ✅ Session created in database: 44661877-9265-4d37-ae8a-f023c0113bbd (db_id=27, user=admin@PatelHospital.com1, client=1)
+2025-12-04 17:09:35,053 - INFO - ✅ Session saved to database
+2025-12-04 17:09:35,054 - INFO -    Table: chatbot.sessions
+2025-12-04 17:09:35,054 - INFO -    Session DB ID: 27
+2025-12-04 17:09:35,054 - INFO -    Session UUID: 44661877-9265-4d37-ae8a-f023c0113bbd
+2025-12-04 17:09:35,055 - INFO -    Username: admin@PatelHospital.com1
+2025-12-04 17:09:35,055 - INFO -    Client ID: 1
+2025-12-04 17:09:35,055 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:09:35,055 - INFO - 💬 PROCESSING QUERY
+2025-12-04 17:09:35,055 - INFO - Added user message to session (total messages: 1)
+2025-12-04 17:09:35,055 - INFO - No previous context (first message in session)
+2025-12-04 17:09:35,055 - INFO - 🤖 Generating response using RAG system...
+2025-12-04 17:09:35,055 - INFO - ============================================================
+2025-12-04 17:09:35,055 - INFO - Processing query: 'hi'
+2025-12-04 17:09:35,055 - INFO - Params: max_tokens=750, temp=0.1, top_p=0.7
+2025-12-04 17:09:35,055 - INFO - Retrieving relevant documents
+2025-12-04 17:09:35,055 - INFO - Semantic search for: 'hi' (top_k=10)
+2025-12-04 17:09:35,469 - INFO - Semantic search found 20 candidates
+2025-12-04 17:09:35,469 - INFO - Found 20 semantic matches
+2025-12-04 17:09:35,469 - INFO - Returning 20 results
+2025-12-04 17:09:35,469 - INFO - Score stats: mean=0.506, std=0.022
+2025-12-04 17:09:35,469 - INFO - Dynamic threshold: 0.600
+2025-12-04 17:09:35,469 - INFO - Filtered to 0 relevant documents
+2025-12-04 17:09:35,469 - INFO - Using top 0 documents
+2025-12-04 17:09:35,469 - WARNING - No documents passed threshold
+2025-12-04 17:09:35,469 - INFO - >>> DECISION: Using GENERAL RESPONSE (no relevant docs)
+2025-12-04 17:09:35,469 - INFO - Generating general response (no relevant documents found)
+2025-12-04 17:09:35,469 - INFO - ============================================================
+2025-12-04 17:09:35,469 - INFO - GENERAL PROMPT SENT TO LLM:
+2025-12-04 17:09:35,469 - INFO - 
+You are a friendly AI assistant for FlowHCM, an HR management software company. Have a natural, helpful conversation with users. 
+    RULES: Keep responses concise and conversational. 
+           Do not create any tables when asked. 
+           Do not write any HTML code no matter what. 
+           Do not use bold text.
+User: hi
+Assistant:
+2025-12-04 17:09:35,469 - INFO - ============================================================
+2025-12-04 17:09:42,966 - INFO - ✅ Response generated (48 characters, 0 source documents)
+2025-12-04 17:09:42,966 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:09:42,966 - INFO - 🔢 TOKEN COUNTING
+2025-12-04 17:09:42,966 - INFO -    Input tokens: 1
+2025-12-04 17:09:42,966 - INFO -    Output tokens: 13
+2025-12-04 17:09:42,966 - INFO -    Total tokens: 14
+2025-12-04 17:09:42,966 - INFO - Added assistant response to session (total messages: 2)
+2025-12-04 17:09:42,966 - INFO - ✅ Updated in-memory session
+2025-12-04 17:09:42,966 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:09:42,966 - INFO - 💾 SAVING TO DATABASE
+2025-12-04 17:09:42,966 - INFO - Saving conversation to PostgreSQL...
+2025-12-04 17:09:42,974 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-04 17:09:42,977 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 27, tokens: 14)
+2025-12-04 17:09:42,977 - INFO - ✅ Conversation saved to database
+2025-12-04 17:09:42,977 - INFO -    Table: chatbot.conversation_dec_2025
+2025-12-04 17:09:42,977 - INFO -    Session DB ID: 27
+2025-12-04 17:09:42,977 - INFO -    Session UUID: 44661877-9265-4d37-ae8a-f023c0113bbd
+2025-12-04 17:09:42,977 - INFO -    Tokens Used: 14
+2025-12-04 17:09:42,977 - INFO -    User Message: hi...
+2025-12-04 17:09:42,977 - INFO -    Bot Response: Hi there! How can I help you with FlowHCM today?...
+2025-12-04 17:09:42,977 - INFO - Updating token usage for client 1...
+2025-12-04 17:09:42,985 - INFO - ✅ Token usage updated for client 1: +14 tokens (dec_2025)
+2025-12-04 17:09:42,985 - INFO - ✅ Token usage updated
+2025-12-04 17:09:42,986 - INFO -    Client ID: 1
+2025-12-04 17:09:42,986 - INFO -    Tokens Added: 14
+2025-12-04 17:09:42,986 - INFO -    New Total Usage: 2,015 / 100,000
+2025-12-04 17:09:42,986 - INFO -    Remaining: 97,985
+2025-12-04 17:09:42,986 - INFO - Updating session activity timestamp...
+2025-12-04 17:09:42,988 - INFO - ✅ Session activity updated in database (session: 44661877-9265-4d37-ae8a-f023c0113bbd)
+2025-12-04 17:09:42,988 - INFO - ✅ Session activity updated
+2025-12-04 17:09:42,988 - INFO - Disconnected from PostgreSQL database
+2025-12-04 17:09:42,988 - INFO - ✅ Disconnected from PostgreSQL database
+2025-12-04 17:09:42,988 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:09:42,989 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-04 17:09:42,989 - INFO -    Session ID: 44661877-9265-4d37-ae8a-f023c0113bbd
+2025-12-04 17:09:42,989 - INFO -    Source Documents: 0
+2025-12-04 17:09:42,989 - INFO -    Response Length: 48 characters
+2025-12-04 17:09:42,990 - INFO - ================================================================================
+2025-12-04 17:11:41,957 - INFO - ================================================================================
+2025-12-04 17:11:41,957 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-04 17:11:41,957 - INFO - ================================================================================
+2025-12-04 17:11:41,957 - INFO - Query: 'how to make a shift?'
+2025-12-04 17:11:41,957 - INFO - User: admin@PatelHospital.com1
+2025-12-04 17:11:41,957 - INFO - Max Tokens: 750, Temperature: 0.1, Top-P: 0.7
+2025-12-04 17:11:41,957 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:11:41,957 - INFO - HEADERS RECEIVED:
+2025-12-04 17:11:41,957 - INFO -   X-Client-ID: 1 (informational only)
+2025-12-04 17:11:41,957 - INFO -   X-Company-Pin: 11032 (used for auth)
+2025-12-04 17:11:41,957 - INFO -   X-API-Key: test1234567890123456... (used for auth)
+2025-12-04 17:11:41,957 - INFO -   X-User-Name: admin@PatelHospital.com1 (informational only)
+2025-12-04 17:11:41,957 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:11:41,957 - INFO - 🔐 AUTHENTICATING CLIENT...
+2025-12-04 17:11:41,965 - INFO - PostgreSQL manager initialized
+2025-12-04 17:11:42,115 - INFO - Connected to PostgreSQL database
+2025-12-04 17:11:42,115 - INFO - ✅ Connected to PostgreSQL database
+2025-12-04 17:11:42,115 - INFO - 🔍 Validating credentials (Company PIN + API Key)
+2025-12-04 17:11:42,115 - INFO - 🔍 Authenticating with:
+2025-12-04 17:11:42,115 - INFO -    Company PIN: '11032' (length: 5)
+2025-12-04 17:11:42,115 - INFO -    API Key: 'test1234567890123456...' (length: 34)
+2025-12-04 17:11:42,124 - INFO - ✅ Client authenticated successfully from database (client_id: 1)
+2025-12-04 17:11:42,124 - INFO - ✅ AUTHENTICATION SUCCESSFUL
+2025-12-04 17:11:42,124 - INFO -    Client ID: 1 (from database)
+2025-12-04 17:11:42,124 - INFO -    Company PIN: 11032
+2025-12-04 17:11:42,124 - INFO -    API Key: test1234567890123456...
+2025-12-04 17:11:42,127 - INFO -    User: admin@PatelHospital.com1
+2025-12-04 17:11:42,127 - INFO -    Active: True
+2025-12-04 17:11:42,127 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:11:42,127 - INFO - 🔢 TOKEN LIMIT CHECK
+2025-12-04 17:11:42,127 - INFO -    Token Limit: 100,000
+2025-12-04 17:11:42,127 - INFO -    Tokens Used: 2,015
+2025-12-04 17:11:42,127 - INFO -    Remaining: 97,985
+2025-12-04 17:11:42,127 - INFO -    Allowed: True
+2025-12-04 17:11:42,132 - INFO - ✅ Token limit check passed
+2025-12-04 17:11:42,132 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:11:42,132 - INFO - 📋 SESSION MANAGEMENT
+2025-12-04 17:11:42,133 - INFO - Session ID from cookie: None (new session)
+2025-12-04 17:11:42,133 - INFO - Created new session: 3b8bf52a-00f9-40bd-9344-ad23568373a7
+2025-12-04 17:11:42,134 - INFO - Created session 3b8bf52a-00f9-40bd-9344-ad23568373a7 at 2025-12-04T17:11:42.133538
+2025-12-04 17:11:42,134 - INFO - 🆕 Created new in-memory session: 3b8bf52a-00f9-40bd-9344-ad23568373a7
+2025-12-04 17:11:42,134 - INFO - 💾 Saving session to PostgreSQL database...
+2025-12-04 17:11:42,142 - INFO - ✅ Session created in database: 3b8bf52a-00f9-40bd-9344-ad23568373a7 (db_id=28, user=admin@PatelHospital.com1, client=1)
+2025-12-04 17:11:42,142 - INFO - ✅ Session saved to database
+2025-12-04 17:11:42,142 - INFO -    Table: chatbot.sessions
+2025-12-04 17:11:42,142 - INFO -    Session DB ID: 28
+2025-12-04 17:11:42,142 - INFO -    Session UUID: 3b8bf52a-00f9-40bd-9344-ad23568373a7
+2025-12-04 17:11:42,142 - INFO -    Username: admin@PatelHospital.com1
+2025-12-04 17:11:42,142 - INFO -    Client ID: 1
+2025-12-04 17:11:42,142 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:11:42,142 - INFO - 💬 PROCESSING QUERY
+2025-12-04 17:11:42,142 - INFO - Added user message to session (total messages: 1)
+2025-12-04 17:11:42,142 - INFO - No previous context (first message in session)
+2025-12-04 17:11:42,142 - INFO - 🤖 Generating response using RAG system...
+2025-12-04 17:11:42,142 - INFO - ============================================================
+2025-12-04 17:11:42,142 - INFO - Processing query: 'how to make a shift?'
+2025-12-04 17:11:42,142 - INFO - Params: max_tokens=750, temp=0.1, top_p=0.7
+2025-12-04 17:11:42,142 - INFO - Retrieving relevant documents
+2025-12-04 17:11:42,142 - INFO - Semantic search for: 'how to make a shift?' (top_k=10)
+2025-12-04 17:11:42,183 - INFO - Semantic search found 20 candidates
+2025-12-04 17:11:42,183 - INFO - Found 20 semantic matches
+2025-12-04 17:11:42,183 - INFO - Returning 20 results
+2025-12-04 17:11:42,183 - INFO - Score stats: mean=0.661, std=0.056
+2025-12-04 17:11:42,183 - INFO - Dynamic threshold: 0.633
+2025-12-04 17:11:42,183 - INFO - Filtered to 14 relevant documents
+2025-12-04 17:11:42,183 - INFO - Using top 7 documents
+2025-12-04 17:11:42,183 - INFO - Unique source documents: 1
+2025-12-04 17:11:42,183 - INFO -   - Attendance Module.docx
+2025-12-04 17:11:42,183 - INFO - >>> DECISION: Using DOCUMENT-AWARE RESPONSE
+2025-12-04 17:11:42,183 - INFO - Generating document-aware response
+2025-12-04 17:11:42,183 - INFO - ============================================================
+2025-12-04 17:11:42,183 - INFO - CONTEXT CHUNKS USED FOR GENERATION:
+2025-12-04 17:11:42,183 - INFO - 
+--- Chunk 1 ---
+2025-12-04 17:11:42,183 - INFO - Source: Attendance Module.docx
+2025-12-04 17:11:42,183 - INFO - Chunk ID: 45
+2025-12-04 17:11:42,183 - INFO - Relevance Score: 0.745
+2025-12-04 17:11:42,183 - INFO - Content Length: 29 chars
+2025-12-04 17:11:42,183 - INFO - Content:
+Select Add New Shift Request.
+2025-12-04 17:11:42,183 - INFO - 
+--- Chunk 2 ---
+2025-12-04 17:11:42,183 - INFO - Source: Attendance Module.docx
+2025-12-04 17:11:42,183 - INFO - Chunk ID: 82
+2025-12-04 17:11:42,183 - INFO - Relevance Score: 0.730
+2025-12-04 17:11:42,183 - INFO - Content Length: 40 chars
+2025-12-04 17:11:42,183 - INFO - Content:
+Select employees and shifts to exchange.
+2025-12-04 17:11:42,190 - INFO - 
+--- Chunk 3 ---
+2025-12-04 17:11:42,190 - INFO - Source: Attendance Module.docx
+2025-12-04 17:11:42,190 - INFO - Chunk ID: 46
+2025-12-04 17:11:42,190 - INFO - Relevance Score: 0.723
+2025-12-04 17:11:42,190 - INFO - Content Length: 47 chars
+2025-12-04 17:11:42,190 - INFO - Content:
+Choose Employee, New Shift, and Effective Date.
+2025-12-04 17:11:42,191 - INFO - 
+--- Chunk 4 ---
+2025-12-04 17:11:42,191 - INFO - Source: Attendance Module.docx
+2025-12-04 17:11:42,191 - INFO - Chunk ID: 64
+2025-12-04 17:11:42,191 - INFO - Relevance Score: 0.722
+2025-12-04 17:11:42,192 - INFO - Content Length: 38 chars
+2025-12-04 17:11:42,192 - INFO - Content:
+Select Employee and new Shift details.
+2025-12-04 17:11:42,192 - INFO - 
+--- Chunk 5 ---
+2025-12-04 17:11:42,192 - INFO - Source: Attendance Module.docx
+2025-12-04 17:11:42,192 - INFO - Chunk ID: 43
+2025-12-04 17:11:42,193 - INFO - Relevance Score: 0.710
+2025-12-04 17:11:42,193 - INFO - Content Length: 114 chars
+2025-12-04 17:11:42,193 - INFO - Content:
+Shift Request
+
+The Shift Request feature allows employees to request shift changes, which are subject to approval.
+2025-12-04 17:11:42,193 - INFO - 
+--- Chunk 6 ---
+2025-12-04 17:11:42,193 - INFO - Source: Attendance Module.docx
+2025-12-04 17:11:42,194 - INFO - Chunk ID: 80
+2025-12-04 17:11:42,194 - INFO - Relevance Score: 0.703
+2025-12-04 17:11:42,194 - INFO - Content Length: 132 chars
+2025-12-04 17:11:42,195 - INFO - Content:
+Shift Transfer Request
+
+The Shift Transfer Request feature allows employees to exchange shifts with colleagues, subject to approval.
+2025-12-04 17:11:42,195 - INFO - 
+--- Chunk 7 ---
+2025-12-04 17:11:42,196 - INFO - Source: Attendance Module.docx
+2025-12-04 17:11:42,196 - INFO - Chunk ID: 44
+2025-12-04 17:11:42,196 - INFO - Relevance Score: 0.701
+2025-12-04 17:11:42,196 - INFO - Content Length: 131 chars
+2025-12-04 17:11:42,196 - INFO - Content:
+Shift Request Navigation Path:
+
+Attendance Module → Shift Request
+
+Shift Request Process / Flow:
+
+Click Attendance → Shift Request.
+2025-12-04 17:11:42,196 - INFO - ============================================================
+2025-12-04 17:11:42,196 - INFO - ============================================================
+2025-12-04 17:11:42,196 - INFO - FULL PROMPT SENT TO LLM:
+2025-12-04 17:11:42,196 - INFO - 
+You are FlowHCM Assistant, an expert at answering questions about FlowHCM HR management software. Your role is to help users navigate the system and understand processes using the official documentation which contains all the information about the FlowHCM.
+
+INSTRUCTIONS:
+1. Answer using the information provided in the documentation below. Strictly Use the exact terminology and field names from the documentation as is, to avoid confusion.
+2. Provide clear, and step-by-step instructions when explaining processes or procedures. Include all necessary details only from the documentation. Phrase the navigations and process exactly as in the documents do not change words.
+3. If the question is ambiguous or could apply to multiple modules, or contexts, ask the user to clarify which specific area they are referring to.
+4. If the user asks multiple questions or the question has multiple parts (e.g., "What is X and how do I do Y?"), address ALL parts thoroughly and completely.
+5. If the documentation does not contain enough information to fully answer the question, do not make up stuff and tell what you know and what you do not know. 
+6. Keep the answers complete.
+
+DONTS:
+Do not use the word documentation in the answers.
+Do not create any tables even if asked to. 
+Do not write any HTML code no matter what even if asked to. 
+Do not use bold fonts.
+
+THIS IS THE INFORMATION YOU HAVE: 
+[SOURCE 1: Attendance Module.docx]
+Select Add New Shift Request.
+
+[SOURCE 2: Attendance Module.docx]
+Select employees and shifts to exchange.
+
+[SOURCE 3: Attendance Module.docx]
+Choose Employee, New Shift, and Effective Date.
+
+[SOURCE 4: Attendance Module.docx]
+Select Employee and new Shift details.
+
+[SOURCE 5: Attendance Module.docx]
+Shift Request
+
+The Shift Request feature allows employees to request shift changes, which are subject to approval.
+
+[SOURCE 6: Attendance Module.docx]
+Shift Transfer Request
+
+The Shift Transfer Request feature allows employees to exchange shifts with colleagues, subject to approval.
+
+[SOURCE 7: Attendance Module.docx]
+Shift Request Navigation Path:
+
+Attendance Module → Shift Request
+
+Shift Request Process / Flow:
+
+Click Attendance → Shift Request.
+
+
+ANSWER THIS QUESTION: how to make a shift?
+
+YOUR ANSWER:
+2025-12-04 17:11:42,196 - INFO - ============================================================
+2025-12-04 17:11:47,556 - INFO - Response generated: 213 chars
+2025-12-04 17:11:47,557 - INFO - ============================================================
+2025-12-04 17:11:47,557 - INFO - ✅ Response generated (213 characters, 7 source documents)
+2025-12-04 17:11:47,557 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:11:47,557 - INFO - 🔢 TOKEN COUNTING
+2025-12-04 17:11:47,557 - INFO -    Input tokens: 6
+2025-12-04 17:11:47,558 - INFO -    Output tokens: 53
+2025-12-04 17:11:47,558 - INFO -    Total tokens: 59
+2025-12-04 17:11:47,558 - INFO - Added assistant response to session (total messages: 2)
+2025-12-04 17:11:47,558 - INFO - ✅ Updated in-memory session
+2025-12-04 17:11:47,558 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:11:47,558 - INFO - 💾 SAVING TO DATABASE
+2025-12-04 17:11:47,558 - INFO - Saving conversation to PostgreSQL...
+2025-12-04 17:11:47,560 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-04 17:11:47,571 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 28, tokens: 59)
+2025-12-04 17:11:47,571 - INFO - ✅ Conversation saved to database
+2025-12-04 17:11:47,572 - INFO -    Table: chatbot.conversation_dec_2025
+2025-12-04 17:11:47,572 - INFO -    Session DB ID: 28
+2025-12-04 17:11:47,572 - INFO -    Session UUID: 3b8bf52a-00f9-40bd-9344-ad23568373a7
+2025-12-04 17:11:47,572 - INFO -    Tokens Used: 59
+2025-12-04 17:11:47,573 - INFO -    User Message: how to make a shift?...
+2025-12-04 17:11:47,573 - INFO -    Bot Response: Could you clarify what you mean by “make a shift”?...
+2025-12-04 17:11:47,573 - INFO - Updating token usage for client 1...
+2025-12-04 17:11:47,573 - INFO - ✅ Token usage updated for client 1: +59 tokens (dec_2025)
+2025-12-04 17:11:47,573 - INFO - ✅ Token usage updated
+2025-12-04 17:11:47,573 - INFO -    Client ID: 1
+2025-12-04 17:11:47,573 - INFO -    Tokens Added: 59
+2025-12-04 17:11:47,573 - INFO -    New Total Usage: 2,074 / 100,000
+2025-12-04 17:11:47,573 - INFO -    Remaining: 97,926
+2025-12-04 17:11:47,573 - INFO - Updating session activity timestamp...
+2025-12-04 17:11:47,573 - INFO - ✅ Session activity updated in database (session: 3b8bf52a-00f9-40bd-9344-ad23568373a7)
+2025-12-04 17:11:47,573 - INFO - ✅ Session activity updated
+2025-12-04 17:11:47,573 - INFO - Disconnected from PostgreSQL database
+2025-12-04 17:11:47,573 - INFO - ✅ Disconnected from PostgreSQL database
+2025-12-04 17:11:47,573 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:11:47,573 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-04 17:11:47,580 - INFO -    Session ID: 3b8bf52a-00f9-40bd-9344-ad23568373a7
+2025-12-04 17:11:47,580 - INFO -    Source Documents: 7
+2025-12-04 17:11:47,580 - INFO -    Response Length: 213 characters
+2025-12-04 17:11:47,580 - INFO - ================================================================================
+2025-12-04 17:11:58,535 - INFO - ================================================================================
+2025-12-04 17:11:58,535 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-04 17:11:58,535 - INFO - ================================================================================
+2025-12-04 17:11:58,535 - INFO - Query: 'a shift request'
+2025-12-04 17:11:58,535 - INFO - User: admin@PatelHospital.com1
+2025-12-04 17:11:58,543 - INFO - Max Tokens: 750, Temperature: 0.1, Top-P: 0.7
+2025-12-04 17:11:58,543 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:11:58,543 - INFO - HEADERS RECEIVED:
+2025-12-04 17:11:58,543 - INFO -   X-Client-ID: 1 (informational only)
+2025-12-04 17:11:58,543 - INFO -   X-Company-Pin: 11032 (used for auth)
+2025-12-04 17:11:58,543 - INFO -   X-API-Key: test1234567890123456... (used for auth)
+2025-12-04 17:11:58,543 - INFO -   X-User-Name: admin@PatelHospital.com1 (informational only)
+2025-12-04 17:11:58,543 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:11:58,543 - INFO - 🔐 AUTHENTICATING CLIENT...
+2025-12-04 17:11:58,543 - INFO - PostgreSQL manager initialized
+2025-12-04 17:11:58,593 - INFO - Connected to PostgreSQL database
+2025-12-04 17:11:58,593 - INFO - ✅ Connected to PostgreSQL database
+2025-12-04 17:11:58,594 - INFO - 🔍 Validating credentials (Company PIN + API Key)
+2025-12-04 17:11:58,594 - INFO - 🔍 Authenticating with:
+2025-12-04 17:11:58,594 - INFO -    Company PIN: '11032' (length: 5)
+2025-12-04 17:11:58,594 - INFO -    API Key: 'test1234567890123456...' (length: 34)
+2025-12-04 17:11:58,598 - INFO - ✅ Client authenticated successfully from database (client_id: 1)
+2025-12-04 17:11:58,598 - INFO - ✅ AUTHENTICATION SUCCESSFUL
+2025-12-04 17:11:58,598 - INFO -    Client ID: 1 (from database)
+2025-12-04 17:11:58,598 - INFO -    Company PIN: 11032
+2025-12-04 17:11:58,599 - INFO -    API Key: test1234567890123456...
+2025-12-04 17:11:58,599 - INFO -    User: admin@PatelHospital.com1
+2025-12-04 17:11:58,599 - INFO -    Active: True
+2025-12-04 17:11:58,599 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:11:58,600 - INFO - 🔢 TOKEN LIMIT CHECK
+2025-12-04 17:11:58,601 - INFO -    Token Limit: 100,000
+2025-12-04 17:11:58,601 - INFO -    Tokens Used: 2,074
+2025-12-04 17:11:58,602 - INFO -    Remaining: 97,926
+2025-12-04 17:11:58,602 - INFO -    Allowed: True
+2025-12-04 17:11:58,602 - INFO - ✅ Token limit check passed
+2025-12-04 17:11:58,602 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:11:58,602 - INFO - 📋 SESSION MANAGEMENT
+2025-12-04 17:11:58,602 - INFO - Session ID from cookie: None (new session)
+2025-12-04 17:11:58,602 - INFO - Created new session: 2806b81c-5690-4097-839a-c7ca3be97ebc
+2025-12-04 17:11:58,602 - INFO - Created session 2806b81c-5690-4097-839a-c7ca3be97ebc at 2025-12-04T17:11:58.602483
+2025-12-04 17:11:58,602 - INFO - 🆕 Created new in-memory session: 2806b81c-5690-4097-839a-c7ca3be97ebc
+2025-12-04 17:11:58,602 - INFO - 💾 Saving session to PostgreSQL database...
+2025-12-04 17:11:58,602 - INFO - ✅ Session created in database: 2806b81c-5690-4097-839a-c7ca3be97ebc (db_id=29, user=admin@PatelHospital.com1, client=1)
+2025-12-04 17:11:58,602 - INFO - ✅ Session saved to database
+2025-12-04 17:11:58,602 - INFO -    Table: chatbot.sessions
+2025-12-04 17:11:58,602 - INFO -    Session DB ID: 29
+2025-12-04 17:11:58,602 - INFO -    Session UUID: 2806b81c-5690-4097-839a-c7ca3be97ebc
+2025-12-04 17:11:58,602 - INFO -    Username: admin@PatelHospital.com1
+2025-12-04 17:11:58,602 - INFO -    Client ID: 1
+2025-12-04 17:11:58,602 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:11:58,602 - INFO - 💬 PROCESSING QUERY
+2025-12-04 17:11:58,602 - INFO - Added user message to session (total messages: 1)
+2025-12-04 17:11:58,602 - INFO - No previous context (first message in session)
+2025-12-04 17:11:58,602 - INFO - 🤖 Generating response using RAG system...
+2025-12-04 17:11:58,602 - INFO - ============================================================
+2025-12-04 17:11:58,602 - INFO - Processing query: 'a shift request'
+2025-12-04 17:11:58,602 - INFO - Params: max_tokens=750, temp=0.1, top_p=0.7
+2025-12-04 17:11:58,602 - INFO - Retrieving relevant documents
+2025-12-04 17:11:58,602 - INFO - Semantic search for: 'a shift request' (top_k=10)
+2025-12-04 17:11:58,644 - INFO - Semantic search found 20 candidates
+2025-12-04 17:11:58,644 - INFO - Found 20 semantic matches
+2025-12-04 17:11:58,645 - INFO - Returning 20 results
+2025-12-04 17:11:58,645 - INFO - Score stats: mean=0.719, std=0.057
+2025-12-04 17:11:58,646 - INFO - Dynamic threshold: 0.691
+2025-12-04 17:11:58,646 - INFO - Filtered to 14 relevant documents
+2025-12-04 17:11:58,646 - INFO - Using top 7 documents
+2025-12-04 17:11:58,646 - INFO - Unique source documents: 1
+2025-12-04 17:11:58,647 - INFO -   - Attendance Module.docx
+2025-12-04 17:11:58,647 - INFO - >>> DECISION: Using DOCUMENT-AWARE RESPONSE
+2025-12-04 17:11:58,647 - INFO - Generating document-aware response
+2025-12-04 17:11:58,647 - INFO - ============================================================
+2025-12-04 17:11:58,648 - INFO - CONTEXT CHUNKS USED FOR GENERATION:
+2025-12-04 17:11:58,648 - INFO - 
+--- Chunk 1 ---
+2025-12-04 17:11:58,648 - INFO - Source: Attendance Module.docx
+2025-12-04 17:11:58,648 - INFO - Chunk ID: 45
+2025-12-04 17:11:58,648 - INFO - Relevance Score: 0.823
+2025-12-04 17:11:58,648 - INFO - Content Length: 29 chars
+2025-12-04 17:11:58,648 - INFO - Content:
+Select Add New Shift Request.
+2025-12-04 17:11:58,648 - INFO - 
+--- Chunk 2 ---
+2025-12-04 17:11:58,648 - INFO - Source: Attendance Module.docx
+2025-12-04 17:11:58,648 - INFO - Chunk ID: 43
+2025-12-04 17:11:58,648 - INFO - Relevance Score: 0.813
+2025-12-04 17:11:58,648 - INFO - Content Length: 114 chars
+2025-12-04 17:11:58,651 - INFO - Content:
+Shift Request
+
+The Shift Request feature allows employees to request shift changes, which are subject to approval.
+2025-12-04 17:11:58,651 - INFO - 
+--- Chunk 3 ---
+2025-12-04 17:11:58,651 - INFO - Source: Attendance Module.docx
+2025-12-04 17:11:58,651 - INFO - Chunk ID: 64
+2025-12-04 17:11:58,652 - INFO - Relevance Score: 0.780
+2025-12-04 17:11:58,652 - INFO - Content Length: 38 chars
+2025-12-04 17:11:58,652 - INFO - Content:
+Select Employee and new Shift details.
+2025-12-04 17:11:58,652 - INFO - 
+--- Chunk 4 ---
+2025-12-04 17:11:58,653 - INFO - Source: Attendance Module.docx
+2025-12-04 17:11:58,653 - INFO - Chunk ID: 80
+2025-12-04 17:11:58,653 - INFO - Relevance Score: 0.774
+2025-12-04 17:11:58,653 - INFO - Content Length: 132 chars
+2025-12-04 17:11:58,653 - INFO - Content:
+Shift Transfer Request
+
+The Shift Transfer Request feature allows employees to exchange shifts with colleagues, subject to approval.
+2025-12-04 17:11:58,653 - INFO - 
+--- Chunk 5 ---
+2025-12-04 17:11:58,653 - INFO - Source: Attendance Module.docx
+2025-12-04 17:11:58,654 - INFO - Chunk ID: 46
+2025-12-04 17:11:58,654 - INFO - Relevance Score: 0.767
+2025-12-04 17:11:58,654 - INFO - Content Length: 47 chars
+2025-12-04 17:11:58,654 - INFO - Content:
+Choose Employee, New Shift, and Effective Date.
+2025-12-04 17:11:58,654 - INFO - 
+--- Chunk 6 ---
+2025-12-04 17:11:58,654 - INFO - Source: Attendance Module.docx
+2025-12-04 17:11:58,655 - INFO - Chunk ID: 82
+2025-12-04 17:11:58,655 - INFO - Relevance Score: 0.766
+2025-12-04 17:11:58,655 - INFO - Content Length: 40 chars
+2025-12-04 17:11:58,655 - INFO - Content:
+Select employees and shifts to exchange.
+2025-12-04 17:11:58,655 - INFO - 
+--- Chunk 7 ---
+2025-12-04 17:11:58,655 - INFO - Source: Attendance Module.docx
+2025-12-04 17:11:58,656 - INFO - Chunk ID: 84
+2025-12-04 17:11:58,656 - INFO - Relevance Score: 0.763
+2025-12-04 17:11:58,656 - INFO - Content Length: 87 chars
+2025-12-04 17:11:58,656 - INFO - Content:
+Shift Transfer Request General:
+
+Maintains shift compliance while allowing flexibility.
+2025-12-04 17:11:58,656 - INFO - ============================================================
+2025-12-04 17:11:58,656 - INFO - ============================================================
+2025-12-04 17:11:58,656 - INFO - FULL PROMPT SENT TO LLM:
+2025-12-04 17:11:58,656 - INFO - 
+You are FlowHCM Assistant, an expert at answering questions about FlowHCM HR management software. Your role is to help users navigate the system and understand processes using the official documentation which contains all the information about the FlowHCM.
+
+INSTRUCTIONS:
+1. Answer using the information provided in the documentation below. Strictly Use the exact terminology and field names from the documentation as is, to avoid confusion.
+2. Provide clear, and step-by-step instructions when explaining processes or procedures. Include all necessary details only from the documentation. Phrase the navigations and process exactly as in the documents do not change words.
+3. If the question is ambiguous or could apply to multiple modules, or contexts, ask the user to clarify which specific area they are referring to.
+4. If the user asks multiple questions or the question has multiple parts (e.g., "What is X and how do I do Y?"), address ALL parts thoroughly and completely.
+5. If the documentation does not contain enough information to fully answer the question, do not make up stuff and tell what you know and what you do not know. 
+6. Keep the answers complete.
+
+DONTS:
+Do not use the word documentation in the answers.
+Do not create any tables even if asked to. 
+Do not write any HTML code no matter what even if asked to. 
+Do not use bold fonts.
+
+THIS IS THE INFORMATION YOU HAVE: 
+[SOURCE 1: Attendance Module.docx]
+Select Add New Shift Request.
+
+[SOURCE 2: Attendance Module.docx]
+Shift Request
+
+The Shift Request feature allows employees to request shift changes, which are subject to approval.
+
+[SOURCE 3: Attendance Module.docx]
+Select Employee and new Shift details.
+
+[SOURCE 4: Attendance Module.docx]
+Shift Transfer Request
+
+The Shift Transfer Request feature allows employees to exchange shifts with colleagues, subject to approval.
+
+[SOURCE 5: Attendance Module.docx]
+Choose Employee, New Shift, and Effective Date.
+
+[SOURCE 6: Attendance Module.docx]
+Select employees and shifts to exchange.
+
+[SOURCE 7: Attendance Module.docx]
+Shift Transfer Request General:
+
+Maintains shift compliance while allowing flexibility.
+
+
+ANSWER THIS QUESTION: a shift request
+
+YOUR ANSWER:
+2025-12-04 17:11:58,659 - INFO - ============================================================
+2025-12-04 17:12:01,420 - INFO - Response generated: 60 chars
+2025-12-04 17:12:01,421 - INFO - ============================================================
+2025-12-04 17:12:01,421 - INFO - ✅ Response generated (60 characters, 7 source documents)
+2025-12-04 17:12:01,422 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:12:01,422 - INFO - 🔢 TOKEN COUNTING
+2025-12-04 17:12:01,422 - INFO -    Input tokens: 4
+2025-12-04 17:12:01,422 - INFO -    Output tokens: 16
+2025-12-04 17:12:01,422 - INFO -    Total tokens: 20
+2025-12-04 17:12:01,422 - INFO - Added assistant response to session (total messages: 2)
+2025-12-04 17:12:01,422 - INFO - ✅ Updated in-memory session
+2025-12-04 17:12:01,423 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:12:01,423 - INFO - 💾 SAVING TO DATABASE
+2025-12-04 17:12:01,423 - INFO - Saving conversation to PostgreSQL...
+2025-12-04 17:12:01,424 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-04 17:12:01,435 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 29, tokens: 20)
+2025-12-04 17:12:01,435 - INFO - ✅ Conversation saved to database
+2025-12-04 17:12:01,435 - INFO -    Table: chatbot.conversation_dec_2025
+2025-12-04 17:12:01,435 - INFO -    Session DB ID: 29
+2025-12-04 17:12:01,435 - INFO -    Session UUID: 2806b81c-5690-4097-839a-c7ca3be97ebc
+2025-12-04 17:12:01,435 - INFO -    Tokens Used: 20
+2025-12-04 17:12:01,435 - INFO -    User Message: a shift request...
+2025-12-04 17:12:01,435 - INFO -    Bot Response: I'm here to help! What would you like to know abou...
+2025-12-04 17:12:01,435 - INFO - Updating token usage for client 1...
+2025-12-04 17:12:01,435 - INFO - ✅ Token usage updated for client 1: +20 tokens (dec_2025)
+2025-12-04 17:12:01,435 - INFO - ✅ Token usage updated
+2025-12-04 17:12:01,441 - INFO -    Client ID: 1
+2025-12-04 17:12:01,441 - INFO -    Tokens Added: 20
+2025-12-04 17:12:01,441 - INFO -    New Total Usage: 2,094 / 100,000
+2025-12-04 17:12:01,441 - INFO -    Remaining: 97,906
+2025-12-04 17:12:01,441 - INFO - Updating session activity timestamp...
+2025-12-04 17:12:01,444 - INFO - ✅ Session activity updated in database (session: 2806b81c-5690-4097-839a-c7ca3be97ebc)
+2025-12-04 17:12:01,444 - INFO - ✅ Session activity updated
+2025-12-04 17:12:01,444 - INFO - Disconnected from PostgreSQL database
+2025-12-04 17:12:01,444 - INFO - ✅ Disconnected from PostgreSQL database
+2025-12-04 17:12:01,444 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:12:01,444 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-04 17:12:01,444 - INFO -    Session ID: 2806b81c-5690-4097-839a-c7ca3be97ebc
+2025-12-04 17:12:01,444 - INFO -    Source Documents: 7
+2025-12-04 17:12:01,444 - INFO -    Response Length: 60 characters
+2025-12-04 17:12:01,444 - INFO - ================================================================================
+2025-12-04 17:12:15,695 - INFO - ================================================================================
+2025-12-04 17:12:15,695 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-04 17:12:15,695 - INFO - ================================================================================
+2025-12-04 17:12:15,695 - INFO - Query: 'a shift request'
+2025-12-04 17:12:15,695 - INFO - User: admin@PatelHospital.com1
+2025-12-04 17:12:15,695 - INFO - Max Tokens: 750, Temperature: 0.1, Top-P: 0.7
+2025-12-04 17:12:15,695 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:12:15,695 - INFO - HEADERS RECEIVED:
+2025-12-04 17:12:15,695 - INFO -   X-Client-ID: 1 (informational only)
+2025-12-04 17:12:15,703 - INFO -   X-Company-Pin: 11032 (used for auth)
+2025-12-04 17:12:15,703 - INFO -   X-API-Key: test1234567890123456... (used for auth)
+2025-12-04 17:12:15,704 - INFO -   X-User-Name: admin@PatelHospital.com1 (informational only)
+2025-12-04 17:12:15,704 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:12:15,704 - INFO - 🔐 AUTHENTICATING CLIENT...
+2025-12-04 17:12:15,704 - INFO - PostgreSQL manager initialized
+2025-12-04 17:12:15,855 - INFO - Connected to PostgreSQL database
+2025-12-04 17:12:15,855 - INFO - ✅ Connected to PostgreSQL database
+2025-12-04 17:12:15,855 - INFO - 🔍 Validating credentials (Company PIN + API Key)
+2025-12-04 17:12:15,855 - INFO - 🔍 Authenticating with:
+2025-12-04 17:12:15,855 - INFO -    Company PIN: '11032' (length: 5)
+2025-12-04 17:12:15,855 - INFO -    API Key: 'test1234567890123456...' (length: 34)
+2025-12-04 17:12:15,871 - INFO - ✅ Client authenticated successfully from database (client_id: 1)
+2025-12-04 17:12:15,871 - INFO - ✅ AUTHENTICATION SUCCESSFUL
+2025-12-04 17:12:15,871 - INFO -    Client ID: 1 (from database)
+2025-12-04 17:12:15,871 - INFO -    Company PIN: 11032
+2025-12-04 17:12:15,871 - INFO -    API Key: test1234567890123456...
+2025-12-04 17:12:15,871 - INFO -    User: admin@PatelHospital.com1
+2025-12-04 17:12:15,871 - INFO -    Active: True
+2025-12-04 17:12:15,871 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:12:15,871 - INFO - 🔢 TOKEN LIMIT CHECK
+2025-12-04 17:12:15,880 - INFO -    Token Limit: 100,000
+2025-12-04 17:12:15,880 - INFO -    Tokens Used: 2,094
+2025-12-04 17:12:15,880 - INFO -    Remaining: 97,906
+2025-12-04 17:12:15,880 - INFO -    Allowed: True
+2025-12-04 17:12:15,880 - INFO - ✅ Token limit check passed
+2025-12-04 17:12:15,880 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:12:15,880 - INFO - 📋 SESSION MANAGEMENT
+2025-12-04 17:12:15,880 - INFO - Session ID from cookie: None (new session)
+2025-12-04 17:12:15,880 - INFO - Created new session: 2f4aa342-c003-4d1b-984a-f7d7e60da458
+2025-12-04 17:12:15,880 - INFO - Created session 2f4aa342-c003-4d1b-984a-f7d7e60da458 at 2025-12-04T17:12:15.880679
+2025-12-04 17:12:15,880 - INFO - 🆕 Created new in-memory session: 2f4aa342-c003-4d1b-984a-f7d7e60da458
+2025-12-04 17:12:15,880 - INFO - 💾 Saving session to PostgreSQL database...
+2025-12-04 17:12:15,893 - INFO - ✅ Session created in database: 2f4aa342-c003-4d1b-984a-f7d7e60da458 (db_id=30, user=admin@PatelHospital.com1, client=1)
+2025-12-04 17:12:15,894 - INFO - ✅ Session saved to database
+2025-12-04 17:12:15,894 - INFO -    Table: chatbot.sessions
+2025-12-04 17:12:15,895 - INFO -    Session DB ID: 30
+2025-12-04 17:12:15,895 - INFO -    Session UUID: 2f4aa342-c003-4d1b-984a-f7d7e60da458
+2025-12-04 17:12:15,895 - INFO -    Username: admin@PatelHospital.com1
+2025-12-04 17:12:15,896 - INFO -    Client ID: 1
+2025-12-04 17:12:15,896 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:12:15,896 - INFO - 💬 PROCESSING QUERY
+2025-12-04 17:12:15,896 - INFO - Added user message to session (total messages: 1)
+2025-12-04 17:12:15,896 - INFO - No previous context (first message in session)
+2025-12-04 17:12:15,896 - INFO - 🤖 Generating response using RAG system...
+2025-12-04 17:12:15,896 - INFO - ============================================================
+2025-12-04 17:12:15,896 - INFO - Processing query: 'a shift request'
+2025-12-04 17:12:15,896 - INFO - Params: max_tokens=750, temp=0.1, top_p=0.7
+2025-12-04 17:12:15,896 - INFO - Retrieving relevant documents
+2025-12-04 17:12:15,896 - INFO - Semantic search for: 'a shift request' (top_k=10)
+2025-12-04 17:12:15,930 - INFO - Semantic search found 20 candidates
+2025-12-04 17:12:15,930 - INFO - Found 20 semantic matches
+2025-12-04 17:12:15,930 - INFO - Returning 20 results
+2025-12-04 17:12:15,930 - INFO - Score stats: mean=0.719, std=0.057
+2025-12-04 17:12:15,930 - INFO - Dynamic threshold: 0.691
+2025-12-04 17:12:15,930 - INFO - Filtered to 14 relevant documents
+2025-12-04 17:12:15,930 - INFO - Using top 7 documents
+2025-12-04 17:12:15,930 - INFO - Unique source documents: 1
+2025-12-04 17:12:15,930 - INFO -   - Attendance Module.docx
+2025-12-04 17:12:15,930 - INFO - >>> DECISION: Using DOCUMENT-AWARE RESPONSE
+2025-12-04 17:12:15,930 - INFO - Generating document-aware response
+2025-12-04 17:12:15,930 - INFO - ============================================================
+2025-12-04 17:12:15,930 - INFO - CONTEXT CHUNKS USED FOR GENERATION:
+2025-12-04 17:12:15,930 - INFO - 
+--- Chunk 1 ---
+2025-12-04 17:12:15,930 - INFO - Source: Attendance Module.docx
+2025-12-04 17:12:15,930 - INFO - Chunk ID: 45
+2025-12-04 17:12:15,930 - INFO - Relevance Score: 0.823
+2025-12-04 17:12:15,930 - INFO - Content Length: 29 chars
+2025-12-04 17:12:15,930 - INFO - Content:
+Select Add New Shift Request.
+2025-12-04 17:12:15,930 - INFO - 
+--- Chunk 2 ---
+2025-12-04 17:12:15,930 - INFO - Source: Attendance Module.docx
+2025-12-04 17:12:15,930 - INFO - Chunk ID: 43
+2025-12-04 17:12:15,930 - INFO - Relevance Score: 0.813
+2025-12-04 17:12:15,930 - INFO - Content Length: 114 chars
+2025-12-04 17:12:15,930 - INFO - Content:
+Shift Request
+
+The Shift Request feature allows employees to request shift changes, which are subject to approval.
+2025-12-04 17:12:15,930 - INFO - 
+--- Chunk 3 ---
+2025-12-04 17:12:15,930 - INFO - Source: Attendance Module.docx
+2025-12-04 17:12:15,930 - INFO - Chunk ID: 64
+2025-12-04 17:12:15,930 - INFO - Relevance Score: 0.780
+2025-12-04 17:12:15,930 - INFO - Content Length: 38 chars
+2025-12-04 17:12:15,930 - INFO - Content:
+Select Employee and new Shift details.
+2025-12-04 17:12:15,930 - INFO - 
+--- Chunk 4 ---
+2025-12-04 17:12:15,936 - INFO - Source: Attendance Module.docx
+2025-12-04 17:12:15,936 - INFO - Chunk ID: 80
+2025-12-04 17:12:15,936 - INFO - Relevance Score: 0.774
+2025-12-04 17:12:15,936 - INFO - Content Length: 132 chars
+2025-12-04 17:12:15,936 - INFO - Content:
+Shift Transfer Request
+
+The Shift Transfer Request feature allows employees to exchange shifts with colleagues, subject to approval.
+2025-12-04 17:12:15,938 - INFO - 
+--- Chunk 5 ---
+2025-12-04 17:12:15,938 - INFO - Source: Attendance Module.docx
+2025-12-04 17:12:15,938 - INFO - Chunk ID: 46
+2025-12-04 17:12:15,939 - INFO - Relevance Score: 0.767
+2025-12-04 17:12:15,939 - INFO - Content Length: 47 chars
+2025-12-04 17:12:15,939 - INFO - Content:
+Choose Employee, New Shift, and Effective Date.
+2025-12-04 17:12:15,940 - INFO - 
+--- Chunk 6 ---
+2025-12-04 17:12:15,940 - INFO - Source: Attendance Module.docx
+2025-12-04 17:12:15,940 - INFO - Chunk ID: 82
+2025-12-04 17:12:15,940 - INFO - Relevance Score: 0.766
+2025-12-04 17:12:15,941 - INFO - Content Length: 40 chars
+2025-12-04 17:12:15,941 - INFO - Content:
+Select employees and shifts to exchange.
+2025-12-04 17:12:15,941 - INFO - 
+--- Chunk 7 ---
+2025-12-04 17:12:15,941 - INFO - Source: Attendance Module.docx
+2025-12-04 17:12:15,941 - INFO - Chunk ID: 84
+2025-12-04 17:12:15,941 - INFO - Relevance Score: 0.763
+2025-12-04 17:12:15,941 - INFO - Content Length: 87 chars
+2025-12-04 17:12:15,941 - INFO - Content:
+Shift Transfer Request General:
+
+Maintains shift compliance while allowing flexibility.
+2025-12-04 17:12:15,941 - INFO - ============================================================
+2025-12-04 17:12:15,941 - INFO - ============================================================
+2025-12-04 17:12:15,941 - INFO - FULL PROMPT SENT TO LLM:
+2025-12-04 17:12:15,941 - INFO - 
+You are FlowHCM Assistant, an expert at answering questions about FlowHCM HR management software. Your role is to help users navigate the system and understand processes using the official documentation which contains all the information about the FlowHCM.
+
+INSTRUCTIONS:
+1. Answer using the information provided in the documentation below. Strictly Use the exact terminology and field names from the documentation as is, to avoid confusion.
+2. Provide clear, and step-by-step instructions when explaining processes or procedures. Include all necessary details only from the documentation. Phrase the navigations and process exactly as in the documents do not change words.
+3. If the question is ambiguous or could apply to multiple modules, or contexts, ask the user to clarify which specific area they are referring to.
+4. If the user asks multiple questions or the question has multiple parts (e.g., "What is X and how do I do Y?"), address ALL parts thoroughly and completely.
+5. If the documentation does not contain enough information to fully answer the question, do not make up stuff and tell what you know and what you do not know. 
+6. Keep the answers complete.
+
+DONTS:
+Do not use the word documentation in the answers.
+Do not create any tables even if asked to. 
+Do not write any HTML code no matter what even if asked to. 
+Do not use bold fonts.
+
+THIS IS THE INFORMATION YOU HAVE: 
+[SOURCE 1: Attendance Module.docx]
+Select Add New Shift Request.
+
+[SOURCE 2: Attendance Module.docx]
+Shift Request
+
+The Shift Request feature allows employees to request shift changes, which are subject to approval.
+
+[SOURCE 3: Attendance Module.docx]
+Select Employee and new Shift details.
+
+[SOURCE 4: Attendance Module.docx]
+Shift Transfer Request
+
+The Shift Transfer Request feature allows employees to exchange shifts with colleagues, subject to approval.
+
+[SOURCE 5: Attendance Module.docx]
+Choose Employee, New Shift, and Effective Date.
+
+[SOURCE 6: Attendance Module.docx]
+Select employees and shifts to exchange.
+
+[SOURCE 7: Attendance Module.docx]
+Shift Transfer Request General:
+
+Maintains shift compliance while allowing flexibility.
+
+
+ANSWER THIS QUESTION: a shift request
+
+YOUR ANSWER:
+2025-12-04 17:12:15,941 - INFO - ============================================================
+2025-12-04 17:12:18,548 - INFO - Response generated: 60 chars
+2025-12-04 17:12:18,548 - INFO - ============================================================
+2025-12-04 17:12:18,548 - INFO - ✅ Response generated (60 characters, 7 source documents)
+2025-12-04 17:12:18,548 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:12:18,549 - INFO - 🔢 TOKEN COUNTING
+2025-12-04 17:12:18,549 - INFO -    Input tokens: 4
+2025-12-04 17:12:18,549 - INFO -    Output tokens: 16
+2025-12-04 17:12:18,550 - INFO -    Total tokens: 20
+2025-12-04 17:12:18,550 - INFO - Added assistant response to session (total messages: 2)
+2025-12-04 17:12:18,550 - INFO - ✅ Updated in-memory session
+2025-12-04 17:12:18,550 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:12:18,550 - INFO - 💾 SAVING TO DATABASE
+2025-12-04 17:12:18,550 - INFO - Saving conversation to PostgreSQL...
+2025-12-04 17:12:18,552 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-04 17:12:18,563 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 30, tokens: 20)
+2025-12-04 17:12:18,563 - INFO - ✅ Conversation saved to database
+2025-12-04 17:12:18,563 - INFO -    Table: chatbot.conversation_dec_2025
+2025-12-04 17:12:18,563 - INFO -    Session DB ID: 30
+2025-12-04 17:12:18,563 - INFO -    Session UUID: 2f4aa342-c003-4d1b-984a-f7d7e60da458
+2025-12-04 17:12:18,563 - INFO -    Tokens Used: 20
+2025-12-04 17:12:18,563 - INFO -    User Message: a shift request...
+2025-12-04 17:12:18,563 - INFO -    Bot Response: I'm here to help! What would you like to know abou...
+2025-12-04 17:12:18,563 - INFO - Updating token usage for client 1...
+2025-12-04 17:12:18,563 - INFO - ✅ Token usage updated for client 1: +20 tokens (dec_2025)
+2025-12-04 17:12:18,563 - INFO - ✅ Token usage updated
+2025-12-04 17:12:18,563 - INFO -    Client ID: 1
+2025-12-04 17:12:18,568 - INFO -    Tokens Added: 20
+2025-12-04 17:12:18,569 - INFO -    New Total Usage: 2,114 / 100,000
+2025-12-04 17:12:18,569 - INFO -    Remaining: 97,886
+2025-12-04 17:12:18,569 - INFO - Updating session activity timestamp...
+2025-12-04 17:12:18,570 - INFO - ✅ Session activity updated in database (session: 2f4aa342-c003-4d1b-984a-f7d7e60da458)
+2025-12-04 17:12:18,570 - INFO - ✅ Session activity updated
+2025-12-04 17:12:18,570 - INFO - Disconnected from PostgreSQL database
+2025-12-04 17:12:18,570 - INFO - ✅ Disconnected from PostgreSQL database
+2025-12-04 17:12:18,570 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:12:18,570 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-04 17:12:18,570 - INFO -    Session ID: 2f4aa342-c003-4d1b-984a-f7d7e60da458
+2025-12-04 17:12:18,570 - INFO -    Source Documents: 7
+2025-12-04 17:12:18,570 - INFO -    Response Length: 60 characters
+2025-12-04 17:12:18,570 - INFO - ================================================================================
+2025-12-04 17:12:26,025 - INFO - ================================================================================
+2025-12-04 17:12:26,025 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-04 17:12:26,025 - INFO - ================================================================================
+2025-12-04 17:12:26,025 - INFO - Query: 'how to make a shift request?'
+2025-12-04 17:12:26,025 - INFO - User: admin@PatelHospital.com1
+2025-12-04 17:12:26,025 - INFO - Max Tokens: 750, Temperature: 0.1, Top-P: 0.7
+2025-12-04 17:12:26,033 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:12:26,033 - INFO - HEADERS RECEIVED:
+2025-12-04 17:12:26,033 - INFO -   X-Client-ID: 1 (informational only)
+2025-12-04 17:12:26,033 - INFO -   X-Company-Pin: 11032 (used for auth)
+2025-12-04 17:12:26,033 - INFO -   X-API-Key: test1234567890123456... (used for auth)
+2025-12-04 17:12:26,033 - INFO -   X-User-Name: admin@PatelHospital.com1 (informational only)
+2025-12-04 17:12:26,037 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:12:26,038 - INFO - 🔐 AUTHENTICATING CLIENT...
+2025-12-04 17:12:26,038 - INFO - PostgreSQL manager initialized
+2025-12-04 17:12:26,076 - INFO - Connected to PostgreSQL database
+2025-12-04 17:12:26,076 - INFO - ✅ Connected to PostgreSQL database
+2025-12-04 17:12:26,076 - INFO - 🔍 Validating credentials (Company PIN + API Key)
+2025-12-04 17:12:26,076 - INFO - 🔍 Authenticating with:
+2025-12-04 17:12:26,076 - INFO -    Company PIN: '11032' (length: 5)
+2025-12-04 17:12:26,076 - INFO -    API Key: 'test1234567890123456...' (length: 34)
+2025-12-04 17:12:26,083 - INFO - ✅ Client authenticated successfully from database (client_id: 1)
+2025-12-04 17:12:26,083 - INFO - ✅ AUTHENTICATION SUCCESSFUL
+2025-12-04 17:12:26,083 - INFO -    Client ID: 1 (from database)
+2025-12-04 17:12:26,083 - INFO -    Company PIN: 11032
+2025-12-04 17:12:26,083 - INFO -    API Key: test1234567890123456...
+2025-12-04 17:12:26,083 - INFO -    User: admin@PatelHospital.com1
+2025-12-04 17:12:26,083 - INFO -    Active: True
+2025-12-04 17:12:26,084 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:12:26,084 - INFO - 🔢 TOKEN LIMIT CHECK
+2025-12-04 17:12:26,085 - INFO -    Token Limit: 100,000
+2025-12-04 17:12:26,085 - INFO -    Tokens Used: 2,114
+2025-12-04 17:12:26,085 - INFO -    Remaining: 97,886
+2025-12-04 17:12:26,085 - INFO -    Allowed: True
+2025-12-04 17:12:26,085 - INFO - ✅ Token limit check passed
+2025-12-04 17:12:26,085 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:12:26,085 - INFO - 📋 SESSION MANAGEMENT
+2025-12-04 17:12:26,085 - INFO - Session ID from cookie: None (new session)
+2025-12-04 17:12:26,085 - INFO - Created new session: 6ae85275-4bc1-40f7-91e7-c4e04265de33
+2025-12-04 17:12:26,085 - INFO - Created session 6ae85275-4bc1-40f7-91e7-c4e04265de33 at 2025-12-04T17:12:26.085885
+2025-12-04 17:12:26,085 - INFO - 🆕 Created new in-memory session: 6ae85275-4bc1-40f7-91e7-c4e04265de33
+2025-12-04 17:12:26,085 - INFO - 💾 Saving session to PostgreSQL database...
+2025-12-04 17:12:26,091 - INFO - ✅ Session created in database: 6ae85275-4bc1-40f7-91e7-c4e04265de33 (db_id=31, user=admin@PatelHospital.com1, client=1)
+2025-12-04 17:12:26,092 - INFO - ✅ Session saved to database
+2025-12-04 17:12:26,092 - INFO -    Table: chatbot.sessions
+2025-12-04 17:12:26,093 - INFO -    Session DB ID: 31
+2025-12-04 17:12:26,093 - INFO -    Session UUID: 6ae85275-4bc1-40f7-91e7-c4e04265de33
+2025-12-04 17:12:26,093 - INFO -    Username: admin@PatelHospital.com1
+2025-12-04 17:12:26,093 - INFO -    Client ID: 1
+2025-12-04 17:12:26,093 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:12:26,093 - INFO - 💬 PROCESSING QUERY
+2025-12-04 17:12:26,093 - INFO - Added user message to session (total messages: 1)
+2025-12-04 17:12:26,093 - INFO - No previous context (first message in session)
+2025-12-04 17:12:26,093 - INFO - 🤖 Generating response using RAG system...
+2025-12-04 17:12:26,093 - INFO - ============================================================
+2025-12-04 17:12:26,093 - INFO - Processing query: 'how to make a shift request?'
+2025-12-04 17:12:26,093 - INFO - Params: max_tokens=750, temp=0.1, top_p=0.7
+2025-12-04 17:12:26,093 - INFO - Retrieving relevant documents
+2025-12-04 17:12:26,093 - INFO - Semantic search for: 'how to make a shift request?' (top_k=10)
+2025-12-04 17:12:26,132 - INFO - Semantic search found 20 candidates
+2025-12-04 17:12:26,133 - INFO - Found 20 semantic matches
+2025-12-04 17:12:26,133 - INFO - Returning 20 results
+2025-12-04 17:12:26,133 - INFO - Score stats: mean=0.723, std=0.059
+2025-12-04 17:12:26,134 - INFO - Dynamic threshold: 0.693
+2025-12-04 17:12:26,134 - INFO - Filtered to 11 relevant documents
+2025-12-04 17:12:26,134 - INFO - Using top 7 documents
+2025-12-04 17:12:26,134 - INFO - Unique source documents: 1
+2025-12-04 17:12:26,134 - INFO -   - Attendance Module.docx
+2025-12-04 17:12:26,134 - INFO - >>> DECISION: Using DOCUMENT-AWARE RESPONSE
+2025-12-04 17:12:26,134 - INFO - Generating document-aware response
+2025-12-04 17:12:26,134 - INFO - ============================================================
+2025-12-04 17:12:26,134 - INFO - CONTEXT CHUNKS USED FOR GENERATION:
+2025-12-04 17:12:26,135 - INFO - 
+--- Chunk 1 ---
+2025-12-04 17:12:26,135 - INFO - Source: Attendance Module.docx
+2025-12-04 17:12:26,135 - INFO - Chunk ID: 45
+2025-12-04 17:12:26,135 - INFO - Relevance Score: 0.844
+2025-12-04 17:12:26,135 - INFO - Content Length: 29 chars
+2025-12-04 17:12:26,135 - INFO - Content:
+Select Add New Shift Request.
+2025-12-04 17:12:26,135 - INFO - 
+--- Chunk 2 ---
+2025-12-04 17:12:26,135 - INFO - Source: Attendance Module.docx
+2025-12-04 17:12:26,135 - INFO - Chunk ID: 43
+2025-12-04 17:12:26,136 - INFO - Relevance Score: 0.829
+2025-12-04 17:12:26,136 - INFO - Content Length: 114 chars
+2025-12-04 17:12:26,136 - INFO - Content:
+Shift Request
+
+The Shift Request feature allows employees to request shift changes, which are subject to approval.
+2025-12-04 17:12:26,136 - INFO - 
+--- Chunk 3 ---
+2025-12-04 17:12:26,136 - INFO - Source: Attendance Module.docx
+2025-12-04 17:12:26,136 - INFO - Chunk ID: 44
+2025-12-04 17:12:26,136 - INFO - Relevance Score: 0.784
+2025-12-04 17:12:26,137 - INFO - Content Length: 131 chars
+2025-12-04 17:12:26,137 - INFO - Content:
+Shift Request Navigation Path:
+
+Attendance Module → Shift Request
+
+Shift Request Process / Flow:
+
+Click Attendance → Shift Request.
+2025-12-04 17:12:26,137 - INFO - 
+--- Chunk 4 ---
+2025-12-04 17:12:26,138 - INFO - Source: Attendance Module.docx
+2025-12-04 17:12:26,138 - INFO - Chunk ID: 64
+2025-12-04 17:12:26,138 - INFO - Relevance Score: 0.783
+2025-12-04 17:12:26,138 - INFO - Content Length: 38 chars
+2025-12-04 17:12:26,138 - INFO - Content:
+Select Employee and new Shift details.
+2025-12-04 17:12:26,139 - INFO - 
+--- Chunk 5 ---
+2025-12-04 17:12:26,139 - INFO - Source: Attendance Module.docx
+2025-12-04 17:12:26,139 - INFO - Chunk ID: 80
+2025-12-04 17:12:26,139 - INFO - Relevance Score: 0.781
+2025-12-04 17:12:26,139 - INFO - Content Length: 132 chars
+2025-12-04 17:12:26,139 - INFO - Content:
+Shift Transfer Request
+
+The Shift Transfer Request feature allows employees to exchange shifts with colleagues, subject to approval.
+2025-12-04 17:12:26,139 - INFO - 
+--- Chunk 6 ---
+2025-12-04 17:12:26,139 - INFO - Source: Attendance Module.docx
+2025-12-04 17:12:26,139 - INFO - Chunk ID: 84
+2025-12-04 17:12:26,140 - INFO - Relevance Score: 0.755
+2025-12-04 17:12:26,140 - INFO - Content Length: 87 chars
+2025-12-04 17:12:26,140 - INFO - Content:
+Shift Transfer Request General:
+
+Maintains shift compliance while allowing flexibility.
+2025-12-04 17:12:26,141 - INFO - 
+--- Chunk 7 ---
+2025-12-04 17:12:26,141 - INFO - Source: Attendance Module.docx
+2025-12-04 17:12:26,141 - INFO - Chunk ID: 81
+2025-12-04 17:12:26,141 - INFO - Relevance Score: 0.751
+2025-12-04 17:12:26,141 - INFO - Content Length: 167 chars
+2025-12-04 17:12:26,141 - INFO - Content:
+Shift Transfer Request Navigation Path:
+
+Attendance Module → Shift Transfer Request
+
+Shift Transfer Request Process / Flow:
+
+Click Attendance → Shift Transfer Request.
+2025-12-04 17:12:26,141 - INFO - ============================================================
+2025-12-04 17:12:26,141 - INFO - ============================================================
+2025-12-04 17:12:26,141 - INFO - FULL PROMPT SENT TO LLM:
+2025-12-04 17:12:26,141 - INFO - 
+You are FlowHCM Assistant, an expert at answering questions about FlowHCM HR management software. Your role is to help users navigate the system and understand processes using the official documentation which contains all the information about the FlowHCM.
+
+INSTRUCTIONS:
+1. Answer using the information provided in the documentation below. Strictly Use the exact terminology and field names from the documentation as is, to avoid confusion.
+2. Provide clear, and step-by-step instructions when explaining processes or procedures. Include all necessary details only from the documentation. Phrase the navigations and process exactly as in the documents do not change words.
+3. If the question is ambiguous or could apply to multiple modules, or contexts, ask the user to clarify which specific area they are referring to.
+4. If the user asks multiple questions or the question has multiple parts (e.g., "What is X and how do I do Y?"), address ALL parts thoroughly and completely.
+5. If the documentation does not contain enough information to fully answer the question, do not make up stuff and tell what you know and what you do not know. 
+6. Keep the answers complete.
+
+DONTS:
+Do not use the word documentation in the answers.
+Do not create any tables even if asked to. 
+Do not write any HTML code no matter what even if asked to. 
+Do not use bold fonts.
+
+THIS IS THE INFORMATION YOU HAVE: 
+[SOURCE 1: Attendance Module.docx]
+Select Add New Shift Request.
+
+[SOURCE 2: Attendance Module.docx]
+Shift Request
+
+The Shift Request feature allows employees to request shift changes, which are subject to approval.
+
+[SOURCE 3: Attendance Module.docx]
+Shift Request Navigation Path:
+
+Attendance Module → Shift Request
+
+Shift Request Process / Flow:
+
+Click Attendance → Shift Request.
+
+[SOURCE 4: Attendance Module.docx]
+Select Employee and new Shift details.
+
+[SOURCE 5: Attendance Module.docx]
+Shift Transfer Request
+
+The Shift Transfer Request feature allows employees to exchange shifts with colleagues, subject to approval.
+
+[SOURCE 6: Attendance Module.docx]
+Shift Transfer Request General:
+
+Maintains shift compliance while allowing flexibility.
+
+[SOURCE 7: Attendance Module.docx]
+Shift Transfer Request Navigation Path:
+
+Attendance Module → Shift Transfer Request
+
+Shift Transfer Request Process / Flow:
+
+Click Attendance → Shift Transfer Request.
+
+
+ANSWER THIS QUESTION: how to make a shift request?
+
+YOUR ANSWER:
+2025-12-04 17:12:26,141 - INFO - ============================================================
+2025-12-04 17:12:31,573 - INFO - Response generated: 238 chars
+2025-12-04 17:12:31,574 - INFO - ============================================================
+2025-12-04 17:12:31,574 - INFO - ✅ Response generated (238 characters, 7 source documents)
+2025-12-04 17:12:31,574 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:12:31,574 - INFO - 🔢 TOKEN COUNTING
+2025-12-04 17:12:31,575 - INFO -    Input tokens: 8
+2025-12-04 17:12:31,575 - INFO -    Output tokens: 52
+2025-12-04 17:12:31,575 - INFO -    Total tokens: 60
+2025-12-04 17:12:31,576 - INFO - Added assistant response to session (total messages: 2)
+2025-12-04 17:12:31,576 - INFO - ✅ Updated in-memory session
+2025-12-04 17:12:31,576 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:12:31,576 - INFO - 💾 SAVING TO DATABASE
+2025-12-04 17:12:31,576 - INFO - Saving conversation to PostgreSQL...
+2025-12-04 17:12:31,578 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-04 17:12:31,581 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 31, tokens: 60)
+2025-12-04 17:12:31,581 - INFO - ✅ Conversation saved to database
+2025-12-04 17:12:31,581 - INFO -    Table: chatbot.conversation_dec_2025
+2025-12-04 17:12:31,581 - INFO -    Session DB ID: 31
+2025-12-04 17:12:31,581 - INFO -    Session UUID: 6ae85275-4bc1-40f7-91e7-c4e04265de33
+2025-12-04 17:12:31,581 - INFO -    Tokens Used: 60
+2025-12-04 17:12:31,581 - INFO -    User Message: how to make a shift request?...
+2025-12-04 17:12:31,581 - INFO -    Bot Response: To make a shift request in FlowHCM: 1. Open the **...
+2025-12-04 17:12:31,581 - INFO - Updating token usage for client 1...
+2025-12-04 17:12:31,581 - INFO - ✅ Token usage updated for client 1: +60 tokens (dec_2025)
+2025-12-04 17:12:31,581 - INFO - ✅ Token usage updated
+2025-12-04 17:12:31,581 - INFO -    Client ID: 1
+2025-12-04 17:12:31,587 - INFO -    Tokens Added: 60
+2025-12-04 17:12:31,587 - INFO -    New Total Usage: 2,174 / 100,000
+2025-12-04 17:12:31,587 - INFO -    Remaining: 97,826
+2025-12-04 17:12:31,587 - INFO - Updating session activity timestamp...
+2025-12-04 17:12:31,587 - INFO - ✅ Session activity updated in database (session: 6ae85275-4bc1-40f7-91e7-c4e04265de33)
+2025-12-04 17:12:31,587 - INFO - ✅ Session activity updated
+2025-12-04 17:12:31,589 - INFO - Disconnected from PostgreSQL database
+2025-12-04 17:12:31,589 - INFO - ✅ Disconnected from PostgreSQL database
+2025-12-04 17:12:31,589 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:12:31,589 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-04 17:12:31,589 - INFO -    Session ID: 6ae85275-4bc1-40f7-91e7-c4e04265de33
+2025-12-04 17:12:31,590 - INFO -    Source Documents: 7
+2025-12-04 17:12:31,590 - INFO -    Response Length: 238 characters
+2025-12-04 17:12:31,590 - INFO - ================================================================================
+2025-12-04 17:13:48,429 - INFO - Starting server on 0.0.0.0:8000
+2025-12-04 17:13:48,479 - INFO - ============================================================
+2025-12-04 17:13:48,480 - INFO - Starting FastAPI server
+2025-12-04 17:13:48,480 - INFO - ============================================================
+2025-12-04 17:13:48,480 - INFO - Initialized in-memory session store (max: 10000)
+2025-12-04 17:13:48,480 - INFO - Session manager initialized (PostgreSQL storage)
+2025-12-04 17:13:48,480 - INFO - Session manager initialized successfully
+2025-12-04 17:13:48,481 - INFO - ============================================================
+2025-12-04 17:13:48,481 - INFO - Initializing RAG System
+2025-12-04 17:13:48,481 - INFO - ============================================================
+2025-12-04 17:13:48,481 - INFO - Initialized DocumentProcessor with folder: C:\work\chatbot latest\docs
+2025-12-04 17:13:48,481 - INFO - Initialized SemanticChunker (pure semantic mode, threshold=0.7)
+2025-12-04 17:13:48,482 - INFO - Loading sentence embedding model for semantic analysis...
+2025-12-04 17:13:48,510 - INFO - Use pytorch device_name: cuda:0
+2025-12-04 17:13:48,511 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-12-04 17:13:52,658 - INFO - Sentence embedding model loaded
+2025-12-04 17:13:52,660 - INFO - Loading embedding model: BAAI/bge-base-en-v1.5
+2025-12-04 17:13:52,663 - INFO - Use pytorch device_name: cuda:0
+2025-12-04 17:13:52,664 - INFO - Load pretrained SentenceTransformer: BAAI/bge-base-en-v1.5
+2025-12-04 17:13:56,319 - INFO - Embedding model loaded successfully
+2025-12-04 17:13:56,320 - INFO - Initialized LLMEngine (model=gpt-oss:20b, url=http://localhost:11434)
+2025-12-04 17:13:56,320 - INFO - RAG System initialized
+2025-12-04 17:13:56,321 - INFO - Starting system initialization
+2025-12-04 17:13:56,321 - INFO - Loading LLM model
+2025-12-04 17:13:56,321 - INFO - Checking Ollama connection and model: gpt-oss:20b
+2025-12-04 17:13:58,366 - INFO - Available Ollama models: ['gpt-oss:20b']
+2025-12-04 17:13:58,367 - INFO - Ollama model 'gpt-oss:20b' is ready
+2025-12-04 17:13:58,367 - INFO - LLM model loaded successfully
+2025-12-04 17:13:58,368 - INFO - Loading documents
+2025-12-04 17:13:58,369 - INFO - Starting document loading from: C:\work\chatbot latest\docs
+2025-12-04 17:13:58,399 - INFO - Loaded: Asset Module (5.10).docx (4461 chars)
+2025-12-04 17:13:58,439 - INFO - Loaded: Attendance Module (5.10).docx (9436 chars)
+2025-12-04 17:13:58,464 - INFO - Loaded: Attendance Module.docx (11343 chars)
+2025-12-04 17:13:58,494 - INFO - Loaded: Desk Management (5.10).docx (1151 chars)
+2025-12-04 17:13:58,550 - INFO - Loaded: Employee Module (5.10).docx (6817 chars)
+2025-12-04 17:13:58,584 - INFO - Loaded: Employee Separation Module (5.10).docx (4423 chars)
+2025-12-04 17:13:58,650 - INFO - Loaded: ESS User Manual.docx (14168 chars)
+2025-12-04 17:13:58,689 - INFO - Loaded: Expense Module (5.10).docx (3905 chars)
+2025-12-04 17:13:58,716 - INFO - Loaded: Helpdesk Module (5.10).docx (3106 chars)
+2025-12-04 17:13:58,747 - INFO - Loaded: Leave Module (5.10).docx (7711 chars)
+2025-12-04 17:13:58,762 - INFO - Loaded: Leave Module.docx (5125 chars)
+2025-12-04 17:13:58,799 - INFO - Loaded: Letter Module (5.10).docx (2411 chars)
+2025-12-04 17:13:58,834 - INFO - Loaded: Manpower Budgeting Module (5.10).docx (3930 chars)
+2025-12-04 17:13:58,860 - INFO - Loaded: Onboarding Module (5.10).docx (2641 chars)
+2025-12-04 17:13:58,960 - INFO - Loaded: Payroll Module (5.10).docx (23938 chars)
+2025-12-04 17:13:58,997 - INFO - Loaded: Performance Module (8.2).docx (3989 chars)
+2025-12-04 17:13:59,058 - INFO - Loaded: Recruitment Module (5.10).docx (12016 chars)
+2025-12-04 17:13:59,081 - INFO - Loaded: Scheduled Alert Module (5.10).docx (1766 chars)
+2025-12-04 17:13:59,105 - INFO - Loaded: Scheduled Report Module (5.10).docx (1427 chars)
+2025-12-04 17:13:59,137 - INFO - Loaded: Travel Module (5.10).docx (3825 chars)
+2025-12-04 17:13:59,137 - INFO - Total documents loaded: 20
+2025-12-04 17:13:59,138 - INFO - Creating document chunks
+2025-12-04 17:13:59,138 - INFO - Creating semantic chunks from 20 documents
+2025-12-04 17:13:59,631 - INFO - Total chunks created: 260
+2025-12-04 17:13:59,631 - INFO - Building vector index
+2025-12-04 17:13:59,632 - INFO - Creating embeddings for 260 chunks
+2025-12-04 17:14:00,332 - INFO - Embeddings created with shape: (260, 768)
+2025-12-04 17:14:00,332 - INFO - Building FAISS index with dimension: 768
+2025-12-04 17:14:00,333 - INFO - FAISS index built with 260 vectors
+2025-12-04 17:14:00,335 - INFO - Saved FAISS index to: C:\work\chatbot latest\data\faiss_index.bin
+2025-12-04 17:14:00,336 - INFO - Saved chunks to: C:\work\chatbot latest\data\document_chunks.pkl
+2025-12-04 17:14:00,336 - INFO - Initialized SemanticRetriever
+2025-12-04 17:14:00,337 - INFO - Retriever initialized
+2025-12-04 17:14:00,337 - INFO - ============================================================
+2025-12-04 17:14:00,337 - INFO - RAG System initialization complete
+2025-12-04 17:14:00,337 - INFO - Documents: 20
+2025-12-04 17:14:00,337 - INFO - Chunks: 260
+2025-12-04 17:14:00,338 - INFO - ============================================================
+2025-12-04 17:14:00,338 - INFO - RAG system initialized successfully
+2025-12-04 17:14:00,338 - INFO - Started session cleanup task (interval: 60s)
+2025-12-04 17:29:30,992 - INFO - Starting server on 0.0.0.0:8000
+2025-12-04 17:29:31,040 - INFO - ============================================================
+2025-12-04 17:29:31,042 - INFO - Starting FastAPI server
+2025-12-04 17:29:31,042 - INFO - ============================================================
+2025-12-04 17:29:31,042 - INFO - Initialized in-memory session store (max: 10000)
+2025-12-04 17:29:31,042 - INFO - Session manager initialized (PostgreSQL storage)
+2025-12-04 17:29:31,042 - INFO - Session manager initialized successfully
+2025-12-04 17:29:31,043 - INFO - ============================================================
+2025-12-04 17:29:31,043 - INFO - Initializing RAG System
+2025-12-04 17:29:31,043 - INFO - ============================================================
+2025-12-04 17:29:31,043 - INFO - Initialized DocumentProcessor with folder: C:\work\chatbot latest\docs
+2025-12-04 17:29:31,044 - INFO - Initialized SemanticChunker (pure semantic mode, threshold=0.7)
+2025-12-04 17:29:31,044 - INFO - Loading sentence embedding model for semantic analysis...
+2025-12-04 17:29:33,023 - INFO - Use pytorch device_name: cuda:0
+2025-12-04 17:29:33,023 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-12-04 17:29:37,812 - INFO - Sentence embedding model loaded
+2025-12-04 17:29:37,813 - INFO - Loading embedding model: BAAI/bge-base-en-v1.5
+2025-12-04 17:29:37,815 - INFO - Use pytorch device_name: cuda:0
+2025-12-04 17:29:37,816 - INFO - Load pretrained SentenceTransformer: BAAI/bge-base-en-v1.5
+2025-12-04 17:29:42,182 - INFO - Embedding model loaded successfully
+2025-12-04 17:29:42,182 - INFO - Initialized LLMEngine (model=gpt-oss:20b, url=http://localhost:11434)
+2025-12-04 17:29:42,183 - INFO - RAG System initialized
+2025-12-04 17:29:42,184 - INFO - Starting system initialization
+2025-12-04 17:29:42,184 - INFO - Loading LLM model
+2025-12-04 17:29:42,184 - INFO - Checking Ollama connection and model: gpt-oss:20b
+2025-12-04 17:29:44,220 - INFO - Available Ollama models: ['gpt-oss:20b']
+2025-12-04 17:29:44,220 - INFO - Ollama model 'gpt-oss:20b' is ready
+2025-12-04 17:29:44,221 - INFO - LLM model loaded successfully
+2025-12-04 17:29:44,221 - INFO - Loading documents
+2025-12-04 17:29:44,222 - INFO - Starting document loading from: C:\work\chatbot latest\docs
+2025-12-04 17:29:44,246 - INFO - Loaded: Asset Module (5.10).docx (4461 chars)
+2025-12-04 17:29:44,282 - INFO - Loaded: Attendance Module (5.10).docx (9436 chars)
+2025-12-04 17:29:44,318 - INFO - Loaded: Attendance Module.docx (11343 chars)
+2025-12-04 17:29:44,333 - INFO - Loaded: Desk Management (5.10).docx (1151 chars)
+2025-12-04 17:29:44,372 - INFO - Loaded: Employee Module (5.10).docx (6817 chars)
+2025-12-04 17:29:44,402 - INFO - Loaded: Employee Separation Module (5.10).docx (4423 chars)
+2025-12-04 17:29:44,457 - INFO - Loaded: ESS User Manual.docx (14168 chars)
+2025-12-04 17:29:44,484 - INFO - Loaded: Expense Module (5.10).docx (3905 chars)
+2025-12-04 17:29:44,505 - INFO - Loaded: Helpdesk Module (5.10).docx (3106 chars)
+2025-12-04 17:29:44,532 - INFO - Loaded: Leave Module (5.10).docx (7711 chars)
+2025-12-04 17:29:44,548 - INFO - Loaded: Leave Module.docx (5125 chars)
+2025-12-04 17:29:44,563 - INFO - Loaded: Letter Module (5.10).docx (2411 chars)
+2025-12-04 17:29:44,590 - INFO - Loaded: Manpower Budgeting Module (5.10).docx (3930 chars)
+2025-12-04 17:29:44,604 - INFO - Loaded: Onboarding Module (5.10).docx (2641 chars)
+2025-12-04 17:29:44,708 - INFO - Loaded: Payroll Module (5.10).docx (23938 chars)
+2025-12-04 17:29:44,731 - INFO - Loaded: Performance Module (8.2).docx (3989 chars)
+2025-12-04 17:29:44,789 - INFO - Loaded: Recruitment Module (5.10).docx (12016 chars)
+2025-12-04 17:29:44,799 - INFO - Loaded: Scheduled Alert Module (5.10).docx (1766 chars)
+2025-12-04 17:29:44,810 - INFO - Loaded: Scheduled Report Module (5.10).docx (1427 chars)
+2025-12-04 17:29:44,821 - INFO - Loaded: Travel Module (5.10).docx (3825 chars)
+2025-12-04 17:29:44,821 - INFO - Total documents loaded: 20
+2025-12-04 17:29:44,822 - INFO - Creating document chunks
+2025-12-04 17:29:44,823 - INFO - Creating semantic chunks from 20 documents
+2025-12-04 17:29:45,258 - INFO - Total chunks created: 260
+2025-12-04 17:29:45,259 - INFO - Building vector index
+2025-12-04 17:29:45,260 - INFO - Loading existing FAISS index and chunks
+2025-12-04 17:29:45,293 - INFO - Loaded 260 vectors and 260 chunks
+2025-12-04 17:29:45,293 - INFO - Loaded existing FAISS index from disk
+2025-12-04 17:29:45,294 - INFO - Initialized SemanticRetriever
+2025-12-04 17:29:45,294 - INFO - Retriever initialized
+2025-12-04 17:29:45,294 - INFO - ============================================================
+2025-12-04 17:29:45,295 - INFO - RAG System initialization complete
+2025-12-04 17:29:45,296 - INFO - Documents: 20
+2025-12-04 17:29:45,296 - INFO - Chunks: 260
+2025-12-04 17:29:45,297 - INFO - ============================================================
+2025-12-04 17:29:45,297 - INFO - RAG system initialized successfully
+2025-12-04 17:29:45,297 - INFO - Started session cleanup task (interval: 60s)
+2025-12-04 17:30:06,477 - INFO - ================================================================================
+2025-12-04 17:30:06,477 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-04 17:30:06,477 - INFO - ================================================================================
+2025-12-04 17:30:06,477 - INFO - Query: 'fegwwieu'
+2025-12-04 17:30:06,477 - INFO - User: admin@PatelHospital.com1
+2025-12-04 17:30:06,477 - INFO - Max Tokens: 750, Temperature: 0.1, Top-P: 0.7
+2025-12-04 17:30:06,485 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:30:06,486 - INFO - HEADERS RECEIVED:
+2025-12-04 17:30:06,486 - INFO -   X-Client-ID: 1 (informational only)
+2025-12-04 17:30:06,486 - INFO -   X-Company-Pin: 11032 (used for auth)
+2025-12-04 17:30:06,486 - INFO -   X-API-Key: test1234567890123456... (used for auth)
+2025-12-04 17:30:06,486 - INFO -   X-User-Name: admin@PatelHospital.com1 (informational only)
+2025-12-04 17:30:06,486 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:30:06,486 - INFO - 🔐 AUTHENTICATING CLIENT...
+2025-12-04 17:30:06,514 - INFO - PostgreSQL manager initialized
+2025-12-04 17:30:06,568 - INFO - Connected to PostgreSQL database
+2025-12-04 17:30:06,569 - INFO - ✅ Connected to PostgreSQL database
+2025-12-04 17:30:06,569 - INFO - 🔍 Validating credentials (Company PIN + API Key)
+2025-12-04 17:30:06,569 - INFO - 🔍 Authenticating with:
+2025-12-04 17:30:06,569 - INFO -    Company PIN: '11032' (length: 5)
+2025-12-04 17:30:06,569 - INFO -    API Key: 'test1234567890123456...' (length: 34)
+2025-12-04 17:30:06,578 - INFO - ✅ Client authenticated successfully from database (client_id: 1)
+2025-12-04 17:30:06,578 - INFO - ✅ AUTHENTICATION SUCCESSFUL
+2025-12-04 17:30:06,578 - INFO -    Client ID: 1 (from database)
+2025-12-04 17:30:06,578 - INFO -    Company PIN: 11032
+2025-12-04 17:30:06,578 - INFO -    API Key: test1234567890123456...
+2025-12-04 17:30:06,578 - INFO -    User: admin@PatelHospital.com1
+2025-12-04 17:30:06,578 - INFO -    Active: True
+2025-12-04 17:30:06,578 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:30:06,578 - INFO - 🔢 TOKEN LIMIT CHECK
+2025-12-04 17:30:06,587 - INFO -    Token Limit: 100,000
+2025-12-04 17:30:06,587 - INFO -    Tokens Used: 2,174
+2025-12-04 17:30:06,587 - INFO -    Remaining: 97,826
+2025-12-04 17:30:06,587 - INFO -    Allowed: True
+2025-12-04 17:30:06,588 - INFO - ✅ Token limit check passed
+2025-12-04 17:30:06,588 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:30:06,588 - INFO - 📋 SESSION MANAGEMENT
+2025-12-04 17:30:06,588 - INFO - Session ID from cookie: None (new session)
+2025-12-04 17:30:06,588 - INFO - Created new session: ed809aa8-938e-43c6-8c21-3fa012448ccd
+2025-12-04 17:30:06,588 - INFO - Created session ed809aa8-938e-43c6-8c21-3fa012448ccd at 2025-12-04T17:30:06.588705
+2025-12-04 17:30:06,590 - INFO - 🆕 Created new in-memory session: ed809aa8-938e-43c6-8c21-3fa012448ccd
+2025-12-04 17:30:06,590 - INFO - 💾 Saving session to PostgreSQL database...
+2025-12-04 17:30:06,595 - INFO - ✅ Session created in database: ed809aa8-938e-43c6-8c21-3fa012448ccd (db_id=32, user=admin@PatelHospital.com1, client=1)
+2025-12-04 17:30:06,595 - INFO - ✅ Session saved to database
+2025-12-04 17:30:06,595 - INFO -    Table: chatbot.sessions
+2025-12-04 17:30:06,595 - INFO -    Session DB ID: 32
+2025-12-04 17:30:06,595 - INFO -    Session UUID: ed809aa8-938e-43c6-8c21-3fa012448ccd
+2025-12-04 17:30:06,596 - INFO -    Username: admin@PatelHospital.com1
+2025-12-04 17:30:06,596 - INFO -    Client ID: 1
+2025-12-04 17:30:06,597 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:30:06,597 - INFO - 💬 PROCESSING QUERY
+2025-12-04 17:30:06,597 - INFO - Added user message to session (total messages: 1)
+2025-12-04 17:30:06,597 - INFO - No previous context (first message in session)
+2025-12-04 17:30:06,597 - INFO - 🤖 Generating response using RAG system...
+2025-12-04 17:30:06,597 - INFO - ============================================================
+2025-12-04 17:30:06,597 - INFO - Processing query: 'fegwwieu'
+2025-12-04 17:30:06,597 - INFO - Params: max_tokens=750, temp=0.1, top_p=0.7
+2025-12-04 17:30:06,597 - INFO - Retrieving relevant documents
+2025-12-04 17:30:06,597 - INFO - Semantic search for: 'fegwwieu' (top_k=10)
+2025-12-04 17:30:06,642 - INFO - Semantic search found 20 candidates
+2025-12-04 17:30:06,643 - INFO - Found 20 semantic matches
+2025-12-04 17:30:06,643 - INFO - Returning 20 results
+2025-12-04 17:30:06,644 - INFO - Score stats: mean=0.440, std=0.010
+2025-12-04 17:30:06,644 - INFO - Dynamic threshold: 0.600
+2025-12-04 17:30:06,644 - INFO - Filtered to 0 relevant documents
+2025-12-04 17:30:06,644 - INFO - Using top 0 documents
+2025-12-04 17:30:06,644 - WARNING - No documents passed threshold
+2025-12-04 17:30:06,644 - INFO - >>> DECISION: Using GENERAL RESPONSE (no relevant docs)
+2025-12-04 17:30:06,645 - INFO - Generating general response (no relevant documents found)
+2025-12-04 17:30:06,645 - INFO - ============================================================
+2025-12-04 17:30:06,645 - INFO - GENERAL PROMPT SENT TO LLM:
+2025-12-04 17:30:06,646 - INFO - 
+You are a friendly AI assistant for FlowHCM, an HR management software company. Have a natural, helpful conversation with users. 
+    RULES: Keep responses concise and conversational. 
+           Do not create any tables when asked. 
+           Do not write any HTML code no matter what. 
+           Do not use bold text.
+User: fegwwieu
+Assistant:
+2025-12-04 17:30:06,646 - INFO - ============================================================
+2025-12-04 17:30:14,886 - INFO - ✅ Response generated (78 characters, 0 source documents)
+2025-12-04 17:30:14,886 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:30:14,886 - INFO - 🔢 TOKEN COUNTING
+2025-12-04 17:30:19,048 - INFO -    Input tokens: 4
+2025-12-04 17:30:19,048 - INFO -    Output tokens: 19
+2025-12-04 17:30:19,048 - INFO -    Total tokens: 23
+2025-12-04 17:30:19,048 - INFO - Added assistant response to session (total messages: 2)
+2025-12-04 17:30:19,048 - INFO - ✅ Updated in-memory session
+2025-12-04 17:30:19,048 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:30:19,048 - INFO - 💾 SAVING TO DATABASE
+2025-12-04 17:30:19,048 - INFO - Saving conversation to PostgreSQL...
+2025-12-04 17:30:19,048 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-04 17:30:19,072 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 32, tokens: 23)
+2025-12-04 17:30:19,072 - INFO - ✅ Conversation saved to database
+2025-12-04 17:30:19,072 - INFO -    Table: chatbot.conversation_dec_2025
+2025-12-04 17:30:19,072 - INFO -    Session DB ID: 32
+2025-12-04 17:30:19,072 - INFO -    Session UUID: ed809aa8-938e-43c6-8c21-3fa012448ccd
+2025-12-04 17:30:19,072 - INFO -    Tokens Used: 23
+2025-12-04 17:30:19,072 - INFO -    User Message: fegwwieu...
+2025-12-04 17:30:19,072 - INFO -    Bot Response: I’m not sure I understand that. Could you let me k...
+2025-12-04 17:30:19,072 - INFO - Updating token usage for client 1...
+2025-12-04 17:30:19,076 - INFO - ✅ Token usage updated for client 1: +23 tokens (dec_2025)
+2025-12-04 17:30:19,076 - INFO - ✅ Token usage updated
+2025-12-04 17:30:19,076 - INFO -    Client ID: 1
+2025-12-04 17:30:19,076 - INFO -    Tokens Added: 23
+2025-12-04 17:30:19,076 - INFO -    New Total Usage: 2,197 / 100,000
+2025-12-04 17:30:19,078 - INFO -    Remaining: 97,803
+2025-12-04 17:30:19,078 - INFO - Updating session activity timestamp...
+2025-12-04 17:30:19,079 - INFO - ✅ Session activity updated in database (session: ed809aa8-938e-43c6-8c21-3fa012448ccd)
+2025-12-04 17:30:19,079 - INFO - ✅ Session activity updated
+2025-12-04 17:30:19,079 - INFO - Disconnected from PostgreSQL database
+2025-12-04 17:30:19,079 - INFO - ✅ Disconnected from PostgreSQL database
+2025-12-04 17:30:19,081 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:30:19,081 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-04 17:30:19,081 - INFO -    Session ID: ed809aa8-938e-43c6-8c21-3fa012448ccd
+2025-12-04 17:30:19,081 - INFO -    Source Documents: 0
+2025-12-04 17:30:19,081 - INFO -    Response Length: 78 characters
+2025-12-04 17:30:19,081 - INFO - ================================================================================
+2025-12-04 17:34:27,161 - INFO - ================================================================================
+2025-12-04 17:34:27,161 - INFO - NEW QUERY REQUEST RECEIVED
+2025-12-04 17:34:27,162 - INFO - ================================================================================
+2025-12-04 17:34:27,163 - INFO - Query: 'hihi'
+2025-12-04 17:34:27,163 - INFO - User: admin@PatelHospital.com1
+2025-12-04 17:34:27,163 - INFO - Max Tokens: 750, Temperature: 0.1, Top-P: 0.7
+2025-12-04 17:34:27,163 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:34:27,163 - INFO - HEADERS RECEIVED:
+2025-12-04 17:34:27,163 - INFO -   X-Client-ID: 1 (informational only)
+2025-12-04 17:34:27,163 - INFO -   X-Company-Pin: 11032 (used for auth)
+2025-12-04 17:34:27,163 - INFO -   X-API-Key: test1234567890123456... (used for auth)
+2025-12-04 17:34:27,163 - INFO -   X-User-Name: admin@PatelHospital.com1 (informational only)
+2025-12-04 17:34:27,163 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:34:27,163 - INFO - 🔐 AUTHENTICATING CLIENT...
+2025-12-04 17:34:27,163 - INFO - PostgreSQL manager initialized
+2025-12-04 17:34:27,211 - INFO - Connected to PostgreSQL database
+2025-12-04 17:34:27,211 - INFO - ✅ Connected to PostgreSQL database
+2025-12-04 17:34:27,212 - INFO - 🔍 Validating credentials (Company PIN + API Key)
+2025-12-04 17:34:27,212 - INFO - 🔍 Authenticating with:
+2025-12-04 17:34:27,213 - INFO -    Company PIN: '11032' (length: 5)
+2025-12-04 17:34:27,213 - INFO -    API Key: 'test1234567890123456...' (length: 34)
+2025-12-04 17:34:27,219 - INFO - ✅ Client authenticated successfully from database (client_id: 1)
+2025-12-04 17:34:27,219 - INFO - ✅ AUTHENTICATION SUCCESSFUL
+2025-12-04 17:34:27,219 - INFO -    Client ID: 1 (from database)
+2025-12-04 17:34:27,220 - INFO -    Company PIN: 11032
+2025-12-04 17:34:27,220 - INFO -    API Key: test1234567890123456...
+2025-12-04 17:34:27,220 - INFO -    User: admin@PatelHospital.com1
+2025-12-04 17:34:27,221 - INFO -    Active: True
+2025-12-04 17:34:27,221 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:34:27,221 - INFO - 🔢 TOKEN LIMIT CHECK
+2025-12-04 17:34:27,221 - INFO -    Token Limit: 100,000
+2025-12-04 17:34:27,221 - INFO -    Tokens Used: 2,197
+2025-12-04 17:34:27,221 - INFO -    Remaining: 97,803
+2025-12-04 17:34:27,221 - INFO -    Allowed: True
+2025-12-04 17:34:27,225 - INFO - ✅ Token limit check passed
+2025-12-04 17:34:27,225 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:34:27,225 - INFO - 📋 SESSION MANAGEMENT
+2025-12-04 17:34:27,225 - INFO - Session ID from cookie: None (new session)
+2025-12-04 17:34:27,226 - INFO - Created new session: 908e09e7-fdb9-4d1d-8d38-89bcce98c7ee
+2025-12-04 17:34:27,226 - INFO - Created session 908e09e7-fdb9-4d1d-8d38-89bcce98c7ee at 2025-12-04T17:34:27.226593
+2025-12-04 17:34:27,226 - INFO - 🆕 Created new in-memory session: 908e09e7-fdb9-4d1d-8d38-89bcce98c7ee
+2025-12-04 17:34:27,227 - INFO - 💾 Saving session to PostgreSQL database...
+2025-12-04 17:34:27,229 - INFO - ✅ Session created in database: 908e09e7-fdb9-4d1d-8d38-89bcce98c7ee (db_id=33, user=admin@PatelHospital.com1, client=1)
+2025-12-04 17:34:27,229 - INFO - ✅ Session saved to database
+2025-12-04 17:34:27,229 - INFO -    Table: chatbot.sessions
+2025-12-04 17:34:27,229 - INFO -    Session DB ID: 33
+2025-12-04 17:34:27,229 - INFO -    Session UUID: 908e09e7-fdb9-4d1d-8d38-89bcce98c7ee
+2025-12-04 17:34:27,229 - INFO -    Username: admin@PatelHospital.com1
+2025-12-04 17:34:27,229 - INFO -    Client ID: 1
+2025-12-04 17:34:27,229 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:34:27,229 - INFO - 💬 PROCESSING QUERY
+2025-12-04 17:34:27,229 - INFO - Added user message to session (total messages: 1)
+2025-12-04 17:34:27,229 - INFO - No previous context (first message in session)
+2025-12-04 17:34:27,229 - INFO - 🤖 Generating response using RAG system...
+2025-12-04 17:34:27,229 - INFO - ============================================================
+2025-12-04 17:34:27,229 - INFO - Processing query: 'hihi'
+2025-12-04 17:34:27,229 - INFO - Params: max_tokens=750, temp=0.1, top_p=0.7
+2025-12-04 17:34:27,229 - INFO - Retrieving relevant documents
+2025-12-04 17:34:27,229 - INFO - Semantic search for: 'hihi' (top_k=10)
+2025-12-04 17:34:27,262 - INFO - Semantic search found 20 candidates
+2025-12-04 17:34:27,262 - INFO - Found 20 semantic matches
+2025-12-04 17:34:27,262 - INFO - Returning 20 results
+2025-12-04 17:34:27,262 - INFO - Score stats: mean=0.503, std=0.015
+2025-12-04 17:34:27,262 - INFO - Dynamic threshold: 0.600
+2025-12-04 17:34:27,267 - INFO - Filtered to 0 relevant documents
+2025-12-04 17:34:27,267 - INFO - Using top 0 documents
+2025-12-04 17:34:27,267 - WARNING - No documents passed threshold
+2025-12-04 17:34:27,267 - INFO - >>> DECISION: Using GENERAL RESPONSE (no relevant docs)
+2025-12-04 17:34:27,267 - INFO - Generating general response (no relevant documents found)
+2025-12-04 17:34:27,267 - INFO - ============================================================
+2025-12-04 17:34:27,268 - INFO - GENERAL PROMPT SENT TO LLM:
+2025-12-04 17:34:27,268 - INFO - 
+You are a friendly AI assistant for FlowHCM, an HR management software company. Have a natural, helpful conversation with users. 
+    RULES: Keep responses concise and conversational. 
+           Do not create any tables when asked. 
+           Do not write any HTML code no matter what. 
+           Do not use bold text.
+User: hihi
+Assistant:
+2025-12-04 17:34:27,268 - INFO - ============================================================
+2025-12-04 17:34:30,482 - INFO - ✅ Response generated (36 characters, 0 source documents)
+2025-12-04 17:34:30,482 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:34:30,483 - INFO - 🔢 TOKEN COUNTING
+2025-12-04 17:34:30,483 - INFO -    Input tokens: 2
+2025-12-04 17:34:30,484 - INFO -    Output tokens: 10
+2025-12-04 17:34:30,484 - INFO -    Total tokens: 12
+2025-12-04 17:34:30,484 - INFO - Added assistant response to session (total messages: 2)
+2025-12-04 17:34:30,484 - INFO - ✅ Updated in-memory session
+2025-12-04 17:34:30,484 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:34:30,484 - INFO - 💾 SAVING TO DATABASE
+2025-12-04 17:34:30,484 - INFO - Saving conversation to PostgreSQL...
+2025-12-04 17:34:30,486 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-04 17:34:30,490 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 33, tokens: 12)
+2025-12-04 17:34:30,490 - INFO - ✅ Conversation saved to database
+2025-12-04 17:34:30,490 - INFO -    Table: chatbot.conversation_dec_2025
+2025-12-04 17:34:30,490 - INFO -    Session DB ID: 33
+2025-12-04 17:34:30,490 - INFO -    Session UUID: 908e09e7-fdb9-4d1d-8d38-89bcce98c7ee
+2025-12-04 17:34:30,490 - INFO -    Tokens Used: 12
+2025-12-04 17:34:30,490 - INFO -    User Message: hihi...
+2025-12-04 17:34:30,490 - INFO -    Bot Response: Hey there! How can I help you today?...
+2025-12-04 17:34:30,490 - INFO - Updating token usage for client 1...
+2025-12-04 17:34:30,492 - INFO - ✅ Token usage updated for client 1: +12 tokens (dec_2025)
+2025-12-04 17:34:30,492 - INFO - ✅ Token usage updated
+2025-12-04 17:34:30,492 - INFO -    Client ID: 1
+2025-12-04 17:34:30,492 - INFO -    Tokens Added: 12
+2025-12-04 17:34:30,492 - INFO -    New Total Usage: 2,209 / 100,000
+2025-12-04 17:34:30,493 - INFO -    Remaining: 97,791
+2025-12-04 17:34:30,493 - INFO - Updating session activity timestamp...
+2025-12-04 17:34:30,494 - INFO - ✅ Session activity updated in database (session: 908e09e7-fdb9-4d1d-8d38-89bcce98c7ee)
+2025-12-04 17:34:30,494 - INFO - ✅ Session activity updated
+2025-12-04 17:34:30,494 - INFO - Disconnected from PostgreSQL database
+2025-12-04 17:34:30,494 - INFO - ✅ Disconnected from PostgreSQL database
+2025-12-04 17:34:30,494 - INFO - --------------------------------------------------------------------------------
+2025-12-04 17:34:30,494 - INFO - ✅ QUERY PROCESSED SUCCESSFULLY
+2025-12-04 17:34:30,494 - INFO -    Session ID: 908e09e7-fdb9-4d1d-8d38-89bcce98c7ee
+2025-12-04 17:34:30,494 - INFO -    Source Documents: 0
+2025-12-04 17:34:30,494 - INFO -    Response Length: 36 characters
+2025-12-04 17:34:30,494 - INFO - ================================================================================

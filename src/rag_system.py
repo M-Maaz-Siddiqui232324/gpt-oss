@@ -20,26 +20,63 @@ logger = logging.getLogger(__name__)
 
 
 class RAGSystem:
-    """Complete RAG system"""
+    """Complete RAG system with per-client embedding support"""
     
     def __init__(self):
         logger.info("="*60)
-        logger.info("Initializing RAG System")
+        logger.info("Initializing RAG System (Per-Client Mode)")
         logger.info("="*60)
         
         self.doc_processor = DocumentProcessor(DOCS_FOLDER)
         self.chunker = SemanticChunker(similarity_threshold=SEMANTIC_SIMILARITY_THRESHOLD)
-        self.vector_store = VectorStore(EMBEDDING_MODEL, FAISS_INDEX_FILE, CHUNKS_FILE)
+        self.vector_store = VectorStore(EMBEDDING_MODEL)  # No default paths
         self.llm_engine = LLMEngine(MODEL_NAME, OLLAMA_BASE_URL)
         self.retriever = None
+        self.current_client = None
         
         self.documents = []
         self.chunks = []
         
-        logger.info("RAG System initialized")
+        # Load LLM immediately
+        logger.info("Loading LLM model")
+        if not self.llm_engine.load_model():
+            logger.error("Failed to load LLM model")
+        else:
+            logger.info("LLM model loaded successfully")
+        
+        logger.info("RAG System initialized (client indexes loaded on-demand)")
+    
+    def load_client_index(self, company_pin: str) -> bool:
+        """
+        Load a specific client's index
+        
+        Args:
+            company_pin: Client's company PIN
+            
+        Returns:
+            True if loaded successfully, False otherwise
+        """
+        logger.info(f"Loading index for client: {company_pin}")
+        
+        # Set client-specific paths
+        self.vector_store.set_client_paths(company_pin)
+        self.current_client = company_pin
+        
+        # Try to load existing index
+        if self.vector_store._load_index():
+            logger.info(f"✅ Loaded existing index for client {company_pin}")
+            logger.info(f"   Vectors: {self.vector_store.index.ntotal}")
+            logger.info(f"   Chunks: {len(self.vector_store.chunks)}")
+            
+            # Update retriever
+            self.retriever = SemanticRetriever(self.vector_store, self.vector_store.chunks)
+            return True
+        else:
+            logger.warning(f"⚠️  No existing index found for client {company_pin}")
+            return False
     
     def initialize(self) -> bool:
-        """Initialize all components"""
+        """Initialize all components (legacy method, kept for compatibility)"""
         logger.info("Starting system initialization")
         
         # Load LLM

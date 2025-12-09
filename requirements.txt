@@ -18,6 +18,7 @@ psycopg2-binary>=2.9.0
 
 # Document processing
 python-docx>=0.8.11
+PyPDF2>=3.0.0
 
 # Token counting
 tiktoken>=0.5.0
