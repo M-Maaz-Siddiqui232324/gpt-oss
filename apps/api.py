@@ -291,45 +291,9 @@ async def query(
         
         logger.info(f"Client authenticated: {company_pin} (user: {x_user_name})")
         
-        # Load client-specific index or create from docs folder
-        index_loaded = rag_system.load_client_index(company_pin)
-        
-        if not index_loaded:
-            # No index exists, create one from docs folder
-            logger.info(f"No index found for {company_pin}, creating from docs folder")
-            folder_documents = rag_system.doc_processor.load_documents()
-            
-            if folder_documents:
-                # Create chunks from folder documents
-                folder_chunks = rag_system.chunker.create_chunks(folder_documents)
-                
-                if folder_chunks:
-                    # Set client paths and build index
-                    rag_system.vector_store.set_client_paths(company_pin)
-                    success = rag_system.vector_store.build_index(folder_chunks, force_rebuild=True)
-                    
-                    if success:
-                        # Update retriever
-                        rag_system.retriever = SemanticRetriever(rag_system.vector_store, rag_system.vector_store.chunks)
-                        logger.info(f"Created initial index for {company_pin} from docs folder")
-                    else:
-                        logger.error("Failed to build initial index")
-                        db.disconnect()
-                        clear_client_context()
-                        return QueryResponse(
-                            response="Failed to initialize the system. Please try again.",
-                            session_id=""
-                        )
-                else:
-                    logger.warning("No chunks created from folder documents")
-            else:
-                logger.warning("No documents found in docs folder")
-                db.disconnect()
-                clear_client_context()
-                return QueryResponse(
-                    response="No documents available. Please contact your administrator.",
-                    session_id=""
-                )
+        # Load client-specific HR policy index (if exists)
+        # Note: General index is already loaded during RAG system initialization
+        rag_system.load_client_index(company_pin)
         
         # Check token limit
         token_status = db.check_token_limit(authenticated_client_id)
@@ -608,7 +572,6 @@ async def sync_single_document(request_body: SyncDocumentRequest):
         # Set client context for logging
         set_client_context(request_body.company_pin)
         
-        # Authenticate client
         db = PostgresManager(POSTGRES_CONNECTION_STRING)
         
         if not db.connect():
@@ -670,42 +633,36 @@ async def sync_single_document(request_body: SyncDocumentRequest):
                 'path': f'api_sync/{doc.file_name}',
                 'announcement_id': doc.announcement_id,
                 'document_title': doc.document_title
+            
             })
         
-        # Load all documents from docs/ folder
-        folder_documents = rag_system.doc_processor.load_documents()
+
         
-        # Combine folder documents + API documents
-        all_documents = folder_documents + api_documents
-        
-        # Chunk all documents
+        # Chunk only API documents (HR policies)
         chunker = SemanticChunker(similarity_threshold=SEMANTIC_SIMILARITY_THRESHOLD)
         
-        all_chunks = chunker.create_chunks(all_documents)
+        hr_policy_chunks = chunker.create_chunks(api_documents)
         
-        if not all_chunks:
-            logger.error("No chunks created from documents")
+        if not hr_policy_chunks:
+            logger.error("No chunks created from HR policy documents")
             db.disconnect()
             clear_client_context()
-            raise HTTPException(status_code=400, detail="Failed to create chunks from documents")
+            raise HTTPException(status_code=400, detail="Failed to create chunks from HR policy documents")
         
-        # Rebuild vector store from scratch
-        success = rag_system.vector_store.rebuild_index_from_scratch(all_chunks)
+        # Rebuild client-specific vector store from scratch (HR policies only)
+        success = rag_system.vector_store.rebuild_client_index_from_scratch(hr_policy_chunks)
         
         if not success:
-            logger.error("Failed to rebuild vector store")
+            logger.error("Failed to rebuild client vector store")
             db.disconnect()
             clear_client_context()
-            raise HTTPException(status_code=500, detail="Failed to rebuild vector store")
+            raise HTTPException(status_code=500, detail="Failed to rebuild client vector store")
         
-        # Create/update retriever with new chunks
-        rag_system.retriever = SemanticRetriever(rag_system.vector_store, rag_system.vector_store.chunks)
-        
-        # Store metadata for all API documents (not folder documents)
+        # Store metadata for HR policy documents
         saved_count = 0
         for idx, api_doc in enumerate(api_documents, 1):
             # Count chunks for this document
-            doc_chunks = [c for c in all_chunks if c.source_file == api_doc['name']]
+            doc_chunks = [c for c in hr_policy_chunks if c.source_file == api_doc['name']]
             
             document_id = db.add_document(
                 announcement_id=api_doc['announcement_id'],
@@ -723,19 +680,17 @@ async def sync_single_document(request_body: SyncDocumentRequest):
         
         db.disconnect()
         
-        logger.info(f"Document sync completed: {len(api_documents)} API docs, {len(folder_documents)} folder docs, {len(all_chunks)} chunks")
+        logger.info(f"Document sync completed: {len(api_documents)} HR policy docs, {len(hr_policy_chunks)} chunks")
         
         clear_client_context()
         
         return {
             "success": True,
             "message": f"Successfully synced {len(api_documents)} document(s) (index rebuilt from scratch)",
-            "total_documents": len(all_documents),
-            "folder_documents": len(folder_documents),
             "api_documents": len(api_documents),
             "documents_saved": saved_count,
-            "chunks_created": len(all_chunks),
-            "total_vectors": rag_system.vector_store.index.ntotal,
+            "chunks_created": len(hr_policy_chunks),
+            "total_vectors": rag_system.vector_store.client_index.ntotal if rag_system.vector_store.client_index else 0,
             "rebuild_mode": True
         }
     

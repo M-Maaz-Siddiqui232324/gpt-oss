@@ -22,12 +22,20 @@ FAISS_INDEX_FILE = os.path.join(PROJECT_ROOT, "data", "faiss_index.bin")
 CHUNKS_FILE = os.path.join(PROJECT_ROOT, "data", "document_chunks.pkl")
 
 def get_client_index_path(company_pin: str) -> str:
-    """Get FAISS index path for a specific client"""
-    return os.path.join(DATA_FOLDER, company_pin, "faiss_index.bin")
+    """Get FAISS index path for a specific client (HR policies only)"""
+    return os.path.join(DATA_FOLDER, company_pin, "hr_policies_index.bin")
 
 def get_client_chunks_path(company_pin: str) -> str:
-    """Get chunks file path for a specific client"""
-    return os.path.join(DATA_FOLDER, company_pin, "document_chunks.pkl")
+    """Get chunks file path for a specific client (HR policies only)"""
+    return os.path.join(DATA_FOLDER, company_pin, "hr_policies_chunks.pkl")
+
+def get_general_index_path() -> str:
+    """Get FAISS index path for general docs (shared across all clients)"""
+    return os.path.join(DATA_FOLDER, "general", "docs_index.bin")
+
+def get_general_chunks_path() -> str:
+    """Get chunks file path for general docs (shared across all clients)"""
+    return os.path.join(DATA_FOLDER, "general", "docs_chunks.pkl")
 
 DEFAULT_MAX_TOKENS = 750
 DEFAULT_TEMPERATURE = 0.1

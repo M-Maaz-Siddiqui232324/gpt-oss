@@ -29,9 +29,9 @@ class RAGSystem:
     def __init__(self):
         self.doc_processor = DocumentProcessor(DOCS_FOLDER)
         self.chunker = SemanticChunker(similarity_threshold=SEMANTIC_SIMILARITY_THRESHOLD)
-        self.vector_store = VectorStore(EMBEDDING_MODEL)  # No default paths
+        self.vector_store = VectorStore(EMBEDDING_MODEL)
         self.llm_engine = LLMEngine(MODEL_NAME, OLLAMA_BASE_URL)
-        self.retriever = None
+        self.retriever = SemanticRetriever(self.vector_store)
         self.current_client = None
         
         self.documents = []
@@ -40,10 +40,25 @@ class RAGSystem:
         # Load LLM immediately
         if not self.llm_engine.load_model():
             logger.error("Failed to load LLM model")
+        
+        # Initialize general index from docs folder
+        self._initialize_general_index()
+    
+    def _initialize_general_index(self):
+        """Initialize general index from docs folder (shared across all clients)"""
+        # Try to load existing general index
+        if not self.vector_store._load_general_index():
+            # No general index exists, create one from docs folder
+            folder_documents = self.doc_processor.load_documents()
+            
+            if folder_documents:
+                folder_chunks = self.chunker.create_chunks(folder_documents)
+                if folder_chunks:
+                    self.vector_store.build_general_index(folder_chunks, force_rebuild=True)
     
     def load_client_index(self, company_pin: str) -> bool:
         """
-        Load a specific client's index
+        Load a specific client's HR policy index
         
         Args:
             company_pin: Client's company PIN
@@ -55,13 +70,8 @@ class RAGSystem:
         self.vector_store.set_client_paths(company_pin)
         self.current_client = company_pin
         
-        # Try to load existing index
-        if self.vector_store._load_index():
-            # Update retriever
-            self.retriever = SemanticRetriever(self.vector_store, self.vector_store.chunks)
-            return True
-        else:
-            return False
+        # Try to load existing client index (HR policies)
+        return self.vector_store._load_client_index()
     
 
     
