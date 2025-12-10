@@ -40,8 +40,6 @@ class RAGSystem:
         # Load LLM immediately
         if not self.llm_engine.load_model():
             logger.error("Failed to load LLM model")
-        
-        logger.info("RAG System initialized")
     
     def load_client_index(self, company_pin: str) -> bool:
         """
@@ -59,13 +57,10 @@ class RAGSystem:
         
         # Try to load existing index
         if self.vector_store._load_index():
-            logger.info(f"Loaded index for client: {company_pin}")
-            
             # Update retriever
             self.retriever = SemanticRetriever(self.vector_store, self.vector_store.chunks)
             return True
         else:
-            logger.warning(f"No index found for client: {company_pin}")
             return False
     
 

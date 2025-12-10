@@ -21,23 +21,21 @@ class PostgresManager:
         """
         self.connection_string = connection_string
         self.conn = None
-        logger.info("PostgreSQL manager initialized")
+
     
     def connect(self):
         """Establish database connection"""
         try:
             self.conn = psycopg2.connect(self.connection_string)
-            logger.info("Connected to PostgreSQL database")
             return True
         except Exception as e:
-            logger.error(f"Failed to connect to PostgreSQL: {e}", exc_info=True)
+            logger.error(f"Failed to connect to PostgreSQL: {e}")
             return False
     
     def disconnect(self):
         """Close database connection"""
         if self.conn:
             self.conn.close()
-            logger.info("Disconnected from PostgreSQL database")
     
     def authenticate_client(self, company_pin: str, api_key: str) -> Optional[Dict[str, Any]]:
         """

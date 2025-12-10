@@ -24,22 +24,16 @@ class SemanticChunker:
     
     def __init__(self, chunk_size: int = None, overlap: int = None, similarity_threshold: float = 0.7):
         self.similarity_threshold = similarity_threshold
-        logger.info(f"Initialized SemanticChunker (pure semantic mode, threshold={similarity_threshold})")
-        logger.info("Loading sentence embedding model for semantic analysis...")
         self.encoder = SentenceTransformer('all-MiniLM-L6-v2')  # Fast, lightweight model
-        logger.info("Sentence embedding model loaded")
     
     def create_chunks(self, documents: List[dict]) -> List[DocumentChunk]:
         """Create semantic chunks from documents"""
-        logger.info(f"Creating semantic chunks from {len(documents)} documents")
         chunks = []
         
         for doc in documents:
             doc_chunks = self._chunk_document(doc)
             chunks.extend(doc_chunks)
-            logger.debug(f"Created {len(doc_chunks)} chunks from {doc['name']}")
         
-        logger.info(f"Total chunks created: {len(chunks)}")
         return chunks
     
     def _chunk_document(self, doc: dict) -> List[DocumentChunk]:

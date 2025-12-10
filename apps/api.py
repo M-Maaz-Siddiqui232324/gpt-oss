@@ -291,17 +291,45 @@ async def query(
         
         logger.info(f"Client authenticated: {company_pin} (user: {x_user_name})")
         
-        # Load client-specific index
+        # Load client-specific index or create from docs folder
         index_loaded = rag_system.load_client_index(company_pin)
         
         if not index_loaded:
-            logger.warning(f"No index found for client {company_pin}")
-            db.disconnect()
-            clear_client_context()
-            return QueryResponse(
-                response="No documents have been synced for your account yet. Please sync your HR policy documents first.",
-                session_id=""
-            )
+            # No index exists, create one from docs folder
+            logger.info(f"No index found for {company_pin}, creating from docs folder")
+            folder_documents = rag_system.doc_processor.load_documents()
+            
+            if folder_documents:
+                # Create chunks from folder documents
+                folder_chunks = rag_system.chunker.create_chunks(folder_documents)
+                
+                if folder_chunks:
+                    # Set client paths and build index
+                    rag_system.vector_store.set_client_paths(company_pin)
+                    success = rag_system.vector_store.build_index(folder_chunks, force_rebuild=True)
+                    
+                    if success:
+                        # Update retriever
+                        rag_system.retriever = SemanticRetriever(rag_system.vector_store, rag_system.vector_store.chunks)
+                        logger.info(f"Created initial index for {company_pin} from docs folder")
+                    else:
+                        logger.error("Failed to build initial index")
+                        db.disconnect()
+                        clear_client_context()
+                        return QueryResponse(
+                            response="Failed to initialize the system. Please try again.",
+                            session_id=""
+                        )
+                else:
+                    logger.warning("No chunks created from folder documents")
+            else:
+                logger.warning("No documents found in docs folder")
+                db.disconnect()
+                clear_client_context()
+                return QueryResponse(
+                    response="No documents available. Please contact your administrator.",
+                    session_id=""
+                )
         
         # Check token limit
         token_status = db.check_token_limit(authenticated_client_id)

@@ -55,8 +55,21 @@ CREATE INDEX IF NOT EXISTS idx_conversation_dec_2025_session_id ON chatbot.conve
 CREATE INDEX IF NOT EXISTS idx_conversation_dec_2025_created_at ON chatbot.conversation_dec_2025(created_at);
 CREATE INDEX IF NOT EXISTS idx_tokens_client_month ON chatbot.tokens(fk_client_id, month_year);
 
+-- Documents table for tracking synced HR policy documents
+CREATE TABLE IF NOT EXISTS chatbot.documents (
+    document_id SERIAL PRIMARY KEY,
+    announcement_id INTEGER NOT NULL,
+    fk_client_id INTEGER NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    document_title VARCHAR(500),
+    file_extension VARCHAR(10),
+    chunk_count INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    synced_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (fk_client_id) REFERENCES chatbot.clients(client_id) ON DELETE CASCADE,
+    UNIQUE(announcement_id, fk_client_id)
+);
 
-INSERT INTO chatbot.clients (company_pin, api_key, is_active) 
-VALUES ('11032', 'test123456789012345678901234567890', TRUE)
-ON CONFLICT (company_pin) DO NOTHING;
+CREATE INDEX IF NOT EXISTS idx_documents_client_id ON chatbot.documents(fk_client_id);
+CREATE INDEX IF NOT EXISTS idx_documents_announcement_id ON chatbot.documents(announcement_id);
 

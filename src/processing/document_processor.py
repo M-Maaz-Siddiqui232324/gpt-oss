@@ -28,12 +28,10 @@ class DocumentProcessor:
     
     def __init__(self, docs_folder: str):
         self.docs_folder = docs_folder
-        logger.info(f"Initialized DocumentProcessor with folder: {docs_folder}")
+
     
     def load_documents(self) -> List[Dict]:
         """Load all documents from the docs folder"""
-        logger.info(f"Starting document loading from: {self.docs_folder}")
-        
         if not os.path.exists(self.docs_folder):
             logger.error(f"Docs folder not found: {self.docs_folder}")
             return []
@@ -43,7 +41,6 @@ class DocumentProcessor:
         
         for file_path in glob.glob(file_pattern, recursive=True):
             if os.path.isfile(file_path):
-                logger.debug(f"Processing file: {file_path}")
                 content = self._extract_content(file_path)
                 
                 if content and content.strip():
@@ -53,11 +50,10 @@ class DocumentProcessor:
                         'content': content,
                         'type': os.path.splitext(file_path)[1][1:] or 'unknown'
                     })
-                    logger.info(f"Loaded: {os.path.basename(file_path)} ({len(content)} chars)")
                 else:
-                    logger.warning(f"Skipped empty/unreadable: {file_path}")
+                    logger.warning(f"Skipped empty file: {os.path.basename(file_path)}")
         
-        logger.info(f"Total documents loaded: {len(documents)}")
+        logger.info(f"Loaded {len(documents)} documents from folder")
         return documents
     
     def _extract_content(self, file_path: str) -> str:
@@ -66,15 +62,13 @@ class DocumentProcessor:
         
         try:
             if file_ext == '.docx' and DOCX_AVAILABLE:
-                logger.debug(f"Extracting DOCX: {file_path}")
                 doc = Document(file_path)
                 return '\n\n'.join([p.text.strip() for p in doc.paragraphs if p.text.strip()])
             else:
-                logger.warning(f"Unsupported file type: {file_path} (only .docx supported)")
                 return ""
         
         except Exception as e:
-            logger.error(f"Failed to extract from {file_path}: {str(e)}")
+            logger.error(f"Failed to extract {os.path.basename(file_path)}: {str(e)}")
             return ""
     
     def process_base64_document(self, base64_content: str, file_name: str, file_extension: str) -> Optional[str]:
@@ -131,10 +125,7 @@ class DocumentProcessor:
                 if text.strip():
                     text_content.append(text.strip())
             
-            full_text = '\n\n'.join(text_content)
-            logger.info(f"PDF processed: {file_name} ({num_pages} pages, {len(full_text)} chars)")
-            
-            return full_text
+            return '\n\n'.join(text_content)
         
         except Exception as e:
             logger.error(f"Failed to extract PDF {file_name}: {e}")
@@ -152,7 +143,7 @@ class DocumentProcessor:
             
             # Extract text from paragraphs
             paragraphs = []
-            for p in enumerate(doc.paragraphs, 1):
+            for p in doc.paragraphs:
                 if p.text.strip():
                     paragraphs.append(p.text.strip())
             
@@ -164,10 +155,7 @@ class DocumentProcessor:
                         if row_text:
                             paragraphs.append(row_text)
             
-            full_text = '\n\n'.join(paragraphs)
-            logger.info(f"DOCX processed: {file_name} ({len(paragraphs)} paragraphs, {len(full_text)} chars)")
-            
-            return full_text
+            return '\n\n'.join(paragraphs)
         
         except Exception as e:
             logger.error(f"Failed to extract DOCX {file_name}: {e}")

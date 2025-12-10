@@ -31,9 +31,7 @@ class VectorStore:
         self.current_client = None  # Track which client's index is loaded
         
         if VECTOR_SEARCH_AVAILABLE:
-            logger.info(f"Loading embedding model: {embedding_model}")
             self.encoder = SentenceTransformer(embedding_model)
-            logger.info("Embedding model loaded successfully")
         else:
             logger.error("Vector search dependencies not available")
     
@@ -56,33 +54,27 @@ class VectorStore:
         
         # load existing index (unless force_rebuild is True)
         if not force_rebuild and self._load_index():
-            logger.info("Loaded existing FAISS index from disk")
             return True
         
         if not chunks:
-            logger.warning("No chunks available to build index")
             return False
         
-        logger.info(f"Creating embeddings for {len(chunks)} chunks")
         self.chunks = chunks
         
         # Create embeddings
         texts = [chunk.content for chunk in chunks]
         embeddings = self.encoder.encode(
             texts, 
-            show_progress_bar=True, 
+            show_progress_bar=False, 
             convert_to_numpy=True
         )
-        logger.info(f"Embeddings created with shape: {embeddings.shape}")
         
         # Build FAISS index
         dimension = embeddings.shape[1]
-        logger.info(f"Building FAISS index with dimension: {dimension}")
         self.index = faiss.IndexFlatIP(dimension)
         
         faiss.normalize_L2(embeddings)
         self.index.add(embeddings.astype('float32'))
-        logger.info(f"FAISS index built with {self.index.ntotal} vectors")
         
         self._save_index()
         return True
@@ -94,8 +86,6 @@ class VectorStore:
             return []
         
         try:
-            logger.debug(f"Semantic search for: '{query}' (top_k={top_k})")
-            
             query_embedding = self.encoder.encode([query], convert_to_numpy=True)
             faiss.normalize_L2(query_embedding)
             
@@ -106,7 +96,6 @@ class VectorStore:
                 if idx < len(self.chunks) and score > 0:
                     results.append((idx, float(score)))
             
-            logger.info(f"Semantic search found {len(results)} candidates")
             return results
         
         except Exception as e:
@@ -139,13 +128,11 @@ class VectorStore:
         """Load FAISS index and chunks from disk"""
         try:
             if os.path.exists(self.index_file) and os.path.exists(self.chunks_file):
-                logger.info("Loading existing FAISS index and chunks")
                 self.index = faiss.read_index(self.index_file)
                 
                 with open(self.chunks_file, 'rb') as f:
                     self.chunks = pickle.load(f)
                 
-                logger.info(f"Loaded {self.index.ntotal} vectors and {len(self.chunks)} chunks")
                 return True
         
         except Exception as e:
@@ -173,8 +160,6 @@ class VectorStore:
             return False
         
         try:
-            logger.info(f"Rebuilding index from scratch: {len(all_chunks)} chunks")
-            
             # Clear existing index and chunks
             self.index = None
             self.chunks = []
