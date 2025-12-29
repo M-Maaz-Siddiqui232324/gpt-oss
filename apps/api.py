@@ -226,7 +226,6 @@ async def cleanup_sessions_task():
                 
                 if memory_cleaned > 0:
                     logger.info(f"Session cleanup: {memory_cleaned} expired sessions removed from memory")
-                    logger.info("Note: Database sessions are preserved for audit/analytics purposes")
         except Exception as e:
             logger.error(f"Error in cleanup task: {e}", exc_info=True)
 
