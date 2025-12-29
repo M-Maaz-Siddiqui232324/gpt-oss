@@ -25,7 +25,7 @@ from config import (
     RECENT_CONTEXT_EXCHANGES, DOCS_FOLDER, SEMANTIC_SIMILARITY_THRESHOLD
 )
 from rag_system import RAGSystem
-from fastapi_session_manager import FastAPISessionManager, Message
+from fastapi_session_manager import FastAPISessionManager, Message, Session
 from database.postgres_manager import PostgresManager
 from processing.document_processor import DocumentProcessor
 from processing.chunking import SemanticChunker
@@ -221,7 +221,19 @@ async def cleanup_sessions_task():
         await asyncio.sleep(CLEANUP_INTERVAL)
         try:
             if session_manager:
-                session_manager.cleanup_expired_sessions()
+                # Clean up in-memory sessions
+                memory_cleaned = session_manager.cleanup_expired_sessions()
+                
+                # Clean up database sessions
+                db = PostgresManager(POSTGRES_CONNECTION_STRING)
+                if db.connect():
+                    db_cleaned = db.cleanup_expired_sessions_by_username(SESSION_MAX_AGE)
+                    db.disconnect()
+                    
+                    if memory_cleaned > 0 or db_cleaned > 0:
+                        logger.info(f"Session cleanup: {memory_cleaned} from memory, {db_cleaned} from database")
+                else:
+                    logger.error("Failed to connect to database for session cleanup")
         except Exception as e:
             logger.error(f"Error in cleanup task: {e}", exc_info=True)
 
@@ -307,20 +319,48 @@ async def query(
                 session_id=""
             )
         
-        # Get or create session
-        session_id = request.session.get("session_id")
+        # Get or create session based on username and client
+        username = x_user_name or "unknown"
+        
+        # First check database for existing active session
+        existing_session_info = db.get_active_session_for_user(username, authenticated_client_id, SESSION_MAX_AGE)
+        
         session = None
-        if session_id:
-            session = session_manager.get_session(session_id)
+        if existing_session_info:
+            # Try to get session from memory
+            session = session_manager.get_session(existing_session_info['session_id'])
+            
+            if session:
+                logger.info(f"Reusing existing session from memory: {session.session_id}")
+            else:
+                # Session exists in DB but not in memory, create new memory session with same ID
+                session = Session(
+                    session_id=existing_session_info['session_id'],
+                    username=username,
+                    client_id=authenticated_client_id,
+                    created_at=existing_session_info['created_at'].isoformat(),
+                    last_active=existing_session_info['last_active'].isoformat(),
+                    messages=[],
+                    session_db_id=existing_session_info['id']
+                )
+                session_manager.store.sessions[session.session_id] = session
+                logger.info(f"Restored session to memory from DB: {session.session_id}")
         
         if not session:
-            session = session_manager.create_session()
-            request.session["session_id"] = session.session_id
-            session_db_id = db.create_session(session.session_id, x_user_name or "unknown", authenticated_client_id)
+            # Create completely new session
+            session = session_manager.create_session(username, authenticated_client_id)
+            session_db_id = db.create_session(session.session_id, username, authenticated_client_id)
             if session_db_id:
                 session.session_db_id = session_db_id
-                logger.info(f"New session created: {session.session_id}")
+                logger.info(f"New session created: {session.session_id} for user: {username}")
+            else:
+                logger.error("Failed to create session in database")
+                db.disconnect()
+                clear_client_context()
+                return QueryResponse(response="Session creation failed", session_id="")
         
+        # Update browser session cookie to match current session
+        request.session["session_id"] = session.session_id
         # Add user message to session
         user_message = Message(
             role="user",
@@ -424,6 +464,42 @@ async def list_sessions():
     }
 
 
+@app.get("/sessions/user/{username}")
+async def get_user_sessions(
+    username: str,
+    x_company_pin: Optional[str] = Header(None, alias="X-Company-Pin"),
+    x_api_key: Optional[str] = Header(None, alias="X-API-Key")
+):
+    """Get session history for a specific user"""
+    if not x_company_pin or not x_api_key:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    try:
+        db = PostgresManager(POSTGRES_CONNECTION_STRING)
+        if not db.connect():
+            raise HTTPException(status_code=503, detail="Database connection failed")
+        
+        client = db.authenticate_client(x_company_pin, x_api_key)
+        if not client:
+            db.disconnect()
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+        
+        sessions = db.get_user_session_history(username, client['client_id'])
+        db.disconnect()
+        
+        return {
+            "username": username,
+            "sessions": sessions,
+            "count": len(sessions)
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting user sessions: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/chat")
 async def chat(message: str, request: Request):
     """Simple GET endpoint for testing - sends a message and gets response"""
@@ -436,7 +512,10 @@ async def chat(message: str, request: Request):
     logger.info(f"Chat endpoint query: '{message}'")
     
     try:
-        # Get or create session
+        # Get or create session (for testing endpoint, use default user)
+        username = "test_user"
+        client_id = 1  # Default client for testing
+        
         session_id = request.session.get("session_id")
         session = None
         
@@ -444,7 +523,7 @@ async def chat(message: str, request: Request):
             session = session_manager.get_session(session_id)
         
         if not session:
-            session = session_manager.create_session()
+            session = session_manager.create_session(username, client_id)
             request.session["session_id"] = session.session_id
         
         # Get recent context

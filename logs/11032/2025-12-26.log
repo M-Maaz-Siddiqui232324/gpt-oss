@@ -1,0 +1,181 @@
+2025-12-26 17:09:40,252 - INFO - Starting server on 0.0.0.0:8000
+2025-12-26 17:09:40,335 - INFO - Starting FastAPI server
+2025-12-26 17:09:40,336 - INFO - Initialized in-memory session store (max: 10000)
+2025-12-26 17:09:40,336 - INFO - Session manager initialized (PostgreSQL storage)
+2025-12-26 17:09:40,414 - INFO - Use pytorch device_name: cuda:0
+2025-12-26 17:09:40,415 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-12-26 17:09:45,225 - INFO - Use pytorch device_name: cuda:0
+2025-12-26 17:09:45,225 - INFO - Load pretrained SentenceTransformer: BAAI/bge-base-en-v1.5
+2025-12-26 17:09:49,893 - INFO - Initialized LLMEngine (model=gpt-oss:20b, url=http://localhost:11434)
+2025-12-26 17:09:49,894 - INFO - Checking Ollama connection and model: gpt-oss:20b
+2025-12-26 17:09:51,985 - INFO - Available Ollama models: ['gpt-oss:20b']
+2025-12-26 17:09:51,985 - INFO - Ollama model 'gpt-oss:20b' is ready
+2025-12-26 17:09:52,000 - INFO - Server initialized successfully
+2025-12-26 17:33:15,345 - INFO - Query received from user: admin@PatelHospital.com1
+2025-12-26 17:33:15,421 - INFO - Client authenticated: 11032 (user: admin@PatelHospital.com1)
+2025-12-26 17:33:15,446 - INFO - Created new session: afbe33f0-824e-4e66-a2ed-557ca4283e45
+2025-12-26 17:33:15,446 - INFO - Created session afbe33f0-824e-4e66-a2ed-557ca4283e45 at 2025-12-26T17:33:15.446774
+2025-12-26 17:33:15,462 - INFO - New session created: afbe33f0-824e-4e66-a2ed-557ca4283e45
+2025-12-26 17:33:58,587 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-26 17:33:58,597 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 55, tokens: 15)
+2025-12-26 17:33:58,603 - INFO - ✅ Token usage updated for client 1: +15 tokens (dec_2025)
+2025-12-26 17:33:58,608 - INFO - ✅ Session activity updated in database (session: afbe33f0-824e-4e66-a2ed-557ca4283e45)
+2025-12-26 17:33:58,609 - INFO - Query processed: 15 tokens, 0 sources
+2025-12-26 17:34:05,244 - INFO - Query received from user: admin@PatelHospital.com1
+2025-12-26 17:34:05,294 - INFO - Client authenticated: 11032 (user: admin@PatelHospital.com1)
+2025-12-26 17:34:05,302 - INFO - Created new session: d1c2965b-b8d0-4596-b723-b74937c5aba3
+2025-12-26 17:34:05,302 - INFO - Created session d1c2965b-b8d0-4596-b723-b74937c5aba3 at 2025-12-26T17:34:05.302681
+2025-12-26 17:34:05,302 - INFO - New session created: d1c2965b-b8d0-4596-b723-b74937c5aba3
+2025-12-26 17:34:11,401 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-26 17:34:11,415 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 56, tokens: 101)
+2025-12-26 17:34:11,416 - INFO - ✅ Token usage updated for client 1: +101 tokens (dec_2025)
+2025-12-26 17:34:11,417 - INFO - ✅ Session activity updated in database (session: d1c2965b-b8d0-4596-b723-b74937c5aba3)
+2025-12-26 17:34:11,417 - INFO - Query processed: 101 tokens, 6 sources
+2025-12-26 17:34:23,137 - INFO - Query received from user: admin@PatelHospital.com1
+2025-12-26 17:34:23,188 - INFO - Client authenticated: 11032 (user: admin@PatelHospital.com1)
+2025-12-26 17:34:23,193 - INFO - Created new session: 2fd41482-709c-49ee-9d35-96e121065e5c
+2025-12-26 17:34:23,193 - INFO - Created session 2fd41482-709c-49ee-9d35-96e121065e5c at 2025-12-26T17:34:23.193054
+2025-12-26 17:34:23,204 - INFO - New session created: 2fd41482-709c-49ee-9d35-96e121065e5c
+2025-12-26 17:34:28,309 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-26 17:34:28,319 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 57, tokens: 45)
+2025-12-26 17:34:28,319 - INFO - ✅ Token usage updated for client 1: +45 tokens (dec_2025)
+2025-12-26 17:34:28,322 - INFO - ✅ Session activity updated in database (session: 2fd41482-709c-49ee-9d35-96e121065e5c)
+2025-12-26 17:34:28,322 - INFO - Query processed: 45 tokens, 6 sources
+2025-12-26 17:34:38,657 - INFO - Query received from user: admin@PatelHospital.com1
+2025-12-26 17:34:38,724 - INFO - Client authenticated: 11032 (user: admin@PatelHospital.com1)
+2025-12-26 17:34:38,727 - INFO - Created new session: f4afc7b4-054a-46fc-a75b-30d5eea727cd
+2025-12-26 17:34:38,727 - INFO - Created session f4afc7b4-054a-46fc-a75b-30d5eea727cd at 2025-12-26T17:34:38.727280
+2025-12-26 17:34:38,733 - INFO - New session created: f4afc7b4-054a-46fc-a75b-30d5eea727cd
+2025-12-26 17:34:41,580 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-26 17:34:41,592 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 58, tokens: 21)
+2025-12-26 17:34:41,592 - INFO - ✅ Token usage updated for client 1: +21 tokens (dec_2025)
+2025-12-26 17:34:41,592 - INFO - ✅ Session activity updated in database (session: f4afc7b4-054a-46fc-a75b-30d5eea727cd)
+2025-12-26 17:34:41,592 - INFO - Query processed: 21 tokens, 6 sources
+2025-12-26 17:34:53,451 - INFO - Query received from user: admin@PatelHospital.com1
+2025-12-26 17:34:53,604 - INFO - Client authenticated: 11032 (user: admin@PatelHospital.com1)
+2025-12-26 17:34:53,607 - INFO - Created new session: 66acbf24-c629-49d1-9b19-5241f8170918
+2025-12-26 17:34:53,608 - INFO - Created session 66acbf24-c629-49d1-9b19-5241f8170918 at 2025-12-26T17:34:53.607607
+2025-12-26 17:34:53,617 - INFO - New session created: 66acbf24-c629-49d1-9b19-5241f8170918
+2025-12-26 17:34:59,824 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-26 17:34:59,826 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 59, tokens: 113)
+2025-12-26 17:34:59,826 - INFO - ✅ Token usage updated for client 1: +113 tokens (dec_2025)
+2025-12-26 17:34:59,832 - INFO - ✅ Session activity updated in database (session: 66acbf24-c629-49d1-9b19-5241f8170918)
+2025-12-26 17:34:59,832 - INFO - Query processed: 113 tokens, 4 sources
+2025-12-26 17:38:24,487 - INFO - Document sync request: Patel Group (7 documents)
+2025-12-26 17:38:24,649 - INFO - 🗑️  Deleting all document records for client_id: 1
+2025-12-26 17:38:24,664 - INFO - ✅ Deleted 7 document record(s)
+2025-12-26 17:38:25,108 - INFO - Use pytorch device_name: cuda:0
+2025-12-26 17:38:25,109 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-12-26 17:38:29,551 - INFO - ============================================================
+2025-12-26 17:38:29,552 - INFO - 💾 SAVING DOCUMENT METADATA TO DATABASE
+2025-12-26 17:38:29,552 - INFO -    Announcement ID: 51
+2025-12-26 17:38:29,553 - INFO -    Client ID: 1
+2025-12-26 17:38:29,553 - INFO -    File Name: Attendance Module-hrpolices-51-1.docx
+2025-12-26 17:38:29,553 - INFO -    Document Title: testing again
+2025-12-26 17:38:29,553 - INFO -    File Extension: docx
+2025-12-26 17:38:29,553 - INFO -    Chunk Count: 94
+2025-12-26 17:38:29,554 - INFO - 🔍 Checking if document already exists...
+2025-12-26 17:38:29,554 - INFO - ✅ Document is new, will insert
+2025-12-26 17:38:29,554 - INFO - 💾 Executing INSERT/UPDATE query...
+2025-12-26 17:38:29,560 - INFO - ✅ Document metadata saved successfully
+2025-12-26 17:38:29,560 - INFO -    Document ID: 340
+2025-12-26 17:38:29,560 - INFO -    Table: chatbot.documents
+2025-12-26 17:38:29,560 - INFO -    Action: Inserted
+2025-12-26 17:38:29,560 - INFO - ============================================================
+2025-12-26 17:38:29,561 - INFO - ============================================================
+2025-12-26 17:38:29,561 - INFO - 💾 SAVING DOCUMENT METADATA TO DATABASE
+2025-12-26 17:38:29,561 - INFO -    Announcement ID: 49
+2025-12-26 17:38:29,561 - INFO -    Client ID: 1
+2025-12-26 17:38:29,561 - INFO -    File Name: HumanResource-hrpolices-49-1.pdf
+2025-12-26 17:38:29,561 - INFO -    Document Title: maaz
+2025-12-26 17:38:29,562 - INFO -    File Extension: pdf
+2025-12-26 17:38:29,562 - INFO -    Chunk Count: 22
+2025-12-26 17:38:29,562 - INFO - 🔍 Checking if document already exists...
+2025-12-26 17:38:29,563 - INFO - ✅ Document is new, will insert
+2025-12-26 17:38:29,563 - INFO - 💾 Executing INSERT/UPDATE query...
+2025-12-26 17:38:29,564 - INFO - ✅ Document metadata saved successfully
+2025-12-26 17:38:29,565 - INFO -    Document ID: 341
+2025-12-26 17:38:29,565 - INFO -    Table: chatbot.documents
+2025-12-26 17:38:29,565 - INFO -    Action: Inserted
+2025-12-26 17:38:29,565 - INFO - ============================================================
+2025-12-26 17:38:29,565 - INFO - ============================================================
+2025-12-26 17:38:29,566 - INFO - 💾 SAVING DOCUMENT METADATA TO DATABASE
+2025-12-26 17:38:29,566 - INFO -    Announcement ID: 45
+2025-12-26 17:38:29,566 - INFO -    Client ID: 1
+2025-12-26 17:38:29,566 - INFO -    File Name: HumanResource-hrpolices-45-1.pdf
+2025-12-26 17:38:29,566 - INFO -    Document Title: rggreger
+2025-12-26 17:38:29,566 - INFO -    File Extension: pdf
+2025-12-26 17:38:29,566 - INFO -    Chunk Count: 22
+2025-12-26 17:38:29,566 - INFO - 🔍 Checking if document already exists...
+2025-12-26 17:38:29,567 - INFO - ✅ Document is new, will insert
+2025-12-26 17:38:29,567 - INFO - 💾 Executing INSERT/UPDATE query...
+2025-12-26 17:38:29,568 - INFO - ✅ Document metadata saved successfully
+2025-12-26 17:38:29,568 - INFO -    Document ID: 342
+2025-12-26 17:38:29,568 - INFO -    Table: chatbot.documents
+2025-12-26 17:38:29,568 - INFO -    Action: Inserted
+2025-12-26 17:38:29,568 - INFO - ============================================================
+2025-12-26 17:38:29,568 - INFO - ============================================================
+2025-12-26 17:38:29,568 - INFO - 💾 SAVING DOCUMENT METADATA TO DATABASE
+2025-12-26 17:38:29,568 - INFO -    Announcement ID: 43
+2025-12-26 17:38:29,568 - INFO -    Client ID: 1
+2025-12-26 17:38:29,568 - INFO -    File Name: HumanResource-hrpolices-43-1.pdf
+2025-12-26 17:38:29,568 - INFO -    Document Title: trecgwftrw
+2025-12-26 17:38:29,568 - INFO -    File Extension: pdf
+2025-12-26 17:38:29,568 - INFO -    Chunk Count: 22
+2025-12-26 17:38:29,568 - INFO - 🔍 Checking if document already exists...
+2025-12-26 17:38:29,568 - INFO - ✅ Document is new, will insert
+2025-12-26 17:38:29,569 - INFO - 💾 Executing INSERT/UPDATE query...
+2025-12-26 17:38:29,569 - INFO - ✅ Document metadata saved successfully
+2025-12-26 17:38:29,569 - INFO -    Document ID: 343
+2025-12-26 17:38:29,569 - INFO -    Table: chatbot.documents
+2025-12-26 17:38:29,569 - INFO -    Action: Inserted
+2025-12-26 17:38:29,569 - INFO - ============================================================
+2025-12-26 17:38:29,570 - INFO - ============================================================
+2025-12-26 17:38:29,570 - INFO - 💾 SAVING DOCUMENT METADATA TO DATABASE
+2025-12-26 17:38:29,570 - INFO -    Announcement ID: 42
+2025-12-26 17:38:29,570 - INFO -    Client ID: 1
+2025-12-26 17:38:29,570 - INFO -    File Name: HumanResource-hrpolices-42-1.pdf
+2025-12-26 17:38:29,570 - INFO -    Document Title: gy54g6
+2025-12-26 17:38:29,570 - INFO -    File Extension: pdf
+2025-12-26 17:38:29,570 - INFO -    Chunk Count: 22
+2025-12-26 17:38:29,570 - INFO - 🔍 Checking if document already exists...
+2025-12-26 17:38:29,571 - INFO - ✅ Document is new, will insert
+2025-12-26 17:38:29,571 - INFO - 💾 Executing INSERT/UPDATE query...
+2025-12-26 17:38:29,571 - INFO - ✅ Document metadata saved successfully
+2025-12-26 17:38:29,572 - INFO -    Document ID: 344
+2025-12-26 17:38:29,572 - INFO -    Table: chatbot.documents
+2025-12-26 17:38:29,572 - INFO -    Action: Inserted
+2025-12-26 17:38:29,572 - INFO - ============================================================
+2025-12-26 17:38:29,573 - INFO - ============================================================
+2025-12-26 17:38:29,573 - INFO - 💾 SAVING DOCUMENT METADATA TO DATABASE
+2025-12-26 17:38:29,573 - INFO -    Announcement ID: 35
+2025-12-26 17:38:29,573 - INFO -    Client ID: 1
+2025-12-26 17:38:29,573 - INFO -    File Name: Asset Module (5.10)-hrpolices-35-1.docx
+2025-12-26 17:38:29,573 - INFO -    Document Title: recvecre
+2025-12-26 17:38:29,573 - INFO -    File Extension: docx
+2025-12-26 17:38:29,573 - INFO -    Chunk Count: 7
+2025-12-26 17:38:29,573 - INFO - 🔍 Checking if document already exists...
+2025-12-26 17:38:29,574 - INFO - ✅ Document is new, will insert
+2025-12-26 17:38:29,574 - INFO - 💾 Executing INSERT/UPDATE query...
+2025-12-26 17:38:29,575 - INFO - ✅ Document metadata saved successfully
+2025-12-26 17:38:29,575 - INFO -    Document ID: 345
+2025-12-26 17:38:29,575 - INFO -    Table: chatbot.documents
+2025-12-26 17:38:29,575 - INFO -    Action: Inserted
+2025-12-26 17:38:29,576 - INFO - ============================================================
+2025-12-26 17:38:29,576 - INFO - ============================================================
+2025-12-26 17:38:29,576 - INFO - 💾 SAVING DOCUMENT METADATA TO DATABASE
+2025-12-26 17:38:29,576 - INFO -    Announcement ID: 34
+2025-12-26 17:38:29,576 - INFO -    Client ID: 1
+2025-12-26 17:38:29,576 - INFO -    File Name: Attendance Module (5.10)-hrpolices-34-1.docx
+2025-12-26 17:38:29,576 - INFO -    Document Title: test
+2025-12-26 17:38:29,576 - INFO -    File Extension: docx
+2025-12-26 17:38:29,577 - INFO -    Chunk Count: 43
+2025-12-26 17:38:29,577 - INFO - 🔍 Checking if document already exists...
+2025-12-26 17:38:29,578 - INFO - ✅ Document is new, will insert
+2025-12-26 17:38:29,578 - INFO - 💾 Executing INSERT/UPDATE query...
+2025-12-26 17:38:29,579 - INFO - ✅ Document metadata saved successfully
+2025-12-26 17:38:29,579 - INFO -    Document ID: 346
+2025-12-26 17:38:29,579 - INFO -    Table: chatbot.documents
+2025-12-26 17:38:29,580 - INFO -    Action: Inserted
+2025-12-26 17:38:29,580 - INFO - ============================================================
+2025-12-26 17:38:29,580 - INFO - Document sync completed: 7 HR policy docs, 232 chunks

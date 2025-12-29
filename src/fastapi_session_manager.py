@@ -24,17 +24,23 @@ class Message:
 class Session:
     """Represents a user session"""
     session_id: str
+    username: str
+    client_id: int
     created_at: str
     last_active: str
     messages: List[Message] = field(default_factory=list)
+    session_db_id: Optional[int] = None
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert session to dictionary"""
         return {
             "session_id": self.session_id,
+            "username": self.username,
+            "client_id": self.client_id,
             "created_at": self.created_at,
             "last_active": self.last_active,
-            "messages": [asdict(msg) for msg in self.messages]
+            "messages": [asdict(msg) for msg in self.messages],
+            "session_db_id": self.session_db_id
         }
     
     @classmethod
@@ -43,9 +49,12 @@ class Session:
         messages = [Message(**msg) for msg in data.get("messages", [])]
         return cls(
             session_id=data["session_id"],
+            username=data.get("username", "unknown"),
+            client_id=data.get("client_id", 0),
             created_at=data["created_at"],
             last_active=data["last_active"],
-            messages=messages
+            messages=messages,
+            session_db_id=data.get("session_db_id")
         )
 
 
@@ -57,17 +66,19 @@ class InMemorySessionStore:
         self.sessions: OrderedDict[str, Session] = OrderedDict()
         logger.info(f"Initialized in-memory session store (max: {max_sessions})")
     
-    def create(self, session_id: str) -> Session:
+    def create(self, session_id: str, username: str, client_id: int) -> Session:
         """Create a new session"""
         now = datetime.now().isoformat()
         session = Session(
             session_id=session_id,
+            username=username,
+            client_id=client_id,
             created_at=now,
             last_active=now,
             messages=[]
         )
         self._store(session_id, session)
-        logger.info(f"Created new session: {session_id}")
+        logger.info(f"Created new session: {session_id} for user: {username}")
         return session
     
     def get(self, session_id: str) -> Optional[Session]:
@@ -94,11 +105,33 @@ class InMemorySessionStore:
             return True
         return False
     
+    def find_active_session_for_user(self, username: str, client_id: int, session_max_age: int) -> Optional[Session]:
+        """Find an active session for a specific username and client"""
+        now = datetime.now()
+        
+        for session in self.sessions.values():
+            if (session.username == username and 
+                session.client_id == client_id):
+                
+                last_active = datetime.fromisoformat(session.last_active)
+                age = (now - last_active).total_seconds()
+                
+                if age <= session_max_age:
+                    logger.info(f"Found active session for user {username}: {session.session_id}")
+                    return session
+                else:
+                    logger.info(f"Session expired for user {username}: {session.session_id} (age: {age}s)")
+        
+        logger.info(f"No active session found for user {username}")
+        return None
+
     def list_all(self) -> List[Dict[str, Any]]:
         """List all active sessions"""
         return [
             {
                 "session_id": session.session_id,
+                "username": session.username,
+                "client_id": session.client_id,
                 "created_at": session.created_at,
                 "last_active": session.last_active,
                 "message_count": len(session.messages)
@@ -131,12 +164,28 @@ class FastAPISessionManager:
         self.session_max_age = session_max_age
         logger.info("Session manager initialized (PostgreSQL storage)")
     
-    def create_session(self) -> Session:
+    def create_session(self, username: str, client_id: int) -> Session:
         """Create a new session with a unique ID"""
         session_id = str(uuid.uuid4())
-        session = self.store.create(session_id)
-        logger.info(f"Created session {session_id} at {session.created_at}")
+        session = self.store.create(session_id, username, client_id)
+        logger.info(f"Created session {session_id} for user {username} at {session.created_at}")
         return session
+    
+    def get_or_create_session_for_user(self, username: str, client_id: int) -> Session:
+        """Get existing active session for user or create a new one"""
+        # First check in-memory store for active session
+        session = self.store.find_active_session_for_user(username, client_id, self.session_max_age)
+        
+        if session:
+            # Update last_active timestamp
+            session.last_active = datetime.now().isoformat()
+            self.store.update(session)
+            logger.info(f"Reusing existing session for user {username}: {session.session_id}")
+            return session
+        
+        # No active session found, create new one
+        logger.info(f"Creating new session for user {username}")
+        return self.create_session(username, client_id)
     
     def get_session(self, session_id: str) -> Optional[Session]:
         """Retrieve a session by ID"""

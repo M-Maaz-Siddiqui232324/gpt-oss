@@ -107,6 +107,43 @@ class PostgresManager:
             self.conn.rollback()
             return False
     
+    def get_active_session_for_user(self, username: str, client_id: int, session_max_age: int) -> Optional[Dict[str, Any]]:
+        """
+        Get active session for a specific username and client if it exists and hasn't expired
+        
+        Args:
+            username: Username from FlowHCM
+            client_id: Client identifier
+            session_max_age: Maximum session age in seconds
+            
+        Returns:
+            Session info dict if found and active, None otherwise
+        """
+        try:
+            with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(
+                    """
+                    SELECT id, session_id, username, fk_client_id, created_at, last_active
+                    FROM chatbot.sessions 
+                    WHERE username = %s 
+                      AND fk_client_id = %s 
+                      AND last_active > NOW() - INTERVAL '%s seconds'
+                    ORDER BY last_active DESC
+                    LIMIT 1
+                    """,
+                    (username, client_id, session_max_age)
+                )
+                result = cur.fetchone()
+                if result:
+                    logger.info(f"Found active session for user {username}: {result['session_id']}")
+                    return dict(result)
+                else:
+                    logger.info(f"No active session found for user {username}")
+                    return None
+        except Exception as e:
+            logger.error(f"Error getting active session for user: {e}", exc_info=True)
+            return None
+
     def create_session(self, session_id: str, username: str, client_id: int) -> Optional[int]:
         """
         Create a new session record
@@ -131,6 +168,7 @@ class PostgresManager:
                 )
                 session_db_id = cur.fetchone()[0]
                 self.conn.commit()
+                logger.info(f"Created new session for user {username}: {session_id}")
                 return session_db_id
         except Exception as e:
             logger.error(f"❌ Error creating session in database: {e}", exc_info=True)
@@ -482,6 +520,65 @@ class PostgresManager:
     
 
     
+    def get_user_session_history(self, username: str, client_id: int, limit: int = 10) -> List[Dict[str, Any]]:
+        """
+        Get session history for a specific user
+        
+        Args:
+            username: Username from FlowHCM
+            client_id: Client identifier
+            limit: Maximum number of sessions to return
+            
+        Returns:
+            List of session info dictionaries
+        """
+        try:
+            with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(
+                    """
+                    SELECT id, session_id, username, fk_client_id, created_at, last_active
+                    FROM chatbot.sessions 
+                    WHERE username = %s AND fk_client_id = %s
+                    ORDER BY last_active DESC
+                    LIMIT %s
+                    """,
+                    (username, client_id, limit)
+                )
+                results = cur.fetchall()
+                return [dict(row) for row in results]
+        except Exception as e:
+            logger.error(f"Error getting user session history: {e}", exc_info=True)
+            return []
+
+    def cleanup_expired_sessions_by_username(self, session_max_age: int) -> int:
+        """
+        Clean up expired sessions from database
+        
+        Args:
+            session_max_age: Maximum session age in seconds
+            
+        Returns:
+            Number of sessions cleaned up
+        """
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute(
+                    """
+                    DELETE FROM chatbot.sessions 
+                    WHERE last_active < NOW() - INTERVAL '%s seconds'
+                    """,
+                    (session_max_age,)
+                )
+                deleted_count = cur.rowcount
+                self.conn.commit()
+                if deleted_count > 0:
+                    logger.info(f"Cleaned up {deleted_count} expired sessions from database")
+                return deleted_count
+        except Exception as e:
+            logger.error(f"Error cleaning up expired sessions: {e}", exc_info=True)
+            self.conn.rollback()
+            return 0
+
     def delete_client_documents(self, client_id: int) -> bool:
         """
         Delete all document records for a specific client

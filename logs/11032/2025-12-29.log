@@ -1,0 +1,118 @@
+2025-12-29 12:33:15,351 - INFO - Starting server on 0.0.0.0:8000
+2025-12-29 12:33:15,449 - INFO - Starting FastAPI server
+2025-12-29 12:33:15,449 - INFO - Initialized in-memory session store (max: 10000)
+2025-12-29 12:33:15,449 - INFO - Session manager initialized (PostgreSQL storage)
+2025-12-29 12:33:15,485 - INFO - Use pytorch device_name: cuda:0
+2025-12-29 12:33:15,485 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-12-29 12:33:20,715 - INFO - Use pytorch device_name: cuda:0
+2025-12-29 12:33:20,715 - INFO - Load pretrained SentenceTransformer: BAAI/bge-base-en-v1.5
+2025-12-29 12:33:26,186 - INFO - Initialized LLMEngine (model=gpt-oss:20b, url=http://localhost:11434)
+2025-12-29 12:33:26,186 - INFO - Checking Ollama connection and model: gpt-oss:20b
+2025-12-29 12:33:28,270 - INFO - Available Ollama models: ['gpt-oss:20b']
+2025-12-29 12:33:28,270 - INFO - Ollama model 'gpt-oss:20b' is ready
+2025-12-29 12:33:28,272 - INFO - Server initialized successfully
+2025-12-29 12:38:14,074 - INFO - Query received from user: admin@PatelHospital.com1
+2025-12-29 12:38:14,132 - INFO - Client authenticated: 11032 (user: admin@PatelHospital.com1)
+2025-12-29 12:38:14,148 - INFO - Created new session: 3ed97540-dc4f-4481-93ff-02c4b90cb9db
+2025-12-29 12:38:14,148 - INFO - Created session 3ed97540-dc4f-4481-93ff-02c4b90cb9db at 2025-12-29T12:38:14.148816
+2025-12-29 12:38:14,173 - INFO - New session created: 3ed97540-dc4f-4481-93ff-02c4b90cb9db
+2025-12-29 12:38:26,518 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-29 12:38:26,525 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 60, tokens: 15)
+2025-12-29 12:38:26,525 - INFO - ✅ Token usage updated for client 1: +15 tokens (dec_2025)
+2025-12-29 12:38:26,533 - INFO - ✅ Session activity updated in database (session: 3ed97540-dc4f-4481-93ff-02c4b90cb9db)
+2025-12-29 12:38:26,533 - INFO - Query processed: 15 tokens, 0 sources
+2025-12-29 12:38:35,693 - INFO - Query received from user: admin@PatelHospital.com1
+2025-12-29 12:38:35,742 - INFO - Client authenticated: 11032 (user: admin@PatelHospital.com1)
+2025-12-29 12:38:35,742 - INFO - Created new session: d92aa7c9-3b2d-4af6-8267-06e90a1f4a0a
+2025-12-29 12:38:35,742 - INFO - Created session d92aa7c9-3b2d-4af6-8267-06e90a1f4a0a at 2025-12-29T12:38:35.742543
+2025-12-29 12:38:35,754 - INFO - New session created: d92aa7c9-3b2d-4af6-8267-06e90a1f4a0a
+2025-12-29 12:38:41,967 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-29 12:38:41,974 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 61, tokens: 103)
+2025-12-29 12:38:41,975 - INFO - ✅ Token usage updated for client 1: +103 tokens (dec_2025)
+2025-12-29 12:38:41,975 - INFO - ✅ Session activity updated in database (session: d92aa7c9-3b2d-4af6-8267-06e90a1f4a0a)
+2025-12-29 12:38:41,975 - INFO - Query processed: 103 tokens, 6 sources
+2025-12-29 12:44:24,317 - INFO - Query received from user: admin@PatelHospital.com1
+2025-12-29 12:44:24,367 - INFO - Client authenticated: 11032 (user: admin@PatelHospital.com1)
+2025-12-29 12:44:24,368 - INFO - Created new session: 415c2b8d-e672-4926-b4b8-fc2333106a4e
+2025-12-29 12:44:24,368 - INFO - Created session 415c2b8d-e672-4926-b4b8-fc2333106a4e at 2025-12-29T12:44:24.368827
+2025-12-29 12:44:24,382 - INFO - New session created: 415c2b8d-e672-4926-b4b8-fc2333106a4e
+2025-12-29 12:44:32,308 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-29 12:44:32,314 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 62, tokens: 18)
+2025-12-29 12:44:32,316 - INFO - ✅ Token usage updated for client 1: +18 tokens (dec_2025)
+2025-12-29 12:44:32,317 - INFO - ✅ Session activity updated in database (session: 415c2b8d-e672-4926-b4b8-fc2333106a4e)
+2025-12-29 12:44:32,317 - INFO - Query processed: 18 tokens, 0 sources
+2025-12-29 12:44:32,317 - INFO - Query received from user: admin@PatelHospital.com1
+2025-12-29 12:44:32,367 - INFO - Client authenticated: 11032 (user: admin@PatelHospital.com1)
+2025-12-29 12:44:32,372 - INFO - Created new session: 6fad824d-f79d-40ab-b8b5-f78a6bd4385b
+2025-12-29 12:44:32,373 - INFO - Created session 6fad824d-f79d-40ab-b8b5-f78a6bd4385b at 2025-12-29T12:44:32.372667
+2025-12-29 12:44:32,377 - INFO - New session created: 6fad824d-f79d-40ab-b8b5-f78a6bd4385b
+2025-12-29 12:44:38,310 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-29 12:44:38,320 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 63, tokens: 79)
+2025-12-29 12:44:38,320 - INFO - ✅ Token usage updated for client 1: +79 tokens (dec_2025)
+2025-12-29 12:44:38,320 - INFO - ✅ Session activity updated in database (session: 6fad824d-f79d-40ab-b8b5-f78a6bd4385b)
+2025-12-29 12:44:38,320 - INFO - Query processed: 79 tokens, 0 sources
+2025-12-29 12:44:51,999 - INFO - Query received from user: admin@PatelHospital.com1
+2025-12-29 12:44:52,057 - INFO - Client authenticated: 11032 (user: admin@PatelHospital.com1)
+2025-12-29 12:44:52,065 - INFO - Created new session: f03e94b9-7427-42a0-a914-cb8ca393b074
+2025-12-29 12:44:52,065 - INFO - Created session f03e94b9-7427-42a0-a914-cb8ca393b074 at 2025-12-29T12:44:52.065470
+2025-12-29 12:44:52,079 - INFO - New session created: f03e94b9-7427-42a0-a914-cb8ca393b074
+2025-12-29 12:44:57,458 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-29 12:44:57,472 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 64, tokens: 71)
+2025-12-29 12:44:57,472 - INFO - ✅ Token usage updated for client 1: +71 tokens (dec_2025)
+2025-12-29 12:44:57,475 - INFO - ✅ Session activity updated in database (session: f03e94b9-7427-42a0-a914-cb8ca393b074)
+2025-12-29 12:44:57,475 - INFO - Query processed: 71 tokens, 7 sources
+2025-12-29 12:44:57,821 - INFO - Query received from user: admin@PatelHospital.com1
+2025-12-29 12:44:57,868 - INFO - Client authenticated: 11032 (user: admin@PatelHospital.com1)
+2025-12-29 12:44:57,868 - INFO - Created new session: 3455dc15-6603-4aa3-93d1-6c4f5f02fa0f
+2025-12-29 12:44:57,868 - INFO - Created session 3455dc15-6603-4aa3-93d1-6c4f5f02fa0f at 2025-12-29T12:44:57.868885
+2025-12-29 12:44:57,880 - INFO - New session created: 3455dc15-6603-4aa3-93d1-6c4f5f02fa0f
+2025-12-29 12:45:03,280 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-29 12:45:03,291 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 65, tokens: 176)
+2025-12-29 12:45:03,293 - INFO - ✅ Token usage updated for client 1: +176 tokens (dec_2025)
+2025-12-29 12:45:03,293 - INFO - ✅ Session activity updated in database (session: 3455dc15-6603-4aa3-93d1-6c4f5f02fa0f)
+2025-12-29 12:45:03,293 - INFO - Query processed: 176 tokens, 0 sources
+2025-12-29 12:59:40,021 - INFO - Starting server on 0.0.0.0:8000
+2025-12-29 12:59:40,072 - INFO - Starting FastAPI server
+2025-12-29 12:59:40,072 - INFO - Initialized in-memory session store (max: 10000)
+2025-12-29 12:59:40,072 - INFO - Session manager initialized (PostgreSQL storage)
+2025-12-29 12:59:40,106 - INFO - Use pytorch device_name: cuda:0
+2025-12-29 12:59:40,106 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-12-29 12:59:44,136 - INFO - Use pytorch device_name: cuda:0
+2025-12-29 12:59:44,136 - INFO - Load pretrained SentenceTransformer: BAAI/bge-base-en-v1.5
+2025-12-29 12:59:48,270 - INFO - Initialized LLMEngine (model=gpt-oss:20b, url=http://localhost:11434)
+2025-12-29 12:59:48,270 - INFO - Checking Ollama connection and model: gpt-oss:20b
+2025-12-29 12:59:50,327 - INFO - Available Ollama models: ['gpt-oss:20b']
+2025-12-29 12:59:50,327 - INFO - Ollama model 'gpt-oss:20b' is ready
+2025-12-29 12:59:50,329 - INFO - Server initialized successfully
+2025-12-29 13:00:04,533 - INFO - Query received from user: admin@PatelHospital.com1
+2025-12-29 13:00:04,595 - INFO - Client authenticated: 11032 (user: admin@PatelHospital.com1)
+2025-12-29 13:00:04,607 - INFO - No active session found for user admin@PatelHospital.com1
+2025-12-29 13:00:04,607 - INFO - Created new session: f146de8a-f2e6-4668-a137-85ca65005b5f for user: admin@PatelHospital.com1
+2025-12-29 13:00:04,608 - INFO - Created session f146de8a-f2e6-4668-a137-85ca65005b5f for user admin@PatelHospital.com1 at 2025-12-29T13:00:04.607740
+2025-12-29 13:00:04,610 - INFO - Created new session for user admin@PatelHospital.com1: f146de8a-f2e6-4668-a137-85ca65005b5f
+2025-12-29 13:00:04,611 - INFO - New session created: f146de8a-f2e6-4668-a137-85ca65005b5f for user: admin@PatelHospital.com1
+2025-12-29 13:00:12,822 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-29 13:00:12,828 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 66, tokens: 12)
+2025-12-29 13:00:12,829 - INFO - ✅ Token usage updated for client 1: +12 tokens (dec_2025)
+2025-12-29 13:00:12,830 - INFO - ✅ Session activity updated in database (session: f146de8a-f2e6-4668-a137-85ca65005b5f)
+2025-12-29 13:00:12,830 - INFO - Query processed: 12 tokens, 0 sources
+2025-12-29 13:00:20,484 - INFO - Query received from user: admin@PatelHospital.com1
+2025-12-29 13:00:20,525 - INFO - Client authenticated: 11032 (user: admin@PatelHospital.com1)
+2025-12-29 13:00:20,533 - INFO - Found active session for user admin@PatelHospital.com1: f146de8a-f2e6-4668-a137-85ca65005b5f
+2025-12-29 13:00:20,533 - INFO - Reusing existing session from memory: f146de8a-f2e6-4668-a137-85ca65005b5f
+2025-12-29 13:00:24,283 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-29 13:00:24,294 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 66, tokens: 24)
+2025-12-29 13:00:24,294 - INFO - ✅ Token usage updated for client 1: +24 tokens (dec_2025)
+2025-12-29 13:00:24,294 - INFO - ✅ Session activity updated in database (session: f146de8a-f2e6-4668-a137-85ca65005b5f)
+2025-12-29 13:00:24,294 - INFO - Query processed: 24 tokens, 0 sources
+2025-12-29 13:00:40,851 - INFO - Query received from user: admin@PatelHospital.com1
+2025-12-29 13:00:40,909 - INFO - Client authenticated: 11032 (user: admin@PatelHospital.com1)
+2025-12-29 13:00:40,917 - INFO - Found active session for user admin@PatelHospital.com1: f146de8a-f2e6-4668-a137-85ca65005b5f
+2025-12-29 13:00:40,917 - INFO - Reusing existing session from memory: f146de8a-f2e6-4668-a137-85ca65005b5f
+2025-12-29 13:00:44,263 - INFO - ✅ Ensured conversation table exists: conversation_dec_2025
+2025-12-29 13:00:44,269 - INFO - ✅ Conversation added to conversation_dec_2025 (session_id: 66, tokens: 23)
+2025-12-29 13:00:44,271 - INFO - ✅ Token usage updated for client 1: +23 tokens (dec_2025)
+2025-12-29 13:00:44,272 - INFO - ✅ Session activity updated in database (session: f146de8a-f2e6-4668-a137-85ca65005b5f)
+2025-12-29 13:00:44,272 - INFO - Query processed: 23 tokens, 0 sources
+2025-12-29 13:00:50,363 - INFO - Cleaned up 65 expired sessions from database
+2025-12-29 13:00:50,363 - INFO - Session cleanup: 0 from memory, 65 from database
