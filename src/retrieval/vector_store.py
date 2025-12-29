@@ -242,6 +242,15 @@ class VectorStore:
             self.client_index = None
             self.client_chunks = []
             
+            # Delete existing index files from disk
+            if self.client_index_file and os.path.exists(self.client_index_file):
+                os.remove(self.client_index_file)
+                logger.info(f"Deleted existing client index file: {self.client_index_file}")
+
+            if self.client_chunks_file and os.path.exists(self.client_chunks_file):
+                os.remove(self.client_chunks_file)
+                logger.info(f"Deleted existing client chunks file: {self.client_chunks_file}")
+            
             # Build fresh client index
             return self.build_client_index(hr_policy_chunks, force_rebuild=True)
         
