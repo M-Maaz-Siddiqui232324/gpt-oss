@@ -216,24 +216,17 @@ async def startup_event():
 
 
 async def cleanup_sessions_task():
-    """Background task to clean up expired sessions"""
+    """Background task to clean up expired sessions from memory only"""
     while True:
         await asyncio.sleep(CLEANUP_INTERVAL)
         try:
             if session_manager:
-                # Clean up in-memory sessions
+                # Clean up in-memory sessions only
                 memory_cleaned = session_manager.cleanup_expired_sessions()
                 
-                # Clean up database sessions
-                db = PostgresManager(POSTGRES_CONNECTION_STRING)
-                if db.connect():
-                    db_cleaned = db.cleanup_expired_sessions_by_username(SESSION_MAX_AGE)
-                    db.disconnect()
-                    
-                    if memory_cleaned > 0 or db_cleaned > 0:
-                        logger.info(f"Session cleanup: {memory_cleaned} from memory, {db_cleaned} from database")
-                else:
-                    logger.error("Failed to connect to database for session cleanup")
+                if memory_cleaned > 0:
+                    logger.info(f"Session cleanup: {memory_cleaned} expired sessions removed from memory")
+                    logger.info("Note: Database sessions are preserved for audit/analytics purposes")
         except Exception as e:
             logger.error(f"Error in cleanup task: {e}", exc_info=True)
 
@@ -500,6 +493,42 @@ async def get_user_sessions(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/sessions/analytics")
+async def get_session_analytics(
+    days: int = 30,
+    x_company_pin: Optional[str] = Header(None, alias="X-Company-Pin"),
+    x_api_key: Optional[str] = Header(None, alias="X-API-Key")
+):
+    """Get session analytics for monitoring and audit purposes"""
+    if not x_company_pin or not x_api_key:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    try:
+        db = PostgresManager(POSTGRES_CONNECTION_STRING)
+        if not db.connect():
+            raise HTTPException(status_code=503, detail="Database connection failed")
+        
+        client = db.authenticate_client(x_company_pin, x_api_key)
+        if not client:
+            db.disconnect()
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+        
+        analytics = db.get_session_analytics(client['client_id'], days)
+        db.disconnect()
+        
+        return {
+            "client_id": client['client_id'],
+            "company_pin": client['company_pin'],
+            "analytics": analytics
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting session analytics: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/chat")
 async def chat(message: str, request: Request):
     """Simple GET endpoint for testing - sends a message and gets response"""
@@ -512,19 +541,21 @@ async def chat(message: str, request: Request):
     logger.info(f"Chat endpoint query: '{message}'")
     
     try:
-        # Get or create session (for testing endpoint, use default user)
+        # For testing endpoint, use default user and client
         username = "test_user"
         client_id = 1  # Default client for testing
         
-        session_id = request.session.get("session_id")
-        session = None
-        
-        if session_id:
-            session = session_manager.get_session(session_id)
+        # Get or create session for test user
+        session = session_manager.store.find_active_session_for_user(username, client_id, session_manager.session_max_age)
         
         if not session:
             session = session_manager.create_session(username, client_id)
-            request.session["session_id"] = session.session_id
+            logger.info(f"Created new test session: {session.session_id}")
+        else:
+            logger.info(f"Reusing existing test session: {session.session_id}")
+        
+        # Update browser session cookie for compatibility
+        request.session["session_id"] = session.session_id
         
         # Get recent context
         recent_context = ""

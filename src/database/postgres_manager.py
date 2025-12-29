@@ -550,34 +550,73 @@ class PostgresManager:
             logger.error(f"Error getting user session history: {e}", exc_info=True)
             return []
 
-    def cleanup_expired_sessions_by_username(self, session_max_age: int) -> int:
+    def get_session_analytics(self, client_id: int = None, days: int = 30) -> Dict[str, Any]:
         """
-        Clean up expired sessions from database
+        Get session analytics for audit and monitoring purposes
         
         Args:
-            session_max_age: Maximum session age in seconds
+            client_id: Optional client ID to filter by specific client
+            days: Number of days to look back (default: 30)
             
         Returns:
-            Number of sessions cleaned up
+            Dictionary with session analytics
         """
         try:
-            with self.conn.cursor() as cur:
-                cur.execute(
-                    """
-                    DELETE FROM chatbot.sessions 
-                    WHERE last_active < NOW() - INTERVAL '%s seconds'
-                    """,
-                    (session_max_age,)
-                )
-                deleted_count = cur.rowcount
-                self.conn.commit()
-                if deleted_count > 0:
-                    logger.info(f"Cleaned up {deleted_count} expired sessions from database")
-                return deleted_count
+            with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
+                # Base query conditions
+                where_clause = "WHERE created_at >= NOW() - INTERVAL '%s days'"
+                params = [days]
+                
+                if client_id:
+                    where_clause += " AND fk_client_id = %s"
+                    params.append(client_id)
+                
+                # Total sessions
+                cur.execute(f"SELECT COUNT(*) as total_sessions FROM chatbot.sessions {where_clause}", params)
+                total_sessions = cur.fetchone()['total_sessions']
+                
+                # Active sessions (not expired)
+                active_where = where_clause + " AND last_active > NOW() - INTERVAL '%s seconds'"
+                active_params = params + [1800]  # SESSION_MAX_AGE
+                cur.execute(f"SELECT COUNT(*) as active_sessions FROM chatbot.sessions {active_where}", active_params)
+                active_sessions = cur.fetchone()['active_sessions']
+                
+                # Unique users
+                cur.execute(f"SELECT COUNT(DISTINCT username) as unique_users FROM chatbot.sessions {where_clause}", params)
+                unique_users = cur.fetchone()['unique_users']
+                
+                # Sessions by day
+                cur.execute(f"""
+                    SELECT DATE(created_at) as session_date, COUNT(*) as session_count
+                    FROM chatbot.sessions {where_clause}
+                    GROUP BY DATE(created_at)
+                    ORDER BY session_date DESC
+                    LIMIT 7
+                """, params)
+                sessions_by_day = [dict(row) for row in cur.fetchall()]
+                
+                return {
+                    'total_sessions': total_sessions,
+                    'active_sessions': active_sessions,
+                    'expired_sessions': total_sessions - active_sessions,
+                    'unique_users': unique_users,
+                    'sessions_by_day': sessions_by_day,
+                    'period_days': days,
+                    'client_id': client_id
+                }
+                
         except Exception as e:
-            logger.error(f"Error cleaning up expired sessions: {e}", exc_info=True)
-            self.conn.rollback()
-            return 0
+            logger.error(f"Error getting session analytics: {e}", exc_info=True)
+            return {
+                'total_sessions': 0,
+                'active_sessions': 0,
+                'expired_sessions': 0,
+                'unique_users': 0,
+                'sessions_by_day': [],
+                'period_days': days,
+                'client_id': client_id,
+                'error': str(e)
+            }
 
     def delete_client_documents(self, client_id: int) -> bool:
         """

@@ -171,22 +171,6 @@ class FastAPISessionManager:
         logger.info(f"Created session {session_id} for user {username} at {session.created_at}")
         return session
     
-    def get_or_create_session_for_user(self, username: str, client_id: int) -> Session:
-        """Get existing active session for user or create a new one"""
-        # First check in-memory store for active session
-        session = self.store.find_active_session_for_user(username, client_id, self.session_max_age)
-        
-        if session:
-            # Update last_active timestamp
-            session.last_active = datetime.now().isoformat()
-            self.store.update(session)
-            logger.info(f"Reusing existing session for user {username}: {session.session_id}")
-            return session
-        
-        # No active session found, create new one
-        logger.info(f"Creating new session for user {username}")
-        return self.create_session(username, client_id)
-    
     def get_session(self, session_id: str) -> Optional[Session]:
         """Retrieve a session by ID"""
         session = self.store.get(session_id)
