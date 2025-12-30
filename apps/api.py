@@ -314,31 +314,12 @@ async def query(
         # Get or create session based on username and client
         username = x_user_name or "unknown"
         
-        # First check database for existing active session
-        existing_session_info = db.get_active_session_for_user(username, authenticated_client_id, SESSION_MAX_AGE)
+        #checking memory for active sessions
+        session = session_manager.store.find_active_session_for_user(username, authenticated_client_id, SESSION_MAX_AGE)
         
-        session = None
-        if existing_session_info:
-            # Try to get session from memory
-            session = session_manager.get_session(existing_session_info['session_id'])
-            
-            if session:
-                logger.info(f"Reusing existing session from memory: {session.session_id}")
-            else:
-                # Session exists in DB but not in memory, create new memory session with same ID
-                session = Session(
-                    session_id=existing_session_info['session_id'],
-                    username=username,
-                    client_id=authenticated_client_id,
-                    created_at=existing_session_info['created_at'].isoformat(),
-                    last_active=existing_session_info['last_active'].isoformat(),
-                    messages=[],
-                    session_db_id=existing_session_info['id']
-                )
-                session_manager.store.sessions[session.session_id] = session
-                logger.info(f"Restored session to memory from DB: {session.session_id}")
-        
-        if not session:
+        if session:
+            logger.info(f"Reusing existing session from memory: {session.session_id}")
+        else:
             # Create completely new session
             session = session_manager.create_session(username, authenticated_client_id)
             session_db_id = db.create_session(session.session_id, username, authenticated_client_id)
