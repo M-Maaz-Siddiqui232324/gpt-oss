@@ -194,6 +194,17 @@ class FastAPISessionManager:
         return self.store.list_all()
     
 
+    def is_session_expired(self, session: Session) -> bool:
+        """Check if a session has expired"""
+        if not session:
+            return True
+        
+        now = datetime.now()
+        last_active = datetime.fromisoformat(session.last_active)
+        age = (now - last_active).total_seconds()
+        
+        return age > self.session_max_age
+
     def cleanup_expired_sessions(self) -> int:
         """Remove sessions that have been inactive for too long"""
         now = datetime.now()
