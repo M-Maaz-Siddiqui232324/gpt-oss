@@ -315,46 +315,33 @@ async def query(
         # Get or create session based on username and client
         username = x_user_name or "unknown"
         
-        # Log incoming request details
-        logger.info(f"Query request - User: {username}, Client: {authenticated_client_id}, Session ID from payload: {request_body.session_id}")
-        
         # Try to use provided session_id from request payload
         session = None
         if request_body.session_id:
-            logger.info(f"Attempting to lookup session: {request_body.session_id}")
             session = session_manager.get_session(request_body.session_id)
             
             if session:
-                logger.info(f"Session found - ID: {session.session_id}, User: {session.username}, Client: {session.client_id}")
-                
                 # Verify session belongs to current user and client
                 if session.username == username and session.client_id == authenticated_client_id:
-                    logger.info(f"Session validation SUCCESS - Reusing session: {session.session_id}")
+                    logger.info(f"Reusing session: {session.session_id}")
                 else:
-                    logger.warning(f"Session validation FAILED - Expected: {username}/{authenticated_client_id}, Got: {session.username}/{session.client_id}")
+                    logger.warning(f"Session user/client mismatch. Expected: {username}/{authenticated_client_id}, Got: {session.username}/{session.client_id}")
                     session = None
             else:
-                logger.warning(f"Session NOT FOUND in memory: {request_body.session_id}")
                 session = None
-        else:
-            logger.info("No session_id provided in request payload")
         
         # Create new session if none provided or invalid
         if not session:
-            logger.info("Creating NEW session")
-            # Create completely new session
             session = session_manager.create_session(username, authenticated_client_id)
             session_db_id = db.create_session(session.session_id, username, authenticated_client_id)
             if session_db_id:
                 session.session_db_id = session_db_id
-                logger.info(f"New session created successfully: {session.session_id} for user: {username}")
+                logger.info(f"New session created: {session.session_id}")
             else:
                 logger.error("Failed to create session in database")
                 db.disconnect()
                 clear_client_context()
                 return QueryResponse(response="Session creation failed", session_id="")
-        else:
-            logger.info(f"Using EXISTING session: {session.session_id}")
         
         # Update browser session cookie to match current session
         request.session["session_id"] = session.session_id
