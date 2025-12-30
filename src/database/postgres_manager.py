@@ -4,6 +4,7 @@ from psycopg2.extras import RealDictCursor
 import logging
 from typing import Optional, Dict, List, Any
 from datetime import datetime
+from config import POSTGRES_SCHEMA
 
 logger = logging.getLogger(__name__)
 
@@ -21,8 +22,12 @@ class PostgresManager:
         """
         self.connection_string = connection_string
         self.conn = None
-
+        self.schema = POSTGRES_SCHEMA
     
+    def _get_table_name(self, table: str) -> str:
+        """Get fully qualified table name with schema"""
+        return f"{self.schema}.{table}"
+
     def connect(self):
         """Establish database connection"""
         try:
@@ -53,11 +58,11 @@ class PostgresManager:
                 cur.execute(
                     """
                     SELECT client_id, company_pin, api_key, is_active, created_at
-                    FROM chatbot.clients 
+                    FROM {} 
                     WHERE company_pin = %s 
                       AND api_key = %s 
                       AND is_active = TRUE
-                    """,
+                    """.format(self._get_table_name('clients')),
                     (company_pin, api_key)
                 )
                 result = cur.fetchone()
@@ -89,14 +94,14 @@ class PostgresManager:
       
                 cur.execute(
                     """
-                    INSERT INTO chatbot.clients (company_pin, api_key, is_active, created_at)
+                    INSERT INTO {} (company_pin, api_key, is_active, created_at)
                     VALUES (%s, %s, %s, NOW())
                     ON CONFLICT (company_pin) 
                     DO UPDATE SET 
                         api_key = EXCLUDED.api_key,
                         is_active = EXCLUDED.is_active
                     RETURNING client_id
-                    """,
+                    """.format(self._get_table_name('clients')),
                     (company_pin, api_key, is_active)
                 )
                 result = cur.fetchone()
@@ -124,13 +129,13 @@ class PostgresManager:
                 cur.execute(
                     """
                     SELECT id, session_id, username, fk_client_id, created_at, last_active
-                    FROM chatbot.sessions 
+                    FROM {} 
                     WHERE username = %s 
                       AND fk_client_id = %s 
                       AND last_active > NOW() - INTERVAL '%s seconds'
                     ORDER BY last_active DESC
                     LIMIT 1
-                    """,
+                    """.format(self._get_table_name('sessions')),
                     (username, client_id, session_max_age)
                 )
                 result = cur.fetchone()
@@ -160,10 +165,10 @@ class PostgresManager:
             with self.conn.cursor() as cur:
                 cur.execute(
                     """
-                    INSERT INTO chatbot.sessions (session_id, username, fk_client_id, created_at, last_active)
+                    INSERT INTO {} (session_id, username, fk_client_id, created_at, last_active)
                     VALUES (%s, %s, %s, NOW(), NOW())
                     RETURNING id
-                    """,
+                    """.format(self._get_table_name('sessions')),
                     (session_id, username, client_id)
                 )
                 session_db_id = cur.fetchone()[0]
@@ -188,7 +193,7 @@ class PostgresManager:
         try:
             with self.conn.cursor() as cur:
                 cur.execute(
-                    "SELECT id FROM chatbot.sessions WHERE session_id = %s",
+                    "SELECT id FROM {} WHERE session_id = %s".format(self._get_table_name('sessions')),
                     (session_id,)
                 )
                 result = cur.fetchone()
@@ -203,7 +208,7 @@ class PostgresManager:
             logger.debug(f"Updating last_active timestamp for session: {session_id}")
             with self.conn.cursor() as cur:
                 cur.execute(
-                    "UPDATE chatbot.sessions SET last_active = NOW() WHERE session_id = %s",
+                    "UPDATE {} SET last_active = NOW() WHERE session_id = %s".format(self._get_table_name('sessions')),
                     (session_id,)
                 )
                 self.conn.commit()
@@ -239,14 +244,14 @@ class PostgresManager:
             with self.conn.cursor() as cur:
                 cur.execute(
                     f"""
-                    CREATE TABLE IF NOT EXISTS chatbot.{table_name} (
+                    CREATE TABLE IF NOT EXISTS {self._get_table_name(table_name)} (
                         conversation_id SERIAL PRIMARY KEY,
                         fk_session_id INTEGER NOT NULL,
                         user_message TEXT NOT NULL,
                         chatbot_response TEXT NOT NULL,
                         tokens_used INTEGER DEFAULT 0,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        FOREIGN KEY (fk_session_id) REFERENCES chatbot.sessions(id) ON DELETE CASCADE
+                        FOREIGN KEY (fk_session_id) REFERENCES {self._get_table_name('sessions')}(id) ON DELETE CASCADE
                     )
                     """
                 )
@@ -254,13 +259,13 @@ class PostgresManager:
                 cur.execute(
                     f"""
                     CREATE INDEX IF NOT EXISTS idx_{table_name}_session_id 
-                    ON chatbot.{table_name}(fk_session_id)
+                    ON {self._get_table_name(table_name)}(fk_session_id)
                     """
                 )
                 cur.execute(
                     f"""
                     CREATE INDEX IF NOT EXISTS idx_{table_name}_created_at 
-                    ON chatbot.{table_name}(created_at)
+                    ON {self._get_table_name(table_name)}(created_at)
                     """
                 )
                 self.conn.commit()
@@ -296,7 +301,7 @@ class PostgresManager:
             with self.conn.cursor() as cur:
                 cur.execute(
                     f"""
-                    INSERT INTO chatbot.{table_name} (fk_session_id, user_message, chatbot_response, tokens_used, created_at)
+                    INSERT INTO {self._get_table_name(table_name)} (fk_session_id, user_message, chatbot_response, tokens_used, created_at)
                     VALUES (%s, %s, %s, %s, NOW())
                     """,
                     (session_db_id, user_message, chatbot_response, tokens_used)
@@ -326,7 +331,7 @@ class PostgresManager:
         try:
             with self.conn.cursor() as cur:
                 cur.execute(
-                    "SELECT token_limit_per_month FROM chatbot.clients WHERE client_id = %s",
+                    "SELECT token_limit_per_month FROM {} WHERE client_id = %s".format(self._get_table_name('clients')),
                     (client_id,)
                 )
                 result = cur.fetchone()
@@ -355,9 +360,9 @@ class PostgresManager:
             with self.conn.cursor() as cur:
                 cur.execute(
                     """
-                    SELECT tokens_used FROM chatbot.tokens 
+                    SELECT tokens_used FROM {} 
                     WHERE fk_client_id = %s AND month_year = %s
-                    """,
+                    """.format(self._get_table_name('tokens')),
                     (client_id, month_year)
                 )
                 result = cur.fetchone()
@@ -390,13 +395,13 @@ class PostgresManager:
                 # Insert or update token usage
                 cur.execute(
                     """
-                    INSERT INTO chatbot.tokens (fk_client_id, month_year, tokens_used, created_at, updated_at)
+                    INSERT INTO {} (fk_client_id, month_year, tokens_used, created_at, updated_at)
                     VALUES (%s, %s, %s, NOW(), NOW())
                     ON CONFLICT (fk_client_id, month_year)
                     DO UPDATE SET 
-                        tokens_used = chatbot.tokens.tokens_used + EXCLUDED.tokens_used,
+                        tokens_used = {}.tokens_used + EXCLUDED.tokens_used,
                         updated_at = NOW()
-                    """,
+                    """.format(self._get_table_name('tokens'), self._get_table_name('tokens')),
                     (client_id, month_year, tokens_used)
                 )
                 self.conn.commit()
@@ -471,23 +476,15 @@ class PostgresManager:
             logger.info(f"   Chunk Count: {chunk_count}")
             
             with self.conn.cursor() as cur:
-                logger.info("🔍 Checking if document already exists...")
                 cur.execute(
-                    "SELECT document_id FROM chatbot.documents WHERE announcement_id = %s AND fk_client_id = %s",
+                    "SELECT document_id FROM {} WHERE announcement_id = %s AND fk_client_id = %s".format(self._get_table_name('documents')),
                     (announcement_id, client_id)
                 )
                 existing = cur.fetchone()
                 
-                if existing:
-                    logger.info(f"⚠️  Document already exists (document_id: {existing[0]})")
-                    logger.info("   Will update existing record")
-                else:
-                    logger.info("✅ Document is new, will insert")
-                
-                logger.info("💾 Executing INSERT/UPDATE query...")
                 cur.execute(
                     """
-                    INSERT INTO chatbot.documents 
+                    INSERT INTO {} 
                     (announcement_id, fk_client_id, file_name, document_title, file_extension, chunk_count, synced_at)
                     VALUES (%s, %s, %s, %s, %s, %s, NOW())
                     ON CONFLICT (announcement_id, fk_client_id)
@@ -498,7 +495,7 @@ class PostgresManager:
                         chunk_count = EXCLUDED.chunk_count,
                         synced_at = NOW()
                     RETURNING document_id
-                    """,
+                    """.format(self._get_table_name('documents')),
                     (announcement_id, client_id, file_name, document_title, file_extension, chunk_count)
                 )
                 document_id = cur.fetchone()[0]
@@ -506,7 +503,7 @@ class PostgresManager:
                 
                 logger.info("✅ Document metadata saved successfully")
                 logger.info(f"   Document ID: {document_id}")
-                logger.info(f"   Table: chatbot.documents")
+                logger.info(f"   Table: {self._get_table_name('documents')}")
                 logger.info(f"   Action: {'Updated' if existing else 'Inserted'}")
                 logger.info("="*60)
                 
@@ -537,11 +534,11 @@ class PostgresManager:
                 cur.execute(
                     """
                     SELECT id, session_id, username, fk_client_id, created_at, last_active
-                    FROM chatbot.sessions 
+                    FROM {} 
                     WHERE username = %s AND fk_client_id = %s
                     ORDER BY last_active DESC
                     LIMIT %s
-                    """,
+                    """.format(self._get_table_name('sessions')),
                     (username, client_id, limit)
                 )
                 results = cur.fetchall()
@@ -572,23 +569,23 @@ class PostgresManager:
                     params.append(client_id)
                 
                 # Total sessions
-                cur.execute(f"SELECT COUNT(*) as total_sessions FROM chatbot.sessions {where_clause}", params)
+                cur.execute(f"SELECT COUNT(*) as total_sessions FROM {self._get_table_name('sessions')} {where_clause}", params)
                 total_sessions = cur.fetchone()['total_sessions']
                 
                 # Active sessions (not expired)
                 active_where = where_clause + " AND last_active > NOW() - INTERVAL '%s seconds'"
                 active_params = params + [1800]  # SESSION_MAX_AGE
-                cur.execute(f"SELECT COUNT(*) as active_sessions FROM chatbot.sessions {active_where}", active_params)
+                cur.execute(f"SELECT COUNT(*) as active_sessions FROM {self._get_table_name('sessions')} {active_where}", active_params)
                 active_sessions = cur.fetchone()['active_sessions']
                 
                 # Unique users
-                cur.execute(f"SELECT COUNT(DISTINCT username) as unique_users FROM chatbot.sessions {where_clause}", params)
+                cur.execute(f"SELECT COUNT(DISTINCT username) as unique_users FROM {self._get_table_name('sessions')} {where_clause}", params)
                 unique_users = cur.fetchone()['unique_users']
                 
                 # Sessions by day
                 cur.execute(f"""
                     SELECT DATE(created_at) as session_date, COUNT(*) as session_count
-                    FROM chatbot.sessions {where_clause}
+                    FROM {self._get_table_name('sessions')} {where_clause}
                     GROUP BY DATE(created_at)
                     ORDER BY session_date DESC
                     LIMIT 7
@@ -633,7 +630,7 @@ class PostgresManager:
             logger.info(f"🗑️  Deleting all document records for client_id: {client_id}")
             with self.conn.cursor() as cur:
                 cur.execute(
-                    "DELETE FROM chatbot.documents WHERE fk_client_id = %s",
+                    "DELETE FROM {} WHERE fk_client_id = %s".format(self._get_table_name('documents')),
                     (client_id,)
                 )
                 deleted_count = cur.rowcount
