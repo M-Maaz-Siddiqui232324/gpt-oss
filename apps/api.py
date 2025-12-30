@@ -327,17 +327,11 @@ async def query(
             if session:
                 logger.info(f"Session found - ID: {session.session_id}, User: {session.username}, Client: {session.client_id}")
                 
-                if not session_manager.is_session_expired(session):
-                    logger.info(f"Session is not expired - Last active: {session.last_active}")
-                    
-                    # Verify session belongs to current user and client
-                    if session.username == username and session.client_id == authenticated_client_id:
-                        logger.info(f"Session validation SUCCESS - Reusing session: {session.session_id}")
-                    else:
-                        logger.warning(f"Session validation FAILED - Expected: {username}/{authenticated_client_id}, Got: {session.username}/{session.client_id}")
-                        session = None
+                # Verify session belongs to current user and client
+                if session.username == username and session.client_id == authenticated_client_id:
+                    logger.info(f"Session validation SUCCESS - Reusing session: {session.session_id}")
                 else:
-                    logger.info(f"Session EXPIRED - Last active: {session.last_active}")
+                    logger.warning(f"Session validation FAILED - Expected: {username}/{authenticated_client_id}, Got: {session.username}/{session.client_id}")
                     session = None
             else:
                 logger.warning(f"Session NOT FOUND in memory: {request_body.session_id}")
