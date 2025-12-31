@@ -209,6 +209,7 @@ async def startup_event():
         )
         rag_system = RAGSystem()
         asyncio.create_task(cleanup_sessions_task())
+        asyncio.create_task(update_tokens_job())
         logger.info("Server initialized successfully")
     
     except Exception as e:
@@ -222,13 +223,32 @@ async def cleanup_sessions_task():
         await asyncio.sleep(CLEANUP_INTERVAL)
         try:
             if session_manager:
-                # Clean up in-memory sessions only
-                memory_cleaned = session_manager.cleanup_expired_sessions()
+                # Clean up in-memory sessions with token updating
+                db = PostgresManager(POSTGRES_CONNECTION_STRING)
+                db.connect()
+                memory_cleaned = session_manager.cleanup_expired_sessions(db)
+                db.disconnect()
                 
                 if memory_cleaned > 0:
                     logger.info(f"Session cleanup: {memory_cleaned} expired sessions removed from memory")
         except Exception as e:
             logger.error(f"Error in cleanup task: {e}", exc_info=True)
+
+
+async def update_tokens_job():
+    """Background job to update pending tokens to database"""
+    while True:
+        await asyncio.sleep(3600)  # Update every hour
+        try:
+            if session_manager:
+                db = PostgresManager(POSTGRES_CONNECTION_STRING)
+                db.connect()
+                updated = session_manager.update_pending_tokens(db)
+                if updated > 0:
+                    logger.info(f"Token update: {updated} sessions updated to database")
+                db.disconnect()
+        except Exception as e:
+            logger.error(f"Error in token update job: {e}", exc_info=True)
 
 
 @app.get("/", response_model=dict)
@@ -301,14 +321,20 @@ async def query(
         rag_system.load_client_index(company_pin)
         
         # Check token limit
-        token_status = db.check_token_limit(authenticated_client_id)
+        estimated_tokens = min(max(len(request_body.query) // 4, 10), 100)  # 10-100 tokens estimate
         
-        if not token_status['allowed']:
-            logger.warning(f"Token limit exceeded for client {authenticated_client_id}")
+        can_use, error_msg = session_manager.can_use_tokens(
+            authenticated_client_id, 
+            estimated_tokens, 
+            db
+        )
+        
+        if not can_use:
+            logger.warning(f"Token limit check failed for client {authenticated_client_id}: {error_msg}")
             db.disconnect()
             clear_client_context()
             return QueryResponse(
-                response="Your monthly token limit has been reached. Please contact your administrator.",
+                response=f"Token limit exceeded. {error_msg}",
                 session_id=""
             )
         
@@ -399,12 +425,14 @@ async def query(
         if session_db_id:
             db.add_conversation(session_db_id, request_body.query, response, total_tokens)
         
-        # Update token usage and session activity
-        db.update_token_usage(authenticated_client_id, total_tokens)
+        # Cache tokens in session instead of immediate DB write
+        session_manager.add_tokens(session.session_id, total_tokens)
+        
+        # Update session activity only
         db.update_session_activity(session.session_id)
         db.disconnect()
         
-        logger.info(f"Query processed: {total_tokens} tokens, {len(sources)} sources")
+        logger.info(f"Query processed: {total_tokens} tokens cached, {len(sources)} sources")
         
         # Clear client context
         clear_client_context()
@@ -448,78 +476,6 @@ async def list_sessions():
     }
 
 
-@app.get("/sessions/user/{username}")
-async def get_user_sessions(
-    username: str,
-    x_company_pin: Optional[str] = Header(None, alias="X-Company-Pin"),
-    x_api_key: Optional[str] = Header(None, alias="X-API-Key")
-):
-    """Get session history for a specific user"""
-    if not x_company_pin or not x_api_key:
-        raise HTTPException(status_code=401, detail="Authentication required")
-    
-    try:
-        db = PostgresManager(POSTGRES_CONNECTION_STRING)
-        if not db.connect():
-            raise HTTPException(status_code=503, detail="Database connection failed")
-        
-        client = db.authenticate_client(x_company_pin, x_api_key)
-        if not client:
-            db.disconnect()
-            raise HTTPException(status_code=401, detail="Invalid credentials")
-        
-        sessions = db.get_user_session_history(username, client['client_id'])
-        db.disconnect()
-        
-        return {
-            "username": username,
-            "sessions": sessions,
-            "count": len(sessions)
-        }
-    
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error getting user sessions: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get("/sessions/analytics")
-async def get_session_analytics(
-    days: int = 30,
-    x_company_pin: Optional[str] = Header(None, alias="X-Company-Pin"),
-    x_api_key: Optional[str] = Header(None, alias="X-API-Key")
-):
-    """Get session analytics for monitoring and audit purposes"""
-    if not x_company_pin or not x_api_key:
-        raise HTTPException(status_code=401, detail="Authentication required")
-    
-    try:
-        db = PostgresManager(POSTGRES_CONNECTION_STRING)
-        if not db.connect():
-            raise HTTPException(status_code=503, detail="Database connection failed")
-        
-        client = db.authenticate_client(x_company_pin, x_api_key)
-        if not client:
-            db.disconnect()
-            raise HTTPException(status_code=401, detail="Invalid credentials")
-        
-        analytics = db.get_session_analytics(client['client_id'], days)
-        db.disconnect()
-        
-        return {
-            "client_id": client['client_id'],
-            "company_pin": client['company_pin'],
-            "analytics": analytics
-        }
-    
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error getting session analytics: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
 @app.get("/chat")
 async def chat(message: str, request: Request):
     """Simple GET endpoint for testing - sends a message and gets response"""
@@ -537,13 +493,8 @@ async def chat(message: str, request: Request):
         client_id = 1  # Default client for testing
         
         # Get or create session for test user
-        session = session_manager.store.find_active_session_for_user(username, client_id, session_manager.session_max_age)
-        
-        if not session:
-            session = session_manager.create_session(username, client_id)
-            logger.info(f"Created new test session: {session.session_id}")
-        else:
-            logger.info(f"Reusing existing test session: {session.session_id}")
+        session = session_manager.create_session(username, client_id)
+        logger.info(f"Created new test session: {session.session_id}")
         
         # Update browser session cookie for compatibility
         request.session["session_id"] = session.session_id

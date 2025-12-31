@@ -30,6 +30,7 @@ class Session:
     last_active: str
     messages: List[Message] = field(default_factory=list)
     session_db_id: Optional[int] = None
+    pending_tokens: int = 0  
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert session to dictionary"""
@@ -40,7 +41,8 @@ class Session:
             "created_at": self.created_at,
             "last_active": self.last_active,
             "messages": [asdict(msg) for msg in self.messages],
-            "session_db_id": self.session_db_id
+            "session_db_id": self.session_db_id,
+            "pending_tokens": self.pending_tokens
         }
     
     @classmethod
@@ -54,7 +56,8 @@ class Session:
             created_at=data["created_at"],
             last_active=data["last_active"],
             messages=messages,
-            session_db_id=data.get("session_db_id")
+            session_db_id=data.get("session_db_id"),
+            pending_tokens=data.get("pending_tokens", 0)
         )
 
 
@@ -105,26 +108,6 @@ class InMemorySessionStore:
             return True
         return False
     
-    def find_active_session_for_user(self, username: str, client_id: int, session_max_age: int) -> Optional[Session]:
-        """Find an active session for a specific username and client"""
-        now = datetime.now()
-        
-        for session in self.sessions.values():
-            if (session.username == username and 
-                session.client_id == client_id):
-                
-                last_active = datetime.fromisoformat(session.last_active)
-                age = (now - last_active).total_seconds()
-                
-                if age <= session_max_age:
-                    logger.info(f"Found active session for user {username}: {session.session_id}")
-                    return session
-                else:
-                    logger.info(f"Session expired for user {username}: {session.session_id} (age: {age}s)")
-        
-        logger.info(f"No active session found for user {username}")
-        return None
-
     def list_all(self) -> List[Dict[str, Any]]:
         """List all active sessions"""
         return [
@@ -162,6 +145,11 @@ class FastAPISessionManager:
     ):
         self.store = InMemorySessionStore(max_sessions)
         self.session_max_age = session_max_age
+        
+        # Token usage cache: {client_id: {'db_tokens': int, 'limit': int, 'last_updated': datetime}}
+        self.token_cache = {}
+        self.cache_ttl = 3600
+        
         logger.info("Session manager initialized (PostgreSQL storage)")
     
     def create_session(self, username: str, client_id: int) -> Session:
@@ -194,7 +182,113 @@ class FastAPISessionManager:
         return self.store.list_all()
     
 
-    def cleanup_expired_sessions(self) -> int:
+    def add_tokens(self, session_id: str, tokens: int) -> None:
+        """Add tokens to session's pending count"""
+        session = self.store.get(session_id)
+        if session:
+            session.pending_tokens += tokens
+            self.store.update(session)
+            logger.debug(f"Added {tokens} tokens to session {session_id} (pending: {session.pending_tokens})")
+
+    def get_pending_tokens_for_client(self, client_id: int) -> int:
+        """Get total pending tokens for a specific client across all sessions"""
+        total_pending = 0
+        for session in self.store.sessions.values():
+            if session.client_id == client_id:
+                total_pending += session.pending_tokens
+        return total_pending
+
+    def get_cached_token_info(self, client_id: int, db_manager) -> dict:
+        """Get cached token info or fetch from DB if stale"""
+        now = datetime.now()
+        
+        # Check if we have fresh cache
+        if client_id in self.token_cache:
+            cache_entry = self.token_cache[client_id]
+            age = (now - cache_entry['last_updated']).total_seconds()
+            
+            if age < self.cache_ttl:
+                return cache_entry
+        
+        # Cache miss or stale - fetch from DB
+        try:
+            db_tokens = db_manager.get_client_token_usage(client_id)
+            token_limit = db_manager.get_client_token_limit(client_id)
+            
+            # Update cache
+            self.token_cache[client_id] = {
+                'db_tokens': db_tokens,
+                'limit': token_limit,
+                'last_updated': now
+            }
+            
+            return self.token_cache[client_id]
+            
+        except Exception as e:
+            logger.error(f"Error fetching token info for client {client_id}: {e}")
+            # Return default if error
+            return {'db_tokens': 0, 'limit': 100000, 'last_updated': now}
+
+    def can_use_tokens(self, client_id: int, estimated_tokens: int, db_manager) -> tuple[bool, str]:
+        """
+        Check if client can use estimated tokens without exceeding limit
+        Returns (can_use, error_message)
+        """
+        try:
+            # Get cached token info
+            token_info = self.get_cached_token_info(client_id, db_manager)
+            
+            if not token_info['limit']:
+                return True, ""  # No limit set
+            
+            # Get pending tokens from all sessions for this client
+            pending_tokens = self.get_pending_tokens_for_client(client_id)
+            
+            # Calculate total usage
+            total_usage = token_info['db_tokens'] + pending_tokens + estimated_tokens
+            
+            if total_usage > token_info['limit']:
+                return False, f"Token limit exceeded. Usage: {token_info['db_tokens'] + pending_tokens}/{token_info['limit']}, Requested: {estimated_tokens}"
+            
+            return True, ""
+            
+        except Exception as e:
+            logger.error(f"Error checking token limit for client {client_id}: {e}")
+            # Allow request if we can't check (fail open)
+            return True, ""
+
+    def invalidate_token_cache(self, client_id: int) -> None:
+        """Invalidate token cache for a client"""
+        if client_id in self.token_cache:
+            del self.token_cache[client_id]
+            logger.debug(f"Invalidated token cache for client {client_id}")
+
+    def update_pending_tokens(self, db_manager) -> int:
+        """Update all pending tokens to database"""
+        updated_sessions = 0
+        updated_clients = set()
+        
+        for session in self.store.sessions.values():
+            if session.pending_tokens > 0:
+                try:
+                    # Write tokens to database
+                    db_manager.update_token_usage(session.client_id, session.pending_tokens)
+                    
+                    logger.info(f"Updated {session.pending_tokens} tokens for session {session.session_id}")
+                    session.pending_tokens = 0  # Reset after successful write
+                    updated_sessions += 1
+                    updated_clients.add(session.client_id)
+                    
+                except Exception as e:
+                    logger.error(f"Failed to update tokens for session {session.session_id}: {e}")
+        
+        # Invalidate cache for updated clients
+        for client_id in updated_clients:
+            self.invalidate_token_cache(client_id)
+        
+        return updated_sessions
+
+    def cleanup_expired_sessions(self, db_manager=None) -> int:
         """Remove sessions that have been inactive for too long"""
         now = datetime.now()
         expired_sessions = []
@@ -204,10 +298,18 @@ class FastAPISessionManager:
             age = (now - last_active).total_seconds()
             
             if age > self.session_max_age:
+                # Update pending tokens before removing session
+                if session.pending_tokens > 0 and db_manager:
+                    try:
+                        db_manager.update_token_usage(session.client_id, session.pending_tokens)
+                        logger.info(f"Updated {session.pending_tokens} tokens before cleanup for session {session.session_id}")
+                    except Exception as e:
+                        logger.error(f"Failed to update tokens during cleanup for session {session.session_id}: {e}")
+                
                 expired_sessions.append(session)
         
         for session in expired_sessions:
-            logger.info(f"Session expired: {session.session_id} (inactive for {age:.0f}s, conversations already in database)")
+            logger.info(f"Session expired: {session.session_id} (inactive for {age:.0f}s)")
             self.store.delete(session.session_id)
         
         if expired_sessions:
