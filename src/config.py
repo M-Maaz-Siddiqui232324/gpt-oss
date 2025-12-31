@@ -12,7 +12,7 @@ OLLAMA_BASE_URL = "http://localhost:11434"
 EMBEDDING_MODEL = "BAAI/bge-base-en-v1.5"
 
 DOCS_FOLDER = os.path.join(PROJECT_ROOT, "docs")
-SEMANTIC_SIMILARITY_THRESHOLD = 0.7  # Lower = more chunks, Higher = fewer chunks
+SEMANTIC_SIMILARITY_THRESHOLD = 0.6
 
 # Per-client embedding storage
 DATA_FOLDER = os.path.join(PROJECT_ROOT, "data")
@@ -47,7 +47,7 @@ OLLAMA_TIMEOUT = 500
 
 TOP_K_RETRIEVAL = 10
 TOP_K_CONTEXT = 7  
-MIN_RELEVANCE_THRESHOLD = 0.6
+MIN_RELEVANCE_THRESHOLD = 0.7
 
 MAX_HISTORY = 5
 RECENT_CONTEXT_EXCHANGES = 5

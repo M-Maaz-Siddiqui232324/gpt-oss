@@ -90,6 +90,7 @@ class RAGSystem:
             context_docs = self.retriever.retrieve(user_input, TOP_K_RETRIEVAL)
             
             if not context_docs:
+                logger.info(f"🎯 Prompt Selection: GENERAL (no documents found)")
                 return self._generate_general_response(user_input, recent_context, max_tokens, temperature, top_p), []
             
             scores = [doc.relevance_score for doc in context_docs]
@@ -98,11 +99,24 @@ class RAGSystem:
             
             dynamic_threshold = max(MIN_RELEVANCE_THRESHOLD, mean_score - 0.5 * std_score)
             
+            logger.info(f"📊 Relevance Threshold Analysis:")
+            logger.info(f"  Retrieved Documents: {len(context_docs)}")
+            logger.info(f"  Score Range: {min(scores):.3f} - {max(scores):.3f}")
+            logger.info(f"  Mean Score: {mean_score:.3f}")
+            logger.info(f"  Std Deviation: {std_score:.3f}")
+            logger.info(f"  Dynamic Threshold: {dynamic_threshold:.3f}")
+            logger.info(f"  Min Threshold: {MIN_RELEVANCE_THRESHOLD}")
+            
             relevant_docs = [doc for doc in context_docs if doc.relevance_score >= dynamic_threshold]
             relevant_docs = relevant_docs[:TOP_K_CONTEXT]
             
             if not relevant_docs:
+                logger.info(f"🎯 Prompt Selection: GENERAL (no documents above threshold {dynamic_threshold:.3f})")
                 return self._generate_general_response(user_input, recent_context, max_tokens, temperature, top_p), []
+            
+            logger.info(f"🎯 Prompt Selection: DOCUMENT-AWARE")
+            logger.info(f"  Documents Above Threshold: {len(relevant_docs)}")
+            logger.info(f"  Selected Documents: {[doc.source_file for doc in relevant_docs]}")
             
             # Generate response with context
             response = self._generate_document_response(
