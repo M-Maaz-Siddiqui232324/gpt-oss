@@ -209,7 +209,6 @@ async def startup_event():
         )
         rag_system = RAGSystem()
         asyncio.create_task(cleanup_sessions_task())
-        asyncio.create_task(update_tokens_job())
         logger.info("Server initialized successfully")
     
     except Exception as e:
@@ -233,22 +232,6 @@ async def cleanup_sessions_task():
                     logger.info(f"Session cleanup: {memory_cleaned} expired sessions removed from memory")
         except Exception as e:
             logger.error(f"Error in cleanup task: {e}", exc_info=True)
-
-
-async def update_tokens_job():
-    """Background job to update pending tokens to database"""
-    while True:
-        await asyncio.sleep(3600)  # Update every hour
-        try:
-            if session_manager:
-                db = PostgresManager(POSTGRES_CONNECTION_STRING)
-                db.connect()
-                updated = session_manager.update_pending_tokens(db)
-                if updated > 0:
-                    logger.info(f"Token update: {updated} sessions updated to database")
-                db.disconnect()
-        except Exception as e:
-            logger.error(f"Error in token update job: {e}", exc_info=True)
 
 
 @app.get("/", response_model=dict)

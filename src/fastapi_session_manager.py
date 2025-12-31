@@ -263,31 +263,6 @@ class FastAPISessionManager:
             del self.token_cache[client_id]
             logger.debug(f"Invalidated token cache for client {client_id}")
 
-    def update_pending_tokens(self, db_manager) -> int:
-        """Update all pending tokens to database"""
-        updated_sessions = 0
-        updated_clients = set()
-        
-        for session in self.store.sessions.values():
-            if session.pending_tokens > 0:
-                try:
-                    # Write tokens to database
-                    db_manager.update_token_usage(session.client_id, session.pending_tokens)
-                    
-                    logger.info(f"Updated {session.pending_tokens} tokens for session {session.session_id}")
-                    session.pending_tokens = 0  # Reset after successful write
-                    updated_sessions += 1
-                    updated_clients.add(session.client_id)
-                    
-                except Exception as e:
-                    logger.error(f"Failed to update tokens for session {session.session_id}: {e}")
-        
-        # Invalidate cache for updated clients
-        for client_id in updated_clients:
-            self.invalidate_token_cache(client_id)
-        
-        return updated_sessions
-
     def cleanup_expired_sessions(self, db_manager=None) -> int:
         """Remove sessions that have been inactive for too long"""
         now = datetime.now()
