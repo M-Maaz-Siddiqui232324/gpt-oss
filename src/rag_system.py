@@ -7,7 +7,8 @@ from datetime import datetime
 from config import (
     DOCS_FOLDER, SEMANTIC_SIMILARITY_THRESHOLD, EMBEDDING_MODEL,
     MODEL_NAME, OLLAMA_BASE_URL, DEFAULT_MAX_TOKENS, DEFAULT_TEMPERATURE,
-    DEFAULT_TOP_P, TOP_K_RETRIEVAL, TOP_K_CONTEXT, MIN_RELEVANCE_THRESHOLD
+    DEFAULT_TOP_P, TOP_K_RETRIEVAL, TOP_K_CONTEXT, MIN_RELEVANCE_THRESHOLD,
+    BEST_MATCH_THRESHOLD
 )
 from processing.document_processor import DocumentProcessor
 from processing.chunking import SemanticChunker, DocumentChunk
@@ -91,6 +92,12 @@ class RAGSystem:
             
             if not context_docs:
                 logger.info(f"🎯 Prompt Selection: GENERAL (no documents found)")
+                return self._generate_general_response(user_input, recent_context, max_tokens, temperature, top_p), []
+            
+            # Check if best match is good enough (best score check)
+            best_score = max(doc.relevance_score for doc in context_docs)
+            if best_score < BEST_MATCH_THRESHOLD:
+                logger.info(f"🎯 Prompt Selection: GENERAL (best score {best_score:.3f} below threshold {BEST_MATCH_THRESHOLD})")
                 return self._generate_general_response(user_input, recent_context, max_tokens, temperature, top_p), []
             
             scores = [doc.relevance_score for doc in context_docs]
