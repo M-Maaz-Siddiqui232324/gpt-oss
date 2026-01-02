@@ -87,18 +87,34 @@ class RAGSystem:
     ) -> Tuple[str, List[DocumentChunk]]:
         """Process a user query with external context (for session management)"""
         try:
+            # Log query start with unique ID for tracking
+            query_id = f"Q_{datetime.now().strftime('%H%M%S_%f')}"
+            logger.info(f"🔍 RAG_QUERY_START|{query_id}|{user_input}")
+            
             # Retrieve relevant documents
+            retrieval_start = datetime.now()
             context_docs = self.retriever.retrieve(user_input, TOP_K_RETRIEVAL)
+            retrieval_time = (datetime.now() - retrieval_start).total_seconds()
+            
+            logger.info(f"📊 RAG_RETRIEVAL|{query_id}|retrieved_count:{len(context_docs)}|time:{retrieval_time:.3f}s")
             
             if not context_docs:
-                logger.info(f"🎯 Prompt Selection: GENERAL (no documents found)")
-                return self._generate_general_response(user_input, recent_context, max_tokens, temperature, top_p), []
+                logger.info(f"🎯 RAG_PROMPT_TYPE|{query_id}|GENERAL|reason:no_documents_found")
+                response = self._generate_general_response(user_input, recent_context, max_tokens, temperature, top_p, query_id)
+                logger.info(f"✅ RAG_QUERY_END|{query_id}|prompt_type:GENERAL|chunks_used:0")
+                return response, []
+            
+            # Log retrieved chunks details
+            for i, doc in enumerate(context_docs):
+                logger.info(f"📄 RAG_CHUNK|{query_id}|chunk_{i}|file:{doc.source_file}|score:{doc.relevance_score:.3f}|content_preview:{doc.content[:100]}...")
             
             # Check if best match is good enough (best score check)
             best_score = max(doc.relevance_score for doc in context_docs)
             if best_score < BEST_MATCH_THRESHOLD:
-                logger.info(f"🎯 Prompt Selection: GENERAL (best score {best_score:.3f} below threshold {BEST_MATCH_THRESHOLD})")
-                return self._generate_general_response(user_input, recent_context, max_tokens, temperature, top_p), []
+                logger.info(f"🎯 RAG_PROMPT_TYPE|{query_id}|GENERAL|reason:best_score_{best_score:.3f}_below_threshold_{BEST_MATCH_THRESHOLD}")
+                response = self._generate_general_response(user_input, recent_context, max_tokens, temperature, top_p, query_id)
+                logger.info(f"✅ RAG_QUERY_END|{query_id}|prompt_type:GENERAL|chunks_used:0")
+                return response, []
             
             scores = [doc.relevance_score for doc in context_docs]
             mean_score = np.mean(scores)
@@ -106,39 +122,43 @@ class RAGSystem:
             
             dynamic_threshold = max(MIN_RELEVANCE_THRESHOLD, mean_score - 0.5 * std_score)
             
-            logger.info(f"📊 Relevance Threshold Analysis:")
-            logger.info(f"  Retrieved Documents: {len(context_docs)}")
-            logger.info(f"  Score Range: {min(scores):.3f} - {max(scores):.3f}")
-            logger.info(f"  Mean Score: {mean_score:.3f}")
-            logger.info(f"  Std Deviation: {std_score:.3f}")
-            logger.info(f"  Dynamic Threshold: {dynamic_threshold:.3f}")
-            logger.info(f"  Min Threshold: {MIN_RELEVANCE_THRESHOLD}")
+            logger.info(f"📊 RAG_THRESHOLD_ANALYSIS|{query_id}|retrieved:{len(context_docs)}|score_range:{min(scores):.3f}-{max(scores):.3f}|mean:{mean_score:.3f}|std:{std_score:.3f}|dynamic_threshold:{dynamic_threshold:.3f}")
             
             relevant_docs = [doc for doc in context_docs if doc.relevance_score >= dynamic_threshold]
             relevant_docs = relevant_docs[:TOP_K_CONTEXT]
             
             if not relevant_docs:
-                logger.info(f"🎯 Prompt Selection: GENERAL (no documents above threshold {dynamic_threshold:.3f})")
-                return self._generate_general_response(user_input, recent_context, max_tokens, temperature, top_p), []
+                logger.info(f"🎯 RAG_PROMPT_TYPE|{query_id}|GENERAL|reason:no_docs_above_threshold_{dynamic_threshold:.3f}")
+                response = self._generate_general_response(user_input, recent_context, max_tokens, temperature, top_p, query_id)
+                logger.info(f"✅ RAG_QUERY_END|{query_id}|prompt_type:GENERAL|chunks_used:0")
+                return response, []
             
-            logger.info(f"🎯 Prompt Selection: DOCUMENT-AWARE")
-            logger.info(f"  Documents Above Threshold: {len(relevant_docs)}")
-            logger.info(f"  Selected Documents: {[doc.source_file for doc in relevant_docs]}")
+            logger.info(f"🎯 RAG_PROMPT_TYPE|{query_id}|DOCUMENT_AWARE|chunks_selected:{len(relevant_docs)}")
+            
+            # Log selected chunks for context
+            for i, doc in enumerate(relevant_docs):
+                logger.info(f"🎯 RAG_CONTEXT_CHUNK|{query_id}|selected_{i}|file:{doc.source_file}|chunk_id:{doc.chunk_id}|score:{doc.relevance_score:.3f}")
             
             # Generate response with context
+            generation_start = datetime.now()
             response = self._generate_document_response(
                 user_input, 
                 relevant_docs,
                 recent_context,
                 max_tokens,
                 temperature,
-                top_p
+                top_p,
+                query_id  # Pass query_id for logging
             )
+            generation_time = (datetime.now() - generation_start).total_seconds()
+            
+            logger.info(f"⚡ RAG_GENERATION|{query_id}|time:{generation_time:.3f}s|response_length:{len(response)}")
+            logger.info(f"✅ RAG_QUERY_END|{query_id}|prompt_type:DOCUMENT_AWARE|chunks_used:{len(relevant_docs)}|total_time:{retrieval_time + generation_time:.3f}s")
             
             return response, relevant_docs
         
         except Exception as e:
-            logger.error(f"Error processing query: {str(e)}", exc_info=True)
+            logger.error(f"❌ RAG_ERROR|{query_id if 'query_id' in locals() else 'UNKNOWN'}|{str(e)}")
             return f"I apologize, but I encountered an issue: {str(e)}", []
     
     def _generate_general_response(
@@ -147,10 +167,15 @@ class RAGSystem:
         recent_context: str,
         max_tokens: int,
         temperature: float,
-        top_p: float
+        top_p: float,
+        query_id: str = "UNKNOWN"
     ) -> str:
         """Generate response without document context"""
         prompt = get_general_prompt(user_input, recent_context)
+        
+        # Log the built prompt
+        logger.info(f"🔧 RAG_PROMPT_BUILT|{query_id}|length:{len(prompt)}|context_docs:0")
+        logger.info(f"🔧 RAG_FULL_PROMPT|{query_id}|{prompt}")
         
         response = self.llm_engine.generate(
             prompt,
@@ -167,10 +192,15 @@ class RAGSystem:
         recent_context: str,
         max_tokens: int,
         temperature: float,
-        top_p: float
+        top_p: float,
+        query_id: str = "UNKNOWN"
     ) -> str:
         """Generate response with document context"""
         prompt = get_document_aware_prompt(user_input, context_docs, recent_context)
+        
+        # Log the built prompt
+        logger.info(f"🔧 RAG_PROMPT_BUILT|{query_id}|length:{len(prompt)}|context_docs:{len(context_docs)}")
+        logger.info(f"🔧 RAG_FULL_PROMPT|{query_id}|{prompt}")
         
         response = self.llm_engine.generate(
             prompt,
