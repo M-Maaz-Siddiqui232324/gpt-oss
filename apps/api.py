@@ -267,7 +267,13 @@ async def query(
     x_api_key: Optional[str] = Header(None, alias="X-API-Key"),
     x_user_name: Optional[str] = Header(None, alias="X-User-Name")
 ):
-    """Process a query with authentication and session management"""
+    """Process a query with authentication and session management - with detailed timing"""
+    import time
+    
+    # Start timing
+    request_start_time = time.time()
+    timing_log = {"request_start": request_start_time}
+    
     if rag_system is None or session_manager is None:
         raise HTTPException(status_code=503, detail="System not initialized")
     
@@ -278,15 +284,19 @@ async def query(
         logger.warning("Authentication failed: Missing credentials")
         return QueryResponse(response="Unauthorized", session_id="")
     
+    timing_log["validation_complete"] = time.time()
+
     try:
-        # Authenticate client against PostgreSQL
-        db = PostgresManager(POSTGRES_CONNECTION_STRING)
+        # Authenticate client against PostgreSQL with connection pooling
+        auth_start = time.time()
+        db = PostgresManager(POSTGRES_CONNECTION_STRING, POSTGRES_POOL_MIN, POSTGRES_POOL_MAX)
         
         if not db.connect():
             logger.error("Failed to connect to database")
             return QueryResponse(response="Unauthorized", session_id="")
         
         client = db.authenticate_client(x_company_pin, x_api_key)
+        timing_log["auth_complete"] = time.time()
         
         if not client:
             logger.warning("Authentication failed: Invalid credentials")
@@ -300,10 +310,12 @@ async def query(
         logger.info(f"Client authenticated: {company_pin} (user: {x_user_name})")
         
         # Load client-specific HR policy index (if exists)
-        # Note: General index is already loaded during RAG system initialization
+        index_load_start = time.time()
         rag_system.load_client_index(company_pin)
+        timing_log["index_load_complete"] = time.time()
         
         # Check token limit
+        token_check_start = time.time()
         estimated_tokens = min(max(len(request_body.query) // 4, 10), 100)  # 10-100 tokens estimate
         
         can_use, error_msg = session_manager.can_use_tokens(
@@ -311,6 +323,7 @@ async def query(
             estimated_tokens, 
             db
         )
+        timing_log["token_check_complete"] = time.time()
         
         if not can_use:
             logger.warning(f"Token limit check failed for client {authenticated_client_id}: {error_msg}")
@@ -321,7 +334,8 @@ async def query(
                 session_id=""
             )
         
-        # Get or create session based on username and client
+        # Session management
+        session_start = time.time()
         username = x_user_name or "unknown"
         
         # Try to use provided session_id from request payload
@@ -352,8 +366,11 @@ async def query(
                 clear_client_context()
                 return QueryResponse(response="Session creation failed", session_id="")
         
+        timing_log["session_complete"] = time.time()
+        
         # Update browser session cookie to match current session
         request.session["session_id"] = session.session_id
+        
         # Add user message to session
         user_message = Message(
             role="user",
@@ -363,14 +380,17 @@ async def query(
         session.messages.append(user_message)
         
         # Get recent context from session
+        context_start = time.time()
         recent_context = ""
         if len(session.messages) > 1:
             recent_messages = session.messages[:-1][-(RECENT_CONTEXT_EXCHANGES * 2):]
             for msg in recent_messages:
                 role = "Human" if msg.role == "user" else "Assistant"
                 recent_context += f"{role}: {msg.content}\n"
+        timing_log["context_complete"] = time.time()
         
-        # Process query with context
+        # Process query with context - THIS IS WHERE RETRIEVAL AND GENERATION HAPPEN
+        rag_start = time.time()
         response, sources = rag_system.query_with_context(
             request_body.query,
             recent_context=recent_context,
@@ -378,13 +398,17 @@ async def query(
             temperature=request_body.temperature,
             top_p=request_body.top_p
         )
+        timing_log["rag_complete"] = time.time()
         
         # Count tokens used (input + output)
+        token_count_start = time.time()
         input_tokens = utils.count_tokens(request_body.query)
         output_tokens = utils.count_tokens(response)
         total_tokens = input_tokens + output_tokens
+        timing_log["token_count_complete"] = time.time()
         
         # Add assistant response to session
+        session_update_start = time.time()
         assistant_message = Message(
             role="assistant",
             content=response,
@@ -397,8 +421,10 @@ async def query(
         )
         session.messages.append(assistant_message)
         session_manager.update_session(session)
+        timing_log["session_update_complete"] = time.time()
         
         # Save conversation to PostgreSQL
+        db_save_start = time.time()
         session_db_id = getattr(session, 'session_db_id', None)
         if not session_db_id:
             session_db_id = db.get_session_db_id(session.session_id)
@@ -414,6 +440,31 @@ async def query(
         # Update session activity only
         db.update_session_activity(session.session_id)
         db.disconnect()
+        timing_log["db_save_complete"] = time.time()
+        
+        # Calculate timing breakdown
+        total_time = timing_log["db_save_complete"] - timing_log["request_start"]
+        auth_time = timing_log["auth_complete"] - timing_log["validation_complete"]
+        index_time = timing_log["index_load_complete"] - timing_log["auth_complete"]
+        token_check_time = timing_log["token_check_complete"] - timing_log["index_load_complete"]
+        session_time = timing_log["session_complete"] - timing_log["token_check_complete"]
+        context_time = timing_log["context_complete"] - timing_log["session_complete"]
+        rag_time = timing_log["rag_complete"] - timing_log["context_complete"]
+        token_count_time = timing_log["token_count_complete"] - timing_log["rag_complete"]
+        session_update_time = timing_log["session_update_complete"] - timing_log["token_count_complete"]
+        db_save_time = timing_log["db_save_complete"] - timing_log["session_update_complete"]
+        
+        logger.info(f"🕐 DETAILED TIMING BREAKDOWN for {x_user_name}:")
+        logger.info(f"   Total Time: {total_time:.3f}s")
+        logger.info(f"   ├── Auth: {auth_time:.3f}s")
+        logger.info(f"   ├── Index Load: {index_time:.3f}s")
+        logger.info(f"   ├── Token Check: {token_check_time:.3f}s")
+        logger.info(f"   ├── Session Mgmt: {session_time:.3f}s")
+        logger.info(f"   ├── Context Prep: {context_time:.3f}s")
+        logger.info(f"   ├── RAG Processing: {rag_time:.3f}s ⭐")
+        logger.info(f"   ├── Token Count: {token_count_time:.3f}s")
+        logger.info(f"   ├── Session Update: {session_update_time:.3f}s")
+        logger.info(f"   └── DB Save: {db_save_time:.3f}s")
         
         logger.info(f"Query processed: {total_tokens} tokens cached, {len(sources)} sources")
         
@@ -426,7 +477,6 @@ async def query(
         logger.error(f"Query processing error: {e}", exc_info=True)
         clear_client_context()
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.get("/documents")
 async def list_documents():

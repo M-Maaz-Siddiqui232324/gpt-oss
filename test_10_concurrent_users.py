@@ -32,8 +32,8 @@ SAMPLE_QUERIES = [
     "What is the company's leave policy?",
     "How do I apply for annual leave?",
     "How many sick days do I get per year?",
-    "What is the maternity leave policy?",
-    "Can I carry forward unused vacation days?",
+    "how do i change shift?",
+    "how to make an attendance request/",
     "How do I request emergency leave?",
     "What is the bereavement leave policy?",
     "How do I apply for unpaid leave?",
@@ -89,17 +89,17 @@ SAMPLE_QUERIES = [
     # Training and Development
     "What training programs are available?",
     "How do I enroll in professional development courses?",
-    "What is the tuition reimbursement policy?",
+    "What is the reimbursement policy?",
     "Are there mentorship programs?",
     "What certifications does the company support?",
-    "How do I attend conferences?",
+    "whats flowhcm?",
     
     # IT and Equipment
-    "How do I get IT support?",
+    "write me kpi for Account Executive",
     "What is the laptop policy?",
     "How do I reset my password?",
-    "What software can I install?",
-    "How do I access VPN?",
+    "create job description for Product owner",
+    "How do i change all employees shift?",
     "What is the BYOD policy?"
 ]
 
@@ -146,7 +146,7 @@ class ConcurrentUserTester:
             return False
     
     async def send_query(self, user_id: str, user_name: str, message: str, session_id: str = None) -> Dict[str, Any]:
-        """Send a query using the /query endpoint with authentication"""
+        """Send a query using the /query endpoint with authentication and detailed timing"""
         headers = {
             "Content-Type": "application/json",
             "X-Company-Pin": TEST_COMPANY_PIN,
@@ -165,19 +165,34 @@ class ConcurrentUserTester:
         if session_id:
             payload["session_id"] = session_id
         
-        start_time = time.time()
+        # Detailed client-side timing
+        timing_log = {}
+        overall_start = time.time()
+        timing_log["request_start"] = overall_start
         
         try:
+            # Connection establishment timing
+            connection_start = time.time()
+            
             async with self.session.post(
                 f"{self.base_url}/query",
                 headers=headers,
                 json=payload
             ) as response:
-                end_time = time.time()
-                response_time = end_time - start_time
+                timing_log["connection_established"] = time.time()
+                
+                # Response reading timing
+                response_read_start = time.time()
                 
                 if response.status == 200:
                     data = await response.json()
+                    timing_log["response_read_complete"] = time.time()
+                    
+                    # Calculate timing breakdown
+                    total_time = timing_log["response_read_complete"] - timing_log["request_start"]
+                    connection_time = timing_log["connection_established"] - timing_log["request_start"]
+                    response_read_time = timing_log["response_read_complete"] - timing_log["connection_established"]
+                    
                     return {
                         "success": True,
                         "user_id": user_id,
@@ -185,33 +200,52 @@ class ConcurrentUserTester:
                         "query": message,
                         "response": data.get("response", ""),
                         "session_id": data.get("session_id", ""),
-                        "response_time": response_time,
+                        "response_time": total_time,
+                        "timing_breakdown": {
+                            "total_time": total_time,
+                            "connection_time": connection_time,
+                            "server_processing_time": total_time - connection_time - response_read_time,
+                            "response_read_time": response_read_time
+                        },
                         "timestamp": datetime.now().isoformat(),
                         "status_code": response.status
                     }
                 else:
                     error_text = await response.text()
+                    timing_log["error_read_complete"] = time.time()
+                    total_time = timing_log["error_read_complete"] - timing_log["request_start"]
+                    
                     return {
                         "success": False,
                         "user_id": user_id,
                         "user_name": user_name,
                         "query": message,
                         "error": error_text,
-                        "response_time": response_time,
+                        "response_time": total_time,
+                        "timing_breakdown": {
+                            "total_time": total_time,
+                            "connection_time": timing_log.get("connection_established", time.time()) - timing_log["request_start"],
+                            "error_processing_time": total_time - (timing_log.get("connection_established", time.time()) - timing_log["request_start"])
+                        },
                         "timestamp": datetime.now().isoformat(),
                         "status_code": response.status
                     }
                     
         except Exception as e:
-            end_time = time.time()
-            response_time = end_time - start_time
+            error_time = time.time()
+            total_time = error_time - overall_start
+            
             return {
                 "success": False,
                 "user_id": user_id,
                 "user_name": user_name,
                 "query": message,
                 "error": str(e),
-                "response_time": response_time,
+                "response_time": total_time,
+                "timing_breakdown": {
+                    "total_time": total_time,
+                    "error_type": "connection_error"
+                },
                 "timestamp": datetime.now().isoformat(),
                 "status_code": None
             }
@@ -370,14 +404,23 @@ class ConcurrentUserTester:
         
         # Show sample successful responses
         if successful_results:
-            print("\n💬 SAMPLE SUCCESSFUL RESPONSES:")
+            print("\n💬 SAMPLE SUCCESSFUL RESPONSES WITH TIMING:")
             print("-" * 80)
             for result in successful_results[:5]:  # Show first 5 successful responses
                 print(f"👤 User: {result['user_name']} ({result['user_id']})")
                 print(f"❓ Query: {result['query']}")
                 print(f"🤖 Response: {result['response'][:150]}...")
                 print(f"🆔 Session ID: {result.get('session_id', 'N/A')}")
-                print(f"⏱️  Time: {result['response_time']:.2f}s")
+                print(f"⏱️  Total Time: {result['response_time']:.2f}s")
+                
+                # Show timing breakdown if available
+                if 'timing_breakdown' in result:
+                    timing = result['timing_breakdown']
+                    print(f"📊 Timing Breakdown:")
+                    print(f"   ├── Connection: {timing.get('connection_time', 0):.3f}s")
+                    print(f"   ├── Server Processing: {timing.get('server_processing_time', 0):.3f}s")
+                    print(f"   └── Response Reading: {timing.get('response_read_time', 0):.3f}s")
+                
                 print("-" * 40)
         
         # Show failed queries if any
