@@ -71,6 +71,11 @@ POSTGRES_SCHEMA = os.getenv("POSTGRES_SCHEMA")
 POSTGRES_USER = os.getenv("POSTGRES_USER")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 
+# PostgreSQL Connection Pool settings
+POSTGRES_POOL_MIN = int(os.getenv("POSTGRES_POOL_MIN", "1"))
+POSTGRES_POOL_MAX = int(os.getenv("POSTGRES_POOL_MAX", "10"))
+POSTGRES_POOL_TIMEOUT = int(os.getenv("POSTGRES_POOL_TIMEOUT", "30"))
+
 # Validate required environment variables
 if not all([POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_SCHEMA, POSTGRES_USER, POSTGRES_PASSWORD]):
     raise ValueError("Missing required PostgreSQL environment variables. Check your .env file.")

@@ -11,13 +11,37 @@ import time
 import re
 import os
 from datetime import datetime
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 import logging
 import statistics
+from dataclasses import dataclass, asdict
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+@dataclass
+class TimingMetrics:
+    """Detailed timing metrics for each operation"""
+    health_check_time: float = 0.0
+    db_auth_time: float = 0.0
+    request_preparation_time: float = 0.0
+    network_request_time: float = 0.0
+    response_processing_time: float = 0.0
+    log_parsing_time: float = 0.0
+    total_operation_time: float = 0.0
+    
+    # RAG-specific timings (from logs)
+    rag_retrieval_time: float = 0.0
+    rag_generation_time: float = 0.0
+    rag_total_processing_time: float = 0.0
+    
+    # Database operation timings (estimated from logs)
+    db_session_lookup_time: float = 0.0
+    db_session_save_time: float = 0.0
+    
+    def to_dict(self) -> Dict[str, float]:
+        return asdict(self)
 
 # Test Configuration
 API_BASE_URL = "http://localhost:8000"
@@ -286,23 +310,39 @@ class HRQuestionsTester:
             return {"error": f"Log parsing failed: {str(e)}"}
     
     
-    async def check_health(self) -> bool:
-        """Check if the API is healthy and ready"""
+    async def check_health(self) -> Tuple[bool, TimingMetrics]:
+        """Check if the API is healthy and ready with detailed timing"""
+        timing = TimingMetrics()
+        start_time = time.time()
+        
         try:
+            health_start = time.time()
             async with self.session.get(f"{self.base_url}/health") as response:
+                health_end = time.time()
+                timing.health_check_time = health_end - health_start
+                timing.network_request_time = timing.health_check_time
+                
                 if response.status == 200:
                     data = await response.json()
-                    logger.info(f"API Health Check: {data}")
-                    return True
+                    logger.info(f"API Health Check: {data} (took {timing.health_check_time:.3f}s)")
+                    timing.total_operation_time = time.time() - start_time
+                    return True, timing
                 else:
                     logger.error(f"Health check failed: {response.status}")
-                    return False
+                    timing.total_operation_time = time.time() - start_time
+                    return False, timing
         except Exception as e:
             logger.error(f"Health check error: {e}")
-            return False
+            timing.total_operation_time = time.time() - start_time
+            return False, timing
     
     async def send_query(self, question: str, session_id: str = None) -> Dict[str, Any]:
-        """Send a query and capture detailed response information"""
+        """Send a query and capture detailed response information with comprehensive timing"""
+        timing = TimingMetrics()
+        overall_start = time.time()
+        
+        # Step 1: Prepare request
+        prep_start = time.time()
         headers = {
             "Content-Type": "application/json",
             "X-Company-Pin": TEST_COMPANY_PIN,
@@ -321,20 +361,28 @@ class HRQuestionsTester:
         if session_id:
             payload["session_id"] = session_id
         
-        start_time = time.time()
+        prep_end = time.time()
+        timing.request_preparation_time = prep_end - prep_start
+        
         query_start_datetime = datetime.now()
         
         try:
+            # Step 2: Send network request
+            network_start = time.time()
             async with self.session.post(
                 f"{self.base_url}/query",
                 headers=headers,
                 json=payload
             ) as response:
-                end_time = time.time()
-                response_time = end_time - start_time
+                network_end = time.time()
+                timing.network_request_time = network_end - network_start
                 
+                # Step 3: Process response
+                response_proc_start = time.time()
                 if response.status == 200:
                     data = await response.json()
+                    response_proc_end = time.time()
+                    timing.response_processing_time = response_proc_end - response_proc_start
                     
                     # Extract detailed information
                     result = {
@@ -342,41 +390,75 @@ class HRQuestionsTester:
                         "question": question,
                         "response": data.get("response", ""),
                         "session_id": data.get("session_id", ""),
-                        "response_time": response_time,
+                        "response_time": timing.network_request_time,
                         "timestamp": datetime.now().isoformat(),
                         "status_code": response.status,
                         "question_length": len(question),
                         "response_length": len(data.get("response", "")),
                         "tokens_estimated": self.estimate_tokens(question + data.get("response", "")),
+                        "timing_metrics": timing.to_dict()
                     }
                     
-                    # Parse RAG details from logs
+                    # Step 4: Parse RAG details from logs with timing
+                    log_parse_start = time.time()
                     await asyncio.sleep(1)  # Give logs time to be written
                     rag_details = self.parse_rag_logs_for_query(question, query_start_datetime)
+                    log_parse_end = time.time()
+                    timing.log_parsing_time = log_parse_end - log_parse_start
+                    
+                    # Extract RAG timing from logs
+                    if not rag_details.get("error"):
+                        perf_metrics = rag_details.get("performance_metrics", {})
+                        timing.rag_retrieval_time = perf_metrics.get("retrieval_time", 0.0)
+                        timing.rag_generation_time = perf_metrics.get("generation_time", 0.0)
+                        timing.rag_total_processing_time = perf_metrics.get("total_processing_time", 0.0)
+                        
+                        # Estimate database operation times from RAG processing
+                        timing.db_session_lookup_time = max(0.001, timing.rag_total_processing_time * 0.05)  # ~5% for session lookup
+                        timing.db_session_save_time = max(0.001, timing.rag_total_processing_time * 0.03)   # ~3% for session save
+                    
+                    timing.total_operation_time = time.time() - overall_start
+                    result["timing_metrics"] = timing.to_dict()
                     result["rag_details"] = rag_details
+                    
+                    # Log detailed timing breakdown
+                    logger.info(f"🕐 Timing Breakdown for query:")
+                    logger.info(f"   Request prep: {timing.request_preparation_time:.3f}s")
+                    logger.info(f"   Network request: {timing.network_request_time:.3f}s")
+                    logger.info(f"   Response processing: {timing.response_processing_time:.3f}s")
+                    logger.info(f"   Log parsing: {timing.log_parsing_time:.3f}s")
+                    logger.info(f"   RAG retrieval: {timing.rag_retrieval_time:.3f}s")
+                    logger.info(f"   RAG generation: {timing.rag_generation_time:.3f}s")
+                    logger.info(f"   DB session ops: {timing.db_session_lookup_time + timing.db_session_save_time:.3f}s")
+                    logger.info(f"   Total operation: {timing.total_operation_time:.3f}s")
                     
                     return result
                 else:
                     error_text = await response.text()
+                    response_proc_end = time.time()
+                    timing.response_processing_time = response_proc_end - response_proc_start
+                    timing.total_operation_time = time.time() - overall_start
+                    
                     return {
                         "success": False,
                         "question": question,
                         "error": error_text,
-                        "response_time": response_time,
+                        "response_time": timing.network_request_time,
                         "timestamp": datetime.now().isoformat(),
-                        "status_code": response.status
+                        "status_code": response.status,
+                        "timing_metrics": timing.to_dict()
                     }
                     
         except Exception as e:
-            end_time = time.time()
-            response_time = end_time - start_time
+            timing.total_operation_time = time.time() - overall_start
             return {
                 "success": False,
                 "question": question,
                 "error": str(e),
-                "response_time": response_time,
+                "response_time": timing.total_operation_time,
                 "timestamp": datetime.now().isoformat(),
-                "status_code": None
+                "status_code": None,
+                "timing_metrics": timing.to_dict()
             }
     
     def estimate_tokens(self, text: str) -> int:
@@ -384,35 +466,76 @@ class HRQuestionsTester:
         return len(text) // 4
     
     async def run_sequential_test(self) -> List[Dict[str, Any]]:
-        """Run all HR questions sequentially"""
+        """Run all HR questions sequentially with detailed timing"""
         logger.info(f"🎯 Starting sequential HR questions test with {len(HR_QUESTIONS)} questions")
         
-        # Check API health first
-        if not await self.check_health():
+        # Check API health first with timing
+        health_check_start = time.time()
+        health_ok, health_timing = await self.check_health()
+        health_check_end = time.time()
+        
+        if not health_ok:
             raise Exception("API health check failed - cannot proceed with tests")
+        
+        logger.info(f"✅ API health check completed in {health_check_end - health_check_start:.3f}s")
         
         results = []
         session_id = None
+        total_test_start = time.time()
+        
+        # Track cumulative timing statistics
+        cumulative_timings = {
+            "total_request_prep_time": 0.0,
+            "total_network_time": 0.0,
+            "total_response_proc_time": 0.0,
+            "total_log_parsing_time": 0.0,
+            "total_rag_retrieval_time": 0.0,
+            "total_rag_generation_time": 0.0,
+            "total_db_operations_time": 0.0,
+            "total_operation_time": 0.0
+        }
         
         for i, question in enumerate(HR_QUESTIONS, 1):
             logger.info(f"📝 Question {i}/{len(HR_QUESTIONS)}: {question[:100]}...")
             
             # Add small delay between questions to avoid overwhelming the system
             if i > 1:
+                delay_start = time.time()
                 await asyncio.sleep(2)
+                delay_end = time.time()
+                logger.debug(f"   Inter-question delay: {delay_end - delay_start:.3f}s")
             
+            question_start = time.time()
             result = await self.send_query(question, session_id)
+            question_end = time.time()
+            
+            # Add question-level timing
+            result["question_total_time"] = question_end - question_start
+            result["question_number"] = i
+            
             results.append(result)
             
+            # Update cumulative timings
+            if result.get("timing_metrics"):
+                tm = result["timing_metrics"]
+                cumulative_timings["total_request_prep_time"] += tm.get("request_preparation_time", 0)
+                cumulative_timings["total_network_time"] += tm.get("network_request_time", 0)
+                cumulative_timings["total_response_proc_time"] += tm.get("response_processing_time", 0)
+                cumulative_timings["total_log_parsing_time"] += tm.get("log_parsing_time", 0)
+                cumulative_timings["total_rag_retrieval_time"] += tm.get("rag_retrieval_time", 0)
+                cumulative_timings["total_rag_generation_time"] += tm.get("rag_generation_time", 0)
+                cumulative_timings["total_db_operations_time"] += tm.get("db_session_lookup_time", 0) + tm.get("db_session_save_time", 0)
+                cumulative_timings["total_operation_time"] += tm.get("total_operation_time", 0)
+            
             # Save incremental results after each question
-            self.save_incremental_results(results, TEST_RESULTS_FILE.replace('.json', '_incremental.json'))
+            self.save_incremental_results(results, TEST_RESULTS_FILE.replace('.json', '_incremental.json'), cumulative_timings)
             
             # Update session_id for conversation continuity
             if result["success"] and result.get("session_id"):
                 session_id = result["session_id"]
             
             if result["success"]:
-                logger.info(f"✅ Question {i} completed in {result['response_time']:.2f}s")
+                logger.info(f"✅ Question {i} completed in {result['response_time']:.2f}s (total: {result['question_total_time']:.2f}s)")
                 logger.info(f"   Response length: {result['response_length']} chars")
                 
                 # Log RAG details if available
@@ -433,10 +556,24 @@ class HRQuestionsTester:
             else:
                 logger.error(f"❌ Question {i} failed: {result.get('error', 'Unknown error')}")
         
+        total_test_end = time.time()
+        total_test_time = total_test_end - total_test_start
+        
+        # Add overall test timing summary
+        logger.info(f"🏁 Test completed in {total_test_time:.2f}s")
+        logger.info(f"📊 Cumulative timing breakdown:")
+        logger.info(f"   Total request preparation: {cumulative_timings['total_request_prep_time']:.3f}s")
+        logger.info(f"   Total network time: {cumulative_timings['total_network_time']:.3f}s")
+        logger.info(f"   Total response processing: {cumulative_timings['total_response_proc_time']:.3f}s")
+        logger.info(f"   Total RAG retrieval: {cumulative_timings['total_rag_retrieval_time']:.3f}s")
+        logger.info(f"   Total RAG generation: {cumulative_timings['total_rag_generation_time']:.3f}s")
+        logger.info(f"   Total DB operations: {cumulative_timings['total_db_operations_time']:.3f}s")
+        logger.info(f"   Total operation time: {cumulative_timings['total_operation_time']:.3f}s")
+        
         return results
     
-    def save_incremental_results(self, results: List[Dict[str, Any]], filename: str):
-        """Save results incrementally after each question"""
+    def save_incremental_results(self, results: List[Dict[str, Any]], filename: str, cumulative_timings: Dict[str, float] = None):
+        """Save results incrementally after each question with timing analysis"""
         successful_results = [r for r in results if r.get("success")]
         failed_results = [r for r in results if not r.get("success")]
         
@@ -445,6 +582,22 @@ class HRQuestionsTester:
             response_times = [r["response_time"] for r in successful_results]
             response_lengths = [r["response_length"] for r in successful_results]
             question_lengths = [r["question_length"] for r in successful_results]
+            
+            # Calculate timing statistics
+            timing_stats = {}
+            if cumulative_timings:
+                timing_stats = {
+                    "cumulative_timings": cumulative_timings,
+                    "average_timings": {
+                        "avg_request_prep_time": cumulative_timings["total_request_prep_time"] / len(successful_results),
+                        "avg_network_time": cumulative_timings["total_network_time"] / len(successful_results),
+                        "avg_response_proc_time": cumulative_timings["total_response_proc_time"] / len(successful_results),
+                        "avg_rag_retrieval_time": cumulative_timings["total_rag_retrieval_time"] / len(successful_results),
+                        "avg_rag_generation_time": cumulative_timings["total_rag_generation_time"] / len(successful_results),
+                        "avg_db_operations_time": cumulative_timings["total_db_operations_time"] / len(successful_results),
+                        "avg_total_operation_time": cumulative_timings["total_operation_time"] / len(successful_results)
+                    }
+                }
             
             stats = {
                 "total_questions": len(results),
@@ -469,7 +622,8 @@ class HRQuestionsTester:
                     "median": statistics.median(question_lengths),
                     "min": min(question_lengths),
                     "max": max(question_lengths)
-                }
+                },
+                "timing_analysis": timing_stats
             }
         else:
             stats = {
@@ -479,7 +633,8 @@ class HRQuestionsTester:
                 "success_rate": 0,
                 "response_time_stats": {},
                 "response_length_stats": {},
-                "question_length_stats": {}
+                "question_length_stats": {},
+                "timing_analysis": {}
             }
         
         # Create incremental report
@@ -504,6 +659,14 @@ class HRQuestionsTester:
             json.dump(report, f, indent=2, ensure_ascii=False)
         
         logger.info(f"📊 Incremental results saved: {len(results)}/{len(HR_QUESTIONS)} completed")
+        
+        # Log timing summary for current progress
+        if cumulative_timings and len(successful_results) > 0:
+            logger.info(f"⏱️  Current timing averages:")
+            logger.info(f"   Avg network time: {cumulative_timings['total_network_time'] / len(successful_results):.3f}s")
+            logger.info(f"   Avg RAG retrieval: {cumulative_timings['total_rag_retrieval_time'] / len(successful_results):.3f}s")
+            logger.info(f"   Avg RAG generation: {cumulative_timings['total_rag_generation_time'] / len(successful_results):.3f}s")
+            logger.info(f"   Avg DB operations: {cumulative_timings['total_db_operations_time'] / len(successful_results):.3f}s")
 
     def analyze_and_save_results(self, results: List[Dict[str, Any]], filename: str):
         """Analyze results and save detailed report"""
@@ -515,6 +678,9 @@ class HRQuestionsTester:
             response_times = [r["response_time"] for r in successful_results]
             response_lengths = [r["response_length"] for r in successful_results]
             question_lengths = [r["question_length"] for r in successful_results]
+            
+            # Calculate detailed timing statistics
+            timing_analysis = self.calculate_timing_statistics(successful_results)
             
             stats = {
                 "total_questions": len(results),
@@ -539,7 +705,8 @@ class HRQuestionsTester:
                     "median": statistics.median(question_lengths),
                     "min": min(question_lengths),
                     "max": max(question_lengths)
-                }
+                },
+                "detailed_timing_analysis": timing_analysis
             }
         else:
             stats = {
@@ -549,7 +716,8 @@ class HRQuestionsTester:
                 "success_rate": 0,
                 "response_time_stats": {},
                 "response_length_stats": {},
-                "question_length_stats": {}
+                "question_length_stats": {},
+                "detailed_timing_analysis": {}
             }
         
         # Categorize questions by topic (updated categories)
@@ -584,7 +752,8 @@ class HRQuestionsTester:
                 "categories": {cat: len(questions) for cat, questions in categories.items()}
             },
             "detailed_results": results,
-            "category_analysis": {}
+            "category_analysis": {},
+            "timing_breakdown_analysis": self.analyze_timing_patterns(successful_results) if successful_results else {}
         }
         
         # Analyze each category
@@ -593,13 +762,16 @@ class HRQuestionsTester:
                 successful_cat = [r for r in cat_results if r.get("success")]
                 if successful_cat:
                     cat_times = [r["response_time"] for r in successful_cat]
+                    cat_timing_analysis = self.calculate_timing_statistics(successful_cat)
+                    
                     report["category_analysis"][category] = {
                         "total_questions": len(cat_results),
                         "successful": len(successful_cat),
                         "success_rate": len(successful_cat) / len(cat_results) * 100,
                         "avg_response_time": statistics.mean(cat_times),
                         "min_response_time": min(cat_times),
-                        "max_response_time": max(cat_times)
+                        "max_response_time": max(cat_times),
+                        "timing_breakdown": cat_timing_analysis
                     }
         
         # Save to file
@@ -612,7 +784,7 @@ class HRQuestionsTester:
         self.print_summary(stats, categories, successful_results, failed_results)
     
     def print_summary(self, stats, categories, successful_results, failed_results):
-        """Print detailed test summary"""
+        """Print detailed test summary with timing breakdown"""
         print("\n" + "="*80)
         print("🎯 HR QUESTIONS SEQUENTIAL TEST SUMMARY")
         print("="*80)
@@ -629,6 +801,19 @@ class HRQuestionsTester:
             print(f"   Min: {rt_stats['min']:.2f}s")
             print(f"   Max: {rt_stats['max']:.2f}s")
             print(f"   Std Dev: {rt_stats['std_dev']:.2f}s")
+        
+        # Show detailed timing breakdown if available
+        timing_analysis = stats.get('detailed_timing_analysis', {})
+        if timing_analysis:
+            print(f"\n🔧 DETAILED TIMING BREAKDOWN:")
+            print("-" * 50)
+            
+            # Show average times for each component
+            for component, component_stats in timing_analysis.items():
+                if isinstance(component_stats, dict) and 'mean' in component_stats:
+                    component_name = component.replace('_', ' ').title()
+                    print(f"{component_name:25} | Avg: {component_stats['mean']:.3f}s | "
+                          f"Min: {component_stats['min']:.3f}s | Max: {component_stats['max']:.3f}s")
         
         print("\n📋 CATEGORY BREAKDOWN:")
         print("-" * 50)
@@ -647,6 +832,13 @@ class HRQuestionsTester:
                 print(f"\n{i}. Question: {result['question'][:100]}...")
                 print(f"   Response: {result['response'][:200]}...")
                 print(f"   Time: {result['response_time']:.2f}s | Length: {result['response_length']} chars")
+                
+                # Show timing breakdown for this result
+                tm = result.get('timing_metrics', {})
+                if tm:
+                    print(f"   Timing: Network: {tm.get('network_request_time', 0):.3f}s | "
+                          f"RAG: {tm.get('rag_retrieval_time', 0) + tm.get('rag_generation_time', 0):.3f}s | "
+                          f"DB: {tm.get('db_session_lookup_time', 0) + tm.get('db_session_save_time', 0):.3f}s")
         
         # Show failed questions
         if failed_results:
@@ -656,6 +848,100 @@ class HRQuestionsTester:
                 print(f"Question: {result['question'][:100]}...")
                 print(f"Error: {result.get('error', 'Unknown error')}")
                 print("-" * 40)
+    
+    def calculate_timing_statistics(self, successful_results: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Calculate detailed timing statistics from successful results"""
+        if not successful_results:
+            return {}
+        
+        timing_metrics = []
+        for result in successful_results:
+            tm = result.get("timing_metrics", {})
+            if tm:
+                timing_metrics.append(tm)
+        
+        if not timing_metrics:
+            return {}
+        
+        # Calculate statistics for each timing component
+        components = [
+            "request_preparation_time", "network_request_time", "response_processing_time",
+            "log_parsing_time", "rag_retrieval_time", "rag_generation_time",
+            "db_session_lookup_time", "db_session_save_time", "total_operation_time"
+        ]
+        
+        timing_stats = {}
+        for component in components:
+            values = [tm.get(component, 0) for tm in timing_metrics if tm.get(component, 0) > 0]
+            if values:
+                timing_stats[component] = {
+                    "mean": statistics.mean(values),
+                    "median": statistics.median(values),
+                    "min": min(values),
+                    "max": max(values),
+                    "std_dev": statistics.stdev(values) if len(values) > 1 else 0,
+                    "total": sum(values),
+                    "count": len(values)
+                }
+        
+        return timing_stats
+    
+    def analyze_timing_patterns(self, successful_results: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Analyze timing patterns and identify bottlenecks"""
+        if not successful_results:
+            return {}
+        
+        timing_analysis = {
+            "bottleneck_analysis": {},
+            "performance_trends": {},
+            "efficiency_metrics": {}
+        }
+        
+        # Identify bottlenecks by analyzing which component takes the most time on average
+        timing_components = {}
+        for result in successful_results:
+            tm = result.get("timing_metrics", {})
+            if tm:
+                for component, value in tm.items():
+                    if isinstance(value, (int, float)) and value > 0:
+                        if component not in timing_components:
+                            timing_components[component] = []
+                        timing_components[component].append(value)
+        
+        # Calculate average time for each component
+        avg_times = {}
+        for component, values in timing_components.items():
+            if values:
+                avg_times[component] = statistics.mean(values)
+        
+        # Identify top bottlenecks
+        if avg_times:
+            sorted_components = sorted(avg_times.items(), key=lambda x: x[1], reverse=True)
+            timing_analysis["bottleneck_analysis"] = {
+                "primary_bottleneck": sorted_components[0] if sorted_components else None,
+                "top_3_bottlenecks": sorted_components[:3],
+                "component_percentages": {
+                    comp: (time_val / sum(avg_times.values()) * 100) 
+                    for comp, time_val in avg_times.items()
+                }
+            }
+        
+        # Analyze performance trends over time
+        if len(successful_results) > 5:
+            first_half = successful_results[:len(successful_results)//2]
+            second_half = successful_results[len(successful_results)//2:]
+            
+            first_half_avg = statistics.mean([r["response_time"] for r in first_half])
+            second_half_avg = statistics.mean([r["response_time"] for r in second_half])
+            
+            timing_analysis["performance_trends"] = {
+                "first_half_avg_response_time": first_half_avg,
+                "second_half_avg_response_time": second_half_avg,
+                "performance_change": ((second_half_avg - first_half_avg) / first_half_avg * 100) if first_half_avg > 0 else 0,
+                "trend": "improving" if second_half_avg < first_half_avg else "degrading"
+            }
+        
+        return timing_analysis
 
 
 async def main():

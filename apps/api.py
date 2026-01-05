@@ -22,7 +22,8 @@ from config import (
     SECRET_KEY, SESSION_MAX_AGE, MAX_SESSIONS, API_HOST, API_PORT,
     CLEANUP_INTERVAL, POSTGRES_CONNECTION_STRING, LOG_LEVEL,
     DEFAULT_MAX_TOKENS, DEFAULT_TEMPERATURE, DEFAULT_TOP_P,
-    RECENT_CONTEXT_EXCHANGES, DOCS_FOLDER, SEMANTIC_SIMILARITY_THRESHOLD
+    RECENT_CONTEXT_EXCHANGES, DOCS_FOLDER, SEMANTIC_SIMILARITY_THRESHOLD,
+    POSTGRES_POOL_MIN, POSTGRES_POOL_MAX, POSTGRES_POOL_TIMEOUT
 )
 from rag_system import RAGSystem
 from fastapi_session_manager import FastAPISessionManager, Message, Session
@@ -289,7 +290,7 @@ async def query(
     try:
         # Authenticate client against PostgreSQL with connection pooling
         auth_start = time.time()
-        db = PostgresManager(POSTGRES_CONNECTION_STRING, POSTGRES_POOL_MIN, POSTGRES_POOL_MAX)
+        db = PostgresManager(POSTGRES_CONNECTION_STRING)
         
         if not db.connect():
             logger.error("Failed to connect to database")
