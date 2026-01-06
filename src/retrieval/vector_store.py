@@ -40,6 +40,7 @@ class VectorStore:
         
         if VECTOR_SEARCH_AVAILABLE:
             self.encoder = SentenceTransformer(embedding_model, device='cpu')
+            logger.info(f"SentenceTransformer loaded on device: {self.encoder.device}")
         else:
             logger.error("Vector search dependencies not available")
     
