@@ -24,7 +24,7 @@ class SemanticChunker:
     
     def __init__(self, chunk_size: int = None, overlap: int = None, similarity_threshold: float = 0.7):
         self.similarity_threshold = similarity_threshold
-        self.encoder = SentenceTransformer('BAAI/bge-base-en-v1.5')  
+        self.encoder = SentenceTransformer('BAAI/bge-base-en-v1.5', device='cpu')  
     
     def create_chunks(self, documents: List[dict]) -> List[DocumentChunk]:
         """Create semantic chunks from documents"""
