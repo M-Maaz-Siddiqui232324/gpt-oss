@@ -7,7 +7,7 @@ load_dotenv()
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Model settings
-MODEL_NAME = "qwen3:8b-v100"  
+MODEL_NAME = "qwen3:8b"  
 OLLAMA_BASE_URL = "http://localhost:11434" 
 EMBEDDING_MODEL = "BAAI/bge-base-en-v1.5"
 
