@@ -39,7 +39,7 @@ class VectorStore:
         self.current_client = None
         
         if VECTOR_SEARCH_AVAILABLE:
-            self.encoder = SentenceTransformer(embedding_model)
+            self.encoder = SentenceTransformer(embedding_model, device='cpu')
         else:
             logger.error("Vector search dependencies not available")
     
