@@ -33,13 +33,13 @@ def start_v100_ollama():
     
     # Tesla V100 maximum performance settings
     v100_env = {
-        "OLLAMA_NUM_PARALLEL": "20",          # V100 can handle 20+ parallel requests
+        "OLLAMA_NUM_PARALLEL": "12",          # Reduced for stability
         "OLLAMA_MAX_LOADED_MODELS": "1",      # Single model for max performance
         "OLLAMA_FLASH_ATTENTION": "1",        # Enable flash attention
         "OLLAMA_GPU_OVERHEAD": "0",           # Zero GPU overhead
         "CUDA_VISIBLE_DEVICES": "0",          # Tesla V100
-        "OLLAMA_MAX_QUEUE": "2048",           # Large queue for V100
-        "OLLAMA_BATCH_SIZE": "2048",          # Maximum batch size
+        "OLLAMA_MAX_QUEUE": "1024",           # Reduced queue size
+        "OLLAMA_BATCH_SIZE": "512",           # Reduced batch size
         "OLLAMA_CONTEXT_SIZE": "8192",        # Large context window
         "CUDA_LAUNCH_BLOCKING": "0",          # Async CUDA
         "CUDA_CACHE_DISABLE": "0",            # Enable CUDA cache
@@ -87,17 +87,16 @@ def ensure_v100_model():
             # Create V100 optimized modelfile
             modelfile = """FROM qwen3:8b
 
-# Tesla V100 Maximum Performance Settings
-PARAMETER num_ctx 8192
-PARAMETER num_batch 2048
+# Tesla V100 Performance Settings (Conservative)
+PARAMETER num_ctx 4096
+PARAMETER num_batch 512
 PARAMETER num_gpu 99
-PARAMETER num_thread 20
-PARAMETER repeat_penalty 1.05
+PARAMETER num_thread 16
+PARAMETER repeat_penalty 1.1
 PARAMETER temperature 0.1
 PARAMETER top_p 0.7
 PARAMETER top_k 40
-PARAMETER num_predict 300
-PARAMETER stop "<|im_end|>"
+PARAMETER num_predict 400
 """
             
             with open("Modelfile.v100", "w") as f:
